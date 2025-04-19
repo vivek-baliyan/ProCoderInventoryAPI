@@ -4,7 +4,7 @@ namespace PCI.Application.Services.Interfaces;
 
 public interface ITokenService
 {
-    string GenerateAccessToken(LoginResponseDto loginResponseDto);
+    string GenerateAccessToken(UserDto userDto);
     string GenerateRefreshToken();
     bool GetPrincipalFromExpiredToken(string token);
 }

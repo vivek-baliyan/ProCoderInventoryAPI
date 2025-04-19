@@ -73,11 +73,25 @@ public class AccountController(
                 return StatusCode(StatusCodes.Status400BadRequest, logintResult);
             }
 
+            var userProfileResult = await _accountService.GetUserProfileByUserId(logintResult.ResultData.Id);
+
+            if (!userProfileResult.Succeeded)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, userProfileResult);
+            }
+
             var accessToken = _tokenService.GenerateAccessToken(logintResult.ResultData);
             var refreshToken = _tokenService.GenerateRefreshToken();
 
-            var loginResponse = logintResult.ResultData with
+            var loginResponse = new LoginResponseDto()
             {
+                UserId = logintResult.ResultData.Id,
+                UserName = logintResult.ResultData.UserName,
+                Email = logintResult.ResultData.Email,
+                FirstName = userProfileResult.ResultData.FirstName,
+                LastName = userProfileResult.ResultData.LastName,
+                ProfileImageUrl = userProfileResult.ResultData.ProfileImageUrl,
+                UserRoles = logintResult.ResultData.Roles,
                 AccessToken = accessToken,
                 RefreshToken = refreshToken
             };

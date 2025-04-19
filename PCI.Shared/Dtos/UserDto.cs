@@ -30,7 +30,7 @@ public record UserDto
 
     public DateTime? LastPasswordChange { get; init; }
 
-    public List<string> UserRoles { get; init; } = [];
+    public List<string> Roles { get; init; } = [];
 
     //Sessions: Count = 0
 }

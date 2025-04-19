@@ -14,5 +14,5 @@ public interface IIdentityService
     Task<ServiceResult<IdentityResult>> AssignRoleToUser(string userEmail, string roleName);
     Task<ServiceResult<UserDto>> GetUserById(string userId);
     Task<ServiceResult<UserDto>> GetUserByEmail(string userEmail);
-    Task<ServiceResult<LoginResponseDto>> UserLogin(UserLoginDto loginUserDto);
+    Task<ServiceResult<UserDto>> UserLogin(UserLoginDto loginUserDto);
 }

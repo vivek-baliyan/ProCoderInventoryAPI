@@ -112,28 +112,27 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
         return ServiceResult<UserDto>.Success(user.Adapt<UserDto>());
     }
 
-    public async Task<ServiceResult<LoginResponseDto>> UserLogin(UserLoginDto loginUserDto)
+    public async Task<ServiceResult<UserDto>> UserLogin(UserLoginDto loginUserDto)
     {
         var user = await _unitOfWork.IdentityRepository.FindUserByEmailAsync(loginUserDto.Email);
 
         if (user == null)
         {
-            return ServiceResult<LoginResponseDto>.Error(new Problem("InvalidCredentials", "Invalid email or password."));
+            return ServiceResult<UserDto>.Error(new Problem("InvalidCredentials", "Invalid email or password."));
         }
 
         var result = await _unitOfWork.IdentityRepository.ValidateUserPasswordAsync(user, loginUserDto.Password);
 
         if (!result)
         {
-            return ServiceResult<LoginResponseDto>.Error(new Problem("InvalidCredentials", "Invalid email or password."));
+            return ServiceResult<UserDto>.Error(new Problem("InvalidCredentials", "Invalid email or password."));
         }
 
-        var loginResponse = user.Adapt<LoginResponseDto>();
-        loginResponse = loginResponse with
+        var userDto = user.Adapt<UserDto>() with
         {
-            UserRoles = await _unitOfWork.IdentityRepository.GetUserRolesAsync(user)
+            Roles = await _unitOfWork.IdentityRepository.GetUserRolesAsync(user)
         };
 
-        return ServiceResult<LoginResponseDto>.Success(loginResponse);
+        return ServiceResult<UserDto>.Success(userDto);
     }
 }

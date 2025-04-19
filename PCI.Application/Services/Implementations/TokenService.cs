@@ -14,16 +14,16 @@ public class TokenService(IConfiguration configuration) : ITokenService
     private readonly SymmetricSecurityKey _key = new(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
     private readonly IConfiguration _configuration = configuration;
 
-    public string GenerateAccessToken(LoginResponseDto loginResponseDto)
+    public string GenerateAccessToken(UserDto userDto)
     {
         var claims = new List<Claim>
         {
-            new(JwtRegisteredClaimNames.NameId, loginResponseDto.UserId),
-            new(JwtRegisteredClaimNames.Name, loginResponseDto.UserName),
-            new(JwtRegisteredClaimNames.Email, loginResponseDto.Email)
+            new(JwtRegisteredClaimNames.NameId, userDto.Id),
+            new(JwtRegisteredClaimNames.Name, userDto.UserName),
+            new(JwtRegisteredClaimNames.Email, userDto.Email)
         };
 
-        claims.AddRange(loginResponseDto.UserRoles.Select(role => new Claim(ClaimTypes.Role, role)));
+        claims.AddRange(userDto.Roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var signingCredentials = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
         var expirationMinutes = int.Parse(_configuration["Jwt:TokenExpirationMinutes"]);
