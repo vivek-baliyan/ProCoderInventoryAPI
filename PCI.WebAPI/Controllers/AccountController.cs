@@ -66,17 +66,17 @@ public class AccountController(
     {
         try
         {
-            var result = await _identityService.UserLogin(loginUserDto);
+            var logintResult = await _identityService.UserLogin(loginUserDto);
 
-            if (!result.Succeeded)
+            if (!logintResult.Succeeded)
             {
-                return StatusCode(StatusCodes.Status400BadRequest, result);
+                return StatusCode(StatusCodes.Status400BadRequest, logintResult);
             }
 
-            var accessToken = _tokenService.GenerateAccessToken(result.ResultData);
+            var accessToken = _tokenService.GenerateAccessToken(logintResult.ResultData);
             var refreshToken = _tokenService.GenerateRefreshToken();
 
-            var loginResponse = result.ResultData with
+            var loginResponse = logintResult.ResultData with
             {
                 AccessToken = accessToken,
                 RefreshToken = refreshToken

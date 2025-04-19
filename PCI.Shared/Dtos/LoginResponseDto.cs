@@ -10,5 +10,5 @@ public record LoginResponseDto
     public string ProfileImageUrl { get; init; }
     public string AccessToken { get; init; }
     public string RefreshToken { get; init; }
-    public List<UserRoleDto> UserRoles { get; init; } = [];
+    public List<string> UserRoles { get; init; } = [];
 }

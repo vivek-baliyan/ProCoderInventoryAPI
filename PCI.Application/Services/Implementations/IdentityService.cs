@@ -128,7 +128,11 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
             return ServiceResult<LoginResponseDto>.Error(new Problem("InvalidCredentials", "Invalid email or password."));
         }
 
-        var loginResponse = result.Adapt<LoginResponseDto>();
+        var loginResponse = user.Adapt<LoginResponseDto>();
+        loginResponse = loginResponse with
+        {
+            UserRoles = await _unitOfWork.IdentityRepository.GetUserRolesAsync(user)
+        };
 
         return ServiceResult<LoginResponseDto>.Success(loginResponse);
     }

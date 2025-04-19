@@ -23,7 +23,7 @@ public class TokenService(IConfiguration configuration) : ITokenService
             new(JwtRegisteredClaimNames.Email, loginResponseDto.Email)
         };
 
-        claims.AddRange(loginResponseDto.UserRoles.Select(role => new Claim(ClaimTypes.Role, role.RoleName)));
+        claims.AddRange(loginResponseDto.UserRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var signingCredentials = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
         var expirationMinutes = int.Parse(_configuration["Jwt:TokenExpirationMinutes"]);

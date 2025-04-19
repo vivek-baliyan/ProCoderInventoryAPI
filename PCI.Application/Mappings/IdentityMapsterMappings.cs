@@ -10,11 +10,7 @@ public static class IdentityMapsterMappings
     {
         var config = TypeAdapterConfig.GlobalSettings;
 
-        config.NewConfig<AppUser, UserDto>()
-            .Map(dest => dest.UserRoles, src => src.UserRoles.Adapt<List<UserRoleDto>>());
-
         config.NewConfig<AppUser, LoginResponseDto>()
-            .Map(dest => dest.UserId, src => src.Id)
-            .Map(dest => dest.UserRoles, src => src.UserRoles.Adapt<List<UserRoleDto>>());
+            .Map(dest => dest.UserId, src => src.Id);
     }
 }
