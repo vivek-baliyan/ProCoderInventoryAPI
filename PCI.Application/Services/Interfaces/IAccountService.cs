@@ -6,5 +6,6 @@ namespace PCI.Application.Services.Interfaces;
 
 public interface IAccountService
 {
-    Task<ServiceResult<UserProfile>> CreateUserProfile(string userId, RegisterUserDto registerUserDto);
+    Task<ServiceResult<AppUserProfile>> CreateUserProfile(string userId, RegisterUserDto registerUserDto);
+    Task<ServiceResult<AppUserProfile>> GetUserProfileByUserId(string userId);
 }

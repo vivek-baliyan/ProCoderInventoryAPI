@@ -10,6 +10,6 @@ public class AppUser : IdentityUser
     public DateTime? LastPasswordChange { get; set; }
     public bool IsDeleted { get; set; }
 
-    public virtual ICollection<IdentityUserRole<string>> UserRoles { get; set; } = [];
+    public virtual ICollection<AppUserRole> UserRoles { get; set; } = [];
     public virtual ICollection<SessionManagement> Sessions { get; set; } = [];
 }

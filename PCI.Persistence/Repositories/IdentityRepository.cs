@@ -5,7 +5,8 @@ using PCI.Domain.Models;
 
 namespace PCI.Persistence.Repositories;
 
-public class IdentityRepository(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager) : IIdentityRepository
+public class IdentityRepository(UserManager<AppUser> userManager, RoleManager<AppRole> roleManager)
+    : IIdentityRepository
 {
     private readonly UserManager<AppUser> _userManager = userManager;
     private readonly RoleManager<AppRole> _roleManager = roleManager;
@@ -48,6 +49,11 @@ public class IdentityRepository(UserManager<AppUser> userManager, RoleManager<Ap
     public async Task<AppUser> FindUserByEmailAsync(string email)
     {
         return await _userManager.FindByEmailAsync(email);
+    }
+
+    public async Task<bool> ValidateUserPasswordAsync(AppUser user, string password)
+    {
+        return await _userManager.CheckPasswordAsync(user, password);
     }
     #endregion
 }

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PCI.Domain.Models;
 
-public class UserProfile : BaseEntity
+public class AppUserProfile : BaseEntity
 {
     [Key]
     public string UserId { get; set; } // Foreign key to Identity's AspNetUsers table

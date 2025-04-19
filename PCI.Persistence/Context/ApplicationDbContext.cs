@@ -7,7 +7,7 @@ namespace PCI.Persistence.Context;
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IUserAccessorService userAccessor) : DbContext(options)
 {
 
-    public DbSet<UserProfile> UserProfiles { get; init; }
+    public DbSet<AppUserProfile> UserProfiles { get; init; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -17,7 +17,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.HasDefaultSchema("APP");
 
         // Configure UserProfile entity
-        modelBuilder.Entity<UserProfile>(entity =>
+        modelBuilder.Entity<AppUserProfile>(entity =>
         {
             entity.HasKey(e => e.UserId);
 

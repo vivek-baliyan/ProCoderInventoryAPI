@@ -30,9 +30,7 @@ public record ServiceResult<TResult>
         return new() { ResultData = result };
     }
 
-    public bool Failed => Problems.Count > 0;
-
-    public bool Succeeded => !Failed;
+    public bool Succeeded => Problems.Count == 0;
 }
 
 public record Problem(string Code, string Description);

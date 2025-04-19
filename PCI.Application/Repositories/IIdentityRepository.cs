@@ -16,5 +16,7 @@ public interface IIdentityRepository
     Task<IdentityResult> AddUserToRoleAsync(AppUser user, string roleName);
     Task<AppUser> FindUserByIdAsync(string userId);
     Task<AppUser> FindUserByEmailAsync(string email);
+    Task<bool> ValidateUserPasswordAsync(AppUser user, string password);
+
     #endregion
 }

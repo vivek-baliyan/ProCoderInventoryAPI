@@ -7,7 +7,7 @@ namespace PCI.WebAPI.Controllers;
 public class ApplicationRoleController(IIdentityService identityService) : BaseController
 {
     [HttpPost("createRole")]
-    public async Task<IActionResult> CreateRole(AddAppRoleDto role)
+    public async Task<IActionResult> CreateRole(CreateRoleDto role)
     {
         var result = await identityService.CreateRole(role);
 

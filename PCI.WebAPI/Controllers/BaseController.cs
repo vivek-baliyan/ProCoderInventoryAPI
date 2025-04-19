@@ -4,6 +4,7 @@ using PCI.Shared.Common;
 namespace PCI.WebAPI.Controllers;
 
 [ApiController]
+//[Authorize]
 [Route("api/[controller]")]
 public class BaseController : ControllerBase
 {

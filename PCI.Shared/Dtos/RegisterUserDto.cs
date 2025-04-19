@@ -1,6 +1,6 @@
 ﻿namespace PCI.Shared.Dtos;
 
-public class RegisterUserDto
+public record RegisterUserDto
 {
     public string Email { get; set; }
     public string Password { get; set; }

@@ -1,8 +1,8 @@
 ﻿namespace PCI.Shared.Dtos;
 
-public record AppUserDto
+public record UserProfileDto
 {
-    public string Id { get; init; }
+    public string UserId { get; set; }
 
     public string FirstName { get; init; }
 
@@ -29,12 +29,4 @@ public record AppUserDto
     public string ContactPerson { get; init; }
 
     public string WebsiteUrl { get; init; }
-
-    public DateTime? LastLogin { get; init; }
-
-    public string LastLoginDevice { get; init; }
-
-    public DateTime? LastPasswordChange { get; init; }
-
-    public bool IsDeleted { get; init; }
 }

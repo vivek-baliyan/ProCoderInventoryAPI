@@ -1,6 +1,6 @@
 ﻿namespace PCI.Shared.Dtos;
 
-public record AppRoleDto
+public record RoleDto
 {
     public string Id { get; init; }
     public string Name { get; init; }
