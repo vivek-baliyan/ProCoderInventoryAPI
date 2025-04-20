@@ -11,7 +11,7 @@ using PCI.Persistence.Context;
 namespace PCI.Persistence.Migrations.Identity
 {
     [DbContext(typeof(AppIdentityDbContext))]
-    [Migration("20250416060248_InitialCreate")]
+    [Migration("20250420155155_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -30,17 +30,12 @@ namespace PCI.Persistence.Migrations.Identity
                     b.Property<string>("RoleId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Discriminator")
                         .IsRequired()
                         .HasMaxLength(34)
                         .HasColumnType("TEXT");
 
                     b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("AppUserId");
 
                     b.HasIndex("RoleId");
 
@@ -214,18 +209,19 @@ namespace PCI.Persistence.Migrations.Identity
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUserRole<string>");
 
+                    b.Property<string>("AppUserId")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
+
+                    b.HasIndex("AppUserId");
 
                     b.HasDiscriminator().HasValue("AppUserRole");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
-                    b.HasOne("PCI.Domain.Models.AppUser", null)
-                        .WithMany("UserRoles")
-                        .HasForeignKey("AppUserId");
-
                     b.HasOne("PCI.Domain.Models.AppRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
@@ -247,6 +243,13 @@ namespace PCI.Persistence.Migrations.Identity
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.AppUserRole", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.AppUser", null)
+                        .WithMany("UserRoles")
+                        .HasForeignKey("AppUserId");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.AppUser", b =>

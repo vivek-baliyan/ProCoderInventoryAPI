@@ -1,11 +1,9 @@
 using PCI.Domain.Common;
-using System.ComponentModel.DataAnnotations;
 
 namespace PCI.Domain.Models;
 
 public class AppUserProfile : BaseEntity
 {
-    [Key]
     public string UserId { get; set; } // Foreign key to Identity's AspNetUsers table
 
     public string FirstName { get; set; }

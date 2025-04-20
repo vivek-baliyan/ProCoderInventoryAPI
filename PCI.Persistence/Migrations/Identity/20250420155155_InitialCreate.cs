@@ -99,9 +99,9 @@ namespace PCI.Persistence.Migrations.Identity
                 {
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
                     RoleId = table.Column<string>(type: "TEXT", nullable: false),
-                    AppUserId = table.Column<string>(type: "TEXT", nullable: true),
                     Discriminator = table.Column<string>(type: "TEXT", maxLength: 34, nullable: false),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: true)
+                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: true),
+                    AppUserId = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {

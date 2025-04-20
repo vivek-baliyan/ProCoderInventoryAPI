@@ -9,6 +9,7 @@ public class IdentityRepository(UserManager<AppUser> userManager, RoleManager<Ap
 {
     private readonly UserManager<AppUser> _userManager = userManager;
     private readonly RoleManager<AppRole> _roleManager = roleManager;
+
     #region RoleManager
 
     public async Task<IdentityResult> CreateRoleAsync(AppRole role)
@@ -59,5 +60,11 @@ public class IdentityRepository(UserManager<AppUser> userManager, RoleManager<Ap
     {
         return [.. await _userManager.GetRolesAsync(user)];
     }
+
+    public async Task<IdentityResult> UpdateUserAsync(AppUser user)
+    {
+        return await _userManager.UpdateAsync(user);
+    }
+
     #endregion
 }

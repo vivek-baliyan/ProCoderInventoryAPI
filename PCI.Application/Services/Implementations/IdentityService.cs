@@ -135,4 +135,28 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
 
         return ServiceResult<UserDto>.Success(userDto);
     }
+
+    public async Task<ServiceResult<IdentityResult>> UpdateUser(UpdateUserDto updateUserDto)
+    {
+        var user = await _unitOfWork.IdentityRepository.FindUserByIdAsync(updateUserDto.UserId);
+
+        if (user == null)
+        {
+            return ServiceResult<IdentityResult>.Error(new Problem("UserNotFound", $"User with ID {updateUserDto.UserId} not found."));
+        }
+
+        user.PhoneNumber = updateUserDto.PhoneNumber;
+        user.Email = updateUserDto.Email;
+        user.UserName = updateUserDto.Email;
+
+        var result = await _unitOfWork.IdentityRepository.UpdateUserAsync(user);
+
+        if (!result.Succeeded)
+        {
+            var errors = result.Errors.Select(e => new Problem(e.Code, e.Description)).ToList();
+            return ServiceResult<IdentityResult>.Errors(errors);
+        }
+
+        return ServiceResult<IdentityResult>.Success(result);
+    }
 }

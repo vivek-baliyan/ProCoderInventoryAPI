@@ -18,6 +18,7 @@ public interface IIdentityRepository
     Task<AppUser> FindUserByEmailAsync(string email);
     Task<bool> ValidateUserPasswordAsync(AppUser user, string password);
     Task<List<string>> GetUserRolesAsync(AppUser user);
+    Task<IdentityResult> UpdateUserAsync(AppUser user);
 
     #endregion
 }

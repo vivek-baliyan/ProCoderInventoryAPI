@@ -1,3 +1,4 @@
+using Mapster;
 using PCI.Application.Repositories;
 using PCI.Application.Services.Interfaces;
 using PCI.Domain.Models;
@@ -10,7 +11,7 @@ public class AccountService(IUnitOfWork unitOfWork) : IAccountService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<ServiceResult<AppUserProfile>> CreateUserProfile(string userId, RegisterUserDto registerUserDto)
+    public async Task<ServiceResult<UserProfileDto>> CreateUserProfile(string userId, RegisterUserDto registerUserDto)
     {
         var existingUserProfile = await _unitOfWork.Repository<AppUserProfile>()
             .GetFirstOrDefaultAsync(x => x.UserId == userId);
@@ -18,7 +19,8 @@ public class AccountService(IUnitOfWork unitOfWork) : IAccountService
         // Check if the user profile already exists
         if (existingUserProfile != null)
         {
-            return ServiceResult<AppUserProfile>.Success(existingUserProfile);
+            return ServiceResult<UserProfileDto>
+                .Success(existingUserProfile.Adapt<UserProfileDto>());
         }
         try
         {
@@ -45,26 +47,78 @@ public class AccountService(IUnitOfWork unitOfWork) : IAccountService
             _unitOfWork.Repository<AppUserProfile>().Add(userProfile);
             await _unitOfWork.SaveChangesAsync();
 
-            return ServiceResult<AppUserProfile>.Success(userProfile);
+            return ServiceResult<UserProfileDto>
+                .Success(userProfile.Adapt<UserProfileDto>());
         }
         catch (Exception ex)
         {
-            return ServiceResult<AppUserProfile>.Error(
-                new Problem("UserProfileCreationError", ex.ToString()));
+            return ServiceResult<UserProfileDto>
+                .Error(new Problem("UserProfileCreationError", ex.ToString()));
         }
     }
 
-    public async Task<ServiceResult<AppUserProfile>> GetUserProfileByUserId(string userId)
+    public async Task<ServiceResult<UserProfileDto>> GetUserProfileByUserId(string userId)
     {
         var userProfile = await _unitOfWork.Repository<AppUserProfile>()
             .GetFirstOrDefaultAsync(x => x.UserId == userId);
 
         if (userProfile == null)
         {
-            return ServiceResult<AppUserProfile>.Error(
-                new Problem("UserProfileNotFound", "User profile not found."));
+            return ServiceResult<UserProfileDto>
+                .Error(new Problem("UserProfileNotFound", "User profile not found."));
         }
 
-        return ServiceResult<AppUserProfile>.Success(userProfile);
+        return ServiceResult<UserProfileDto>.Success(userProfile.Adapt<UserProfileDto>());
+    }
+
+    public async Task<ServiceResult<UserProfileDto>> UpdateUserProfile(UpdateProfileDto updateProfileDto)
+    {
+        var userProfile = await _unitOfWork.Repository<AppUserProfile>()
+            .GetFirstOrDefaultAsync(x => x.Id == updateProfileDto.ProfileId);
+
+        if (userProfile == null)
+        {
+            return ServiceResult<UserProfileDto>
+                .Error(new Problem("UserProfileNotFound", "User profile not found."));
+        }
+
+        userProfile.FirstName = updateProfileDto.FirstName;
+        userProfile.LastName = updateProfileDto.LastName;
+        userProfile.ProfileImageUrl = updateProfileDto.ProfileImageUrl;
+        userProfile.Bio = updateProfileDto.Bio;
+        userProfile.DateOfBirth = Convert.ToDateTime(updateProfileDto.DateOfBirth);
+
+        _unitOfWork.Repository<AppUserProfile>().Update(userProfile);
+        await _unitOfWork.SaveChangesAsync();
+
+        return ServiceResult<UserProfileDto>
+            .Success(userProfile.Adapt<UserProfileDto>());
+    }
+
+    public async Task<ServiceResult<UserProfileDto>> UpdateUserProfileSettings(UpdateProfileSettingsDto updateProfileSettingsDto)
+    {
+        var userProfile = await _unitOfWork.Repository<AppUserProfile>()
+            .GetFirstOrDefaultAsync(x => x.Id == updateProfileSettingsDto.ProfileId);
+
+        if (userProfile == null)
+        {
+            return ServiceResult<UserProfileDto>
+                .Error(new Problem("UserProfileNotFound", "User profile not found."));
+        }
+
+        userProfile.CompanyName = updateProfileSettingsDto.CompanyName;
+        userProfile.ContactPerson = updateProfileSettingsDto.ContactPerson;
+        userProfile.WebsiteUrl = updateProfileSettingsDto.WebsiteUrl;
+        userProfile.StreetAddress = updateProfileSettingsDto.StreetAddress;
+        userProfile.PostalCode = updateProfileSettingsDto.PostalCode;
+        userProfile.City = updateProfileSettingsDto.City;
+        userProfile.State = updateProfileSettingsDto.State;
+        userProfile.Country = updateProfileSettingsDto.Country;
+
+        _unitOfWork.Repository<AppUserProfile>().Update(userProfile);
+        await _unitOfWork.SaveChangesAsync();
+
+        return ServiceResult<UserProfileDto>
+            .Success(userProfile.Adapt<UserProfileDto>());
     }
 }

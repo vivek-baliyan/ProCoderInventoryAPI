@@ -15,4 +15,5 @@ public interface IIdentityService
     Task<ServiceResult<UserDto>> GetUserById(string userId);
     Task<ServiceResult<UserDto>> GetUserByEmail(string userEmail);
     Task<ServiceResult<UserDto>> UserLogin(UserLoginDto loginUserDto);
+    Task<ServiceResult<IdentityResult>> UpdateUser(UpdateUserDto updateUserDto);
 }

@@ -19,8 +19,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         // Configure UserProfile entity
         modelBuilder.Entity<AppUserProfile>(entity =>
         {
-            entity.HasKey(e => e.UserId);
-
             entity.Property(e => e.UserId).HasMaxLength(36);
             entity.Property(e => e.FirstName).HasMaxLength(100);
             entity.Property(e => e.LastName).HasMaxLength(100);

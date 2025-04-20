@@ -19,11 +19,11 @@ namespace PCI.Persistence.Migrations.Application
                 .HasDefaultSchema("APP")
                 .HasAnnotation("ProductVersion", "8.0.13");
 
-            modelBuilder.Entity("PCI.Domain.Models.UserProfile", b =>
+            modelBuilder.Entity("PCI.Domain.Models.AppUserProfile", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasMaxLength(36)
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Bio")
                         .HasMaxLength(1000)
@@ -58,9 +58,6 @@ namespace PCI.Persistence.Migrations.Application
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Id")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("LastName")
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
@@ -87,11 +84,15 @@ namespace PCI.Persistence.Migrations.Application
                     b.Property<DateTime?>("UpdatedOn")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("UserId")
+                        .HasMaxLength(36)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("WebsiteUrl")
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
-                    b.HasKey("UserId");
+                    b.HasKey("Id");
 
                     b.HasIndex("FirstName", "LastName");
 

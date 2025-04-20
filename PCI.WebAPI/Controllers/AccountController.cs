@@ -1,3 +1,4 @@
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PCI.Application.Services.Interfaces;
@@ -25,7 +26,7 @@ public class AccountController(
 
             if (!result.Succeeded)
             {
-                return StatusCode(StatusCodes.Status400BadRequest, result);
+                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
             }
 
             try
@@ -70,14 +71,14 @@ public class AccountController(
 
             if (!logintResult.Succeeded)
             {
-                return StatusCode(StatusCodes.Status400BadRequest, logintResult);
+                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(logintResult));
             }
 
             var userProfileResult = await _accountService.GetUserProfileByUserId(logintResult.ResultData.Id);
 
             if (!userProfileResult.Succeeded)
             {
-                return StatusCode(StatusCodes.Status400BadRequest, userProfileResult);
+                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(userProfileResult));
             }
 
             var accessToken = _tokenService.GenerateAccessToken(logintResult.ResultData);
@@ -96,7 +97,8 @@ public class AccountController(
                 RefreshToken = refreshToken
             };
 
-            return StatusCode(StatusCodes.Status200OK, SuccessResponse(loginResponse, "User logged in successfully."));
+            return StatusCode(StatusCodes.Status200OK,
+                SuccessResponse(loginResponse, "User logged in successfully."));
         }
         catch (Exception ex)
         {
@@ -114,7 +116,7 @@ public class AccountController(
 
             if (!result.Succeeded)
             {
-                return StatusCode(StatusCodes.Status400BadRequest, result);
+                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
             }
 
             return StatusCode(StatusCodes.Status200OK,
@@ -128,7 +130,7 @@ public class AccountController(
     }
 
     [HttpGet("getAccountByUserId/{userId}")]
-    public async Task<IActionResult> GetAccountByUserId(string userId)
+    public async Task<ActionResult<UserProfileDetailDto>> GetAccountByUserId(string userId)
     {
         try
         {
@@ -136,13 +138,25 @@ public class AccountController(
 
             if (!result.Succeeded)
             {
-                return StatusCode(StatusCodes.Status400BadRequest, result);
+                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
             }
 
             var userProfileResult = await _accountService.GetUserProfileByUserId(userId);
 
+            if (!userProfileResult.Succeeded)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(userProfileResult));
+            }
+
+            var userProfileDetail = userProfileResult.ResultData.Adapt<UserProfileDetailDto>() with
+            {
+                Email = result.ResultData.Email,
+                UserName = result.ResultData.UserName,
+                PhoneNumber = result.ResultData.PhoneNumber,
+            };
+
             return StatusCode(StatusCodes.Status200OK,
-                SuccessResponse(userProfileResult.ResultData, "User retrieved successfully."));
+                SuccessResponse(userProfileDetail, "User retrieved successfully."));
         }
         catch (Exception ex)
         {
@@ -151,4 +165,55 @@ public class AccountController(
         }
     }
 
+    [HttpPut("updateUserProfile")]
+    public async Task<IActionResult> UpdateUserProfile(UpdateProfileDto updateProfileDto)
+    {
+        try
+        {
+            var identityUpdateResult = await _identityService.UpdateUser(
+                new UpdateUserDto(updateProfileDto.UserId, updateProfileDto.Email, updateProfileDto.PhoneNumber));
+
+            if (!identityUpdateResult.Succeeded)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(identityUpdateResult));
+            }
+
+            var result = await _accountService.UpdateUserProfile(updateProfileDto);
+
+            if (!result.Succeeded)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
+            }
+
+            return StatusCode(StatusCodes.Status200OK,
+                SuccessResponse(result.ResultData, "User profile updated successfully."));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                ErrorResponse(ex.ToString(), $"An error occurred while updating user profile: {ex.Message}"));
+        }
+    }
+
+    [HttpPut("updateUserProfileSettings")]
+    public async Task<IActionResult> UpdateUserProfileSettings(UpdateProfileSettingsDto updateProfileSettingsDto)
+    {
+        try
+        {
+            var result = await _accountService.UpdateUserProfileSettings(updateProfileSettingsDto);
+
+            if (!result.Succeeded)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
+            }
+
+            return StatusCode(StatusCodes.Status200OK,
+                SuccessResponse(result.ResultData, "User profile settings updated successfully."));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                ErrorResponse(ex.ToString(), $"An error occurred while updating user profile: {ex.Message}"));
+        }
+    }
 }

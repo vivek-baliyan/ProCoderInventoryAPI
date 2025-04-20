@@ -19,7 +19,9 @@ namespace PCI.Persistence.Migrations.Application
                 schema: "APP",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "TEXT", maxLength: 36, nullable: false),
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserId = table.Column<string>(type: "TEXT", maxLength: 36, nullable: true),
                     FirstName = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     LastName = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     ProfileImageUrl = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
@@ -33,7 +35,6 @@ namespace PCI.Persistence.Migrations.Application
                     CompanyName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
                     ContactPerson = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
                     WebsiteUrl = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
-                    Id = table.Column<int>(type: "INTEGER", nullable: false),
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "TEXT", nullable: false),
@@ -41,7 +42,7 @@ namespace PCI.Persistence.Migrations.Application
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserProfiles", x => x.UserId);
+                    table.PrimaryKey("PK_UserProfiles", x => x.Id);
                 });
 
             migrationBuilder.CreateIndex(
