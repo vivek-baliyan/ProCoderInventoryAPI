@@ -1,4 +1,5 @@
-﻿namespace PCI.Shared.Dtos;
+﻿
+namespace PCI.Shared.Dtos;
 
 public record LoginResponseDto
 {
@@ -11,4 +12,7 @@ public record LoginResponseDto
     public string AccessToken { get; init; }
     public string RefreshToken { get; init; }
     public List<string> UserRoles { get; init; } = [];
+    public string LastLoginDevice { get; init; }
+    public DateTime? LastLogin { get; set; }
+    public DateTime? LastPasswordChange { get; set; }
 }

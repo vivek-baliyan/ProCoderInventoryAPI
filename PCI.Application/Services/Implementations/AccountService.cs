@@ -71,14 +71,14 @@ public class AccountService(IUnitOfWork unitOfWork) : IAccountService
         return ServiceResult<UserProfileDto>.Success(userProfile.Adapt<UserProfileDto>());
     }
 
-    public async Task<ServiceResult<UserProfileDto>> UpdateUserProfile(UpdateProfileDto updateProfileDto)
+    public async Task<ServiceResult<bool>> UpdateProfile(UpdateProfileDto updateProfileDto)
     {
         var userProfile = await _unitOfWork.Repository<AppUserProfile>()
             .GetFirstOrDefaultAsync(x => x.Id == updateProfileDto.ProfileId);
 
         if (userProfile == null)
         {
-            return ServiceResult<UserProfileDto>
+            return ServiceResult<bool>
                 .Error(new Problem("UserProfileNotFound", "User profile not found."));
         }
 
@@ -91,18 +91,17 @@ public class AccountService(IUnitOfWork unitOfWork) : IAccountService
         _unitOfWork.Repository<AppUserProfile>().Update(userProfile);
         await _unitOfWork.SaveChangesAsync();
 
-        return ServiceResult<UserProfileDto>
-            .Success(userProfile.Adapt<UserProfileDto>());
+        return ServiceResult<bool>.Success(true);
     }
 
-    public async Task<ServiceResult<UserProfileDto>> UpdateUserProfileSettings(UpdateProfileSettingsDto updateProfileSettingsDto)
+    public async Task<ServiceResult<bool>> UpdateProfileSettings(UpdateProfileSettingsDto updateProfileSettingsDto)
     {
         var userProfile = await _unitOfWork.Repository<AppUserProfile>()
             .GetFirstOrDefaultAsync(x => x.Id == updateProfileSettingsDto.ProfileId);
 
         if (userProfile == null)
         {
-            return ServiceResult<UserProfileDto>
+            return ServiceResult<bool>
                 .Error(new Problem("UserProfileNotFound", "User profile not found."));
         }
 
@@ -118,7 +117,6 @@ public class AccountService(IUnitOfWork unitOfWork) : IAccountService
         _unitOfWork.Repository<AppUserProfile>().Update(userProfile);
         await _unitOfWork.SaveChangesAsync();
 
-        return ServiceResult<UserProfileDto>
-            .Success(userProfile.Adapt<UserProfileDto>());
+        return ServiceResult<bool>.Success(true);
     }
 }

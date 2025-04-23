@@ -12,6 +12,8 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
+    #region Role Management
+
     public async Task<ServiceResult<IdentityResult>> CreateRole(CreateRoleDto addAppRoleDto)
     {
         var result = await _unitOfWork.IdentityRepository.CreateRoleAsync(addAppRoleDto.Adapt<AppRole>());
@@ -37,6 +39,10 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
 
         return ServiceResult<RoleDto>.Success(role.Adapt<RoleDto>());
     }
+
+    #endregion
+
+    #region User Management
 
     public async Task<ServiceResult<IdentityResult>> CreateUser(RegisterUserDto registerUserDto)
     {
@@ -136,18 +142,16 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
         return ServiceResult<UserDto>.Success(userDto);
     }
 
-    public async Task<ServiceResult<IdentityResult>> UpdateUser(UpdateUserDto updateUserDto)
+    public async Task<ServiceResult<IdentityResult>> UpdateUser(UpdateUserPhoneNumberDto updateUserPhoneNumberDto)
     {
-        var user = await _unitOfWork.IdentityRepository.FindUserByIdAsync(updateUserDto.UserId);
+        var user = await _unitOfWork.IdentityRepository.FindUserByIdAsync(updateUserPhoneNumberDto.UserId);
 
         if (user == null)
         {
-            return ServiceResult<IdentityResult>.Error(new Problem("UserNotFound", $"User with ID {updateUserDto.UserId} not found."));
+            return ServiceResult<IdentityResult>.Error(new Problem("UserNotFound", $"User with ID {updateUserPhoneNumberDto.UserId} not found."));
         }
 
-        user.PhoneNumber = updateUserDto.PhoneNumber;
-        user.Email = updateUserDto.Email;
-        user.UserName = updateUserDto.Email;
+        user.PhoneNumber = updateUserPhoneNumberDto.PhoneNumber;
 
         var result = await _unitOfWork.IdentityRepository.UpdateUserAsync(user);
 
@@ -159,4 +163,34 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
 
         return ServiceResult<IdentityResult>.Success(result);
     }
+
+    public async Task<ServiceResult<IdentityResult>> UpdateLoginDetails(UpdateLoginDetailsDto updateLoginDetailsDto)
+    {
+        var user = await _unitOfWork.IdentityRepository.FindUserByIdAsync(updateLoginDetailsDto.UserId);
+
+        if (user == null)
+        {
+            return ServiceResult<IdentityResult>
+                .Error(new Problem("UserNotFound", $"User with ID {updateLoginDetailsDto.UserId} not found."));
+        }
+
+        user.Email = updateLoginDetailsDto.Email;
+        user.UserName = updateLoginDetailsDto.Email;
+        user.LastPasswordChange = DateTime.UtcNow;
+
+        var result = await _unitOfWork.IdentityRepository.ChangeUserPasswordAsync(
+            user,
+            updateLoginDetailsDto.CurrentPassword,
+            updateLoginDetailsDto.NewPassword);
+
+        if (!result.Succeeded)
+        {
+            var errors = result.Errors.Select(e => new Problem(e.Code, e.Description)).ToList();
+            return ServiceResult<IdentityResult>.Errors(errors);
+        }
+
+        return ServiceResult<IdentityResult>.Success(result);
+    }
+
+    #endregion
 }

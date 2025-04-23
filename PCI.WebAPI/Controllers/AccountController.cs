@@ -84,18 +84,11 @@ public class AccountController(
             var accessToken = _tokenService.GenerateAccessToken(logintResult.ResultData);
             var refreshToken = _tokenService.GenerateRefreshToken();
 
-            var loginResponse = new LoginResponseDto()
-            {
-                UserId = logintResult.ResultData.Id,
-                UserName = logintResult.ResultData.UserName,
-                Email = logintResult.ResultData.Email,
-                FirstName = userProfileResult.ResultData.FirstName,
-                LastName = userProfileResult.ResultData.LastName,
-                ProfileImageUrl = userProfileResult.ResultData.ProfileImageUrl,
-                UserRoles = logintResult.ResultData.Roles,
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
-            };
+            var loginResponse = BindLoginResponse(
+                logintResult.ResultData,
+                userProfileResult.ResultData,
+                accessToken,
+                refreshToken);
 
             return StatusCode(StatusCodes.Status200OK,
                 SuccessResponse(loginResponse, "User logged in successfully."));
@@ -126,6 +119,28 @@ public class AccountController(
         {
             return StatusCode(StatusCodes.Status500InternalServerError,
                 ErrorResponse(ex.ToString(), $"An error occurred while assigning role to user: {ex.Message}"));
+        }
+    }
+
+    [HttpPut("updateLoginDetails")]
+    public async Task<IActionResult> UpdateLoginDetails(UpdateLoginDetailsDto updateLoginDetailsDto)
+    {
+        try
+        {
+            var result = await _identityService.UpdateLoginDetails(updateLoginDetailsDto);
+
+            if (!result.Succeeded)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
+            }
+
+            return StatusCode(StatusCodes.Status200OK,
+                SuccessResponse(result.ResultData, "User login details updated successfully."));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                ErrorResponse(ex.ToString(), $"An error occurred while updating user login details: {ex.Message}"));
         }
     }
 
@@ -165,20 +180,20 @@ public class AccountController(
         }
     }
 
-    [HttpPut("updateUserProfile")]
-    public async Task<IActionResult> UpdateUserProfile(UpdateProfileDto updateProfileDto)
+    [HttpPut("updateProfile")]
+    public async Task<IActionResult> UpdateProfile(UpdateProfileDto updateProfileDto)
     {
         try
         {
             var identityUpdateResult = await _identityService.UpdateUser(
-                new UpdateUserDto(updateProfileDto.UserId, updateProfileDto.Email, updateProfileDto.PhoneNumber));
+                new UpdateUserPhoneNumberDto(updateProfileDto.UserId, updateProfileDto.PhoneNumber));
 
             if (!identityUpdateResult.Succeeded)
             {
                 return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(identityUpdateResult));
             }
 
-            var result = await _accountService.UpdateUserProfile(updateProfileDto);
+            var result = await _accountService.UpdateProfile(updateProfileDto);
 
             if (!result.Succeeded)
             {
@@ -195,12 +210,12 @@ public class AccountController(
         }
     }
 
-    [HttpPut("updateUserProfileSettings")]
-    public async Task<IActionResult> UpdateUserProfileSettings(UpdateProfileSettingsDto updateProfileSettingsDto)
+    [HttpPut("updateProfileSettings")]
+    public async Task<IActionResult> UpdateProfileSettings(UpdateProfileSettingsDto updateProfileSettingsDto)
     {
         try
         {
-            var result = await _accountService.UpdateUserProfileSettings(updateProfileSettingsDto);
+            var result = await _accountService.UpdateProfileSettings(updateProfileSettingsDto);
 
             if (!result.Succeeded)
             {
@@ -215,5 +230,29 @@ public class AccountController(
             return StatusCode(StatusCodes.Status500InternalServerError,
                 ErrorResponse(ex.ToString(), $"An error occurred while updating user profile: {ex.Message}"));
         }
+    }
+
+    private static LoginResponseDto BindLoginResponse(
+        UserDto userDto,
+        UserProfileDto userProfileDto,
+        string accessToken,
+        string refreshToken)
+    {
+        return new LoginResponseDto()
+        {
+            UserId = userDto.Id,
+            UserName = userDto.UserName,
+            Email = userDto.Email,
+            LastLogin = userDto.LastLogin,
+            LastLoginDevice = userDto.LastLoginDevice,
+            LastPasswordChange = userDto.LastPasswordChange,
+            UserRoles = userDto.Roles,
+
+            FirstName = userProfileDto.FirstName,
+            LastName = userProfileDto.LastName,
+            ProfileImageUrl = userProfileDto.ProfileImageUrl,
+            AccessToken = accessToken,
+            RefreshToken = refreshToken
+        };
     }
 }
