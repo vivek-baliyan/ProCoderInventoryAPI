@@ -80,7 +80,7 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
         // Check if the user exists
         if (user == null)
         {
-            return ServiceResult<IdentityResult>.Error(new Problem("UserNotFound", $"User with email {userEmail} not found."));
+            return ServiceResult<IdentityResult>.Error(new Problem(Constants.UserNotFound, $"User with email {userEmail} not found."));
         }
 
         var result = await _unitOfWork.IdentityRepository.AddUserToRoleAsync(user, roleName);
@@ -100,7 +100,7 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
 
         if (user == null)
         {
-            return ServiceResult<UserDto>.Error(new Problem("UserNotFound", $"User with ID {userId} not found."));
+            return ServiceResult<UserDto>.Error(new Problem(Constants.UserNotFound, $"User with ID {userId} not found."));
         }
 
         return ServiceResult<UserDto>.Success(user.Adapt<UserDto>());
@@ -112,7 +112,7 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
 
         if (user == null)
         {
-            return ServiceResult<UserDto>.Error(new Problem("UserNotFound", $"User with Email {userEmail} not found."));
+            return ServiceResult<UserDto>.Error(new Problem(Constants.UserNotFound, $"User with Email {userEmail} not found."));
         }
 
         return ServiceResult<UserDto>.Success(user.Adapt<UserDto>());
@@ -124,14 +124,14 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
 
         if (user == null)
         {
-            return ServiceResult<UserDto>.Error(new Problem("InvalidCredentials", "Invalid email or password."));
+            return ServiceResult<UserDto>.Error(new Problem(Constants.InvalidCredentials, Messages.InvalidCredentials));
         }
 
         var result = await _unitOfWork.IdentityRepository.ValidateUserPasswordAsync(user, loginUserDto.Password);
 
         if (!result)
         {
-            return ServiceResult<UserDto>.Error(new Problem("InvalidCredentials", "Invalid email or password."));
+            return ServiceResult<UserDto>.Error(new Problem(Constants.InvalidCredentials, Messages.InvalidCredentials));
         }
 
         var userDto = user.Adapt<UserDto>() with
@@ -148,7 +148,7 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
 
         if (user == null)
         {
-            return ServiceResult<IdentityResult>.Error(new Problem("UserNotFound", $"User with ID {updateUserPhoneNumberDto.UserId} not found."));
+            return ServiceResult<IdentityResult>.Error(new Problem(Constants.UserNotFound, $"User with ID {updateUserPhoneNumberDto.UserId} not found."));
         }
 
         user.PhoneNumber = updateUserPhoneNumberDto.PhoneNumber;
@@ -171,7 +171,7 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
         if (user == null)
         {
             return ServiceResult<IdentityResult>
-                .Error(new Problem("UserNotFound", $"User with ID {updateLoginDetailsDto.UserId} not found."));
+                .Error(new Problem(Constants.UserNotFound, $"User with ID {updateLoginDetailsDto.UserId} not found."));
         }
 
         user.Email = updateLoginDetailsDto.Email;

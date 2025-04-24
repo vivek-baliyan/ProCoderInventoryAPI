@@ -3,14 +3,9 @@ using System.Security.Claims;
 
 namespace PCI.WebAPI.Middleware
 {
-    public class UserAccessorMiddleware
+    public class UserAccessorMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate _next;
-
-        public UserAccessorMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
+        private readonly RequestDelegate _next = next;
 
         public async Task InvokeAsync(HttpContext context, IUserAccessorService userAccessor)
         {

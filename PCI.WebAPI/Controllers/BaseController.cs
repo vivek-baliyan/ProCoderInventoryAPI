@@ -8,6 +8,9 @@ namespace PCI.WebAPI.Controllers;
 [Route("api/[controller]")]
 public class BaseController : ControllerBase
 {
+    //Get the user ID from the claims
+    protected string UserId => User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
+
     protected ApiResponse<T> SuccessResponse<T>(ServiceResult<T> result)
     {
         return new ApiResponse<T>

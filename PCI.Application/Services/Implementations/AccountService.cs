@@ -53,7 +53,7 @@ public class AccountService(IUnitOfWork unitOfWork) : IAccountService
         catch (Exception ex)
         {
             return ServiceResult<UserProfileDto>
-                .Error(new Problem("UserProfileCreationError", ex.ToString()));
+                .Error(new Problem(ErrorCodes.UserProfileCreationError, ex.ToString()));
         }
     }
 
@@ -65,7 +65,7 @@ public class AccountService(IUnitOfWork unitOfWork) : IAccountService
         if (userProfile == null)
         {
             return ServiceResult<UserProfileDto>
-                .Error(new Problem("UserProfileNotFound", "User profile not found."));
+                .Error(new Problem(ErrorCodes.UserProfileNotFound, Messages.UserProfileNotFound));
         }
 
         return ServiceResult<UserProfileDto>.Success(userProfile.Adapt<UserProfileDto>());
@@ -79,7 +79,7 @@ public class AccountService(IUnitOfWork unitOfWork) : IAccountService
         if (userProfile == null)
         {
             return ServiceResult<bool>
-                .Error(new Problem("UserProfileNotFound", "User profile not found."));
+                .Error(new Problem(ErrorCodes.UserProfileNotFound, Messages.UserProfileNotFound));
         }
 
         userProfile.FirstName = updateProfileDto.FirstName;
@@ -87,6 +87,8 @@ public class AccountService(IUnitOfWork unitOfWork) : IAccountService
         userProfile.ProfileImageUrl = updateProfileDto.ProfileImageUrl;
         userProfile.Bio = updateProfileDto.Bio;
         userProfile.DateOfBirth = Convert.ToDateTime(updateProfileDto.DateOfBirth);
+        userProfile.UpdatedBy = updateProfileDto.UserId;
+        userProfile.UpdatedOn = DateTime.UtcNow;
 
         _unitOfWork.Repository<AppUserProfile>().Update(userProfile);
         await _unitOfWork.SaveChangesAsync();
@@ -102,7 +104,7 @@ public class AccountService(IUnitOfWork unitOfWork) : IAccountService
         if (userProfile == null)
         {
             return ServiceResult<bool>
-                .Error(new Problem("UserProfileNotFound", "User profile not found."));
+                .Error(new Problem(ErrorCodes.UserProfileNotFound, Messages.UserProfileNotFound));
         }
 
         userProfile.CompanyName = updateProfileSettingsDto.CompanyName;
@@ -113,6 +115,8 @@ public class AccountService(IUnitOfWork unitOfWork) : IAccountService
         userProfile.City = updateProfileSettingsDto.City;
         userProfile.State = updateProfileSettingsDto.State;
         userProfile.Country = updateProfileSettingsDto.Country;
+        userProfile.UpdatedBy = updateProfileSettingsDto.UserId;
+        userProfile.UpdatedOn = DateTime.UtcNow;
 
         _unitOfWork.Repository<AppUserProfile>().Update(userProfile);
         await _unitOfWork.SaveChangesAsync();

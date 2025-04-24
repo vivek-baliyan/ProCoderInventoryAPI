@@ -2,6 +2,7 @@ using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PCI.Application.Services.Interfaces;
+using PCI.Shared.Common;
 using PCI.Shared.Dtos;
 
 namespace PCI.WebAPI.Controllers;
@@ -46,7 +47,7 @@ public class AccountController(
                 }
 
                 return StatusCode(StatusCodes.Status200OK,
-                    SuccessResponse(userProfile.ResultData.UserId, "User profile created successfully."));
+                    SuccessResponse(userProfile.ResultData.UserId, Messages.UserProfileCreated));
             }
             catch (Exception ex)
             {
@@ -91,7 +92,7 @@ public class AccountController(
                 refreshToken);
 
             return StatusCode(StatusCodes.Status200OK,
-                SuccessResponse(loginResponse, "User logged in successfully."));
+                SuccessResponse(loginResponse, Messages.UserLoggedIn));
         }
         catch (Exception ex)
         {
@@ -113,7 +114,7 @@ public class AccountController(
             }
 
             return StatusCode(StatusCodes.Status200OK,
-                SuccessResponse(result.ResultData, "Role assigned to user successfully."));
+                SuccessResponse(result.ResultData, Messages.RoleAssigned));
         }
         catch (Exception ex)
         {
@@ -135,7 +136,7 @@ public class AccountController(
             }
 
             return StatusCode(StatusCodes.Status200OK,
-                SuccessResponse(result.ResultData, "User login details updated successfully."));
+                SuccessResponse(result.ResultData, Messages.UserLoginDetailsUpdated));
         }
         catch (Exception ex)
         {
@@ -171,7 +172,7 @@ public class AccountController(
             };
 
             return StatusCode(StatusCodes.Status200OK,
-                SuccessResponse(userProfileDetail, "User retrieved successfully."));
+                SuccessResponse(userProfileDetail, Messages.UserProfileRetrieved));
         }
         catch (Exception ex)
         {
@@ -201,7 +202,7 @@ public class AccountController(
             }
 
             return StatusCode(StatusCodes.Status200OK,
-                SuccessResponse(result.ResultData, "User profile updated successfully."));
+                SuccessResponse(result.ResultData, Messages.UserProfileUpdated));
         }
         catch (Exception ex)
         {
@@ -223,7 +224,7 @@ public class AccountController(
             }
 
             return StatusCode(StatusCodes.Status200OK,
-                SuccessResponse(result.ResultData, "User profile settings updated successfully."));
+                SuccessResponse(result.ResultData, Messages.UserProfileUpdated));
         }
         catch (Exception ex)
         {

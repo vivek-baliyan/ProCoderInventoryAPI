@@ -9,4 +9,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.13" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\PCI.Shared\PCI.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

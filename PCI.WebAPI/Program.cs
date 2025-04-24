@@ -6,6 +6,7 @@ using PCI.Domain.Models;
 using PCI.Persistence;
 using PCI.Persistence.Context;
 using PCI.WebAPI;
+using PCI.WebAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +57,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("CorsApi");
+app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
