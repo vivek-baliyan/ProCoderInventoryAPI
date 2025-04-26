@@ -57,7 +57,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("CorsApi");
-app.UseMiddleware<ErrorHandlerMiddleware>();
+app.ConfigureExceptionHandler();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

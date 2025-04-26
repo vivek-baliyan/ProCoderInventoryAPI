@@ -7,10 +7,6 @@ namespace PCI.Domain.Models;
 /// </summary>
 public class CategoryImage : BaseEntity
 {
-    public int CategoryId { get; set; }
-
-    public virtual Category Category { get; set; }
-
     public string ImagePath { get; set; }
 
     public string AltText { get; set; }
@@ -28,4 +24,8 @@ public class CategoryImage : BaseEntity
     public string AspectRatio { get; set; }
 
     public bool IsPrimary { get; set; }
+
+    public int CategoryId { get; set; }
+
+    public virtual Category Category { get; set; }
 }

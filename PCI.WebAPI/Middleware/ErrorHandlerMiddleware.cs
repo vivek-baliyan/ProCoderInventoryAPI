@@ -4,11 +4,9 @@ using PCI.Shared.Common;
 
 namespace PCI.WebAPI.Middleware;
 
-public class ErrorHandlerMiddleware(ILogger<ErrorHandlerMiddleware> logger)
+public static class ErrorHandlerMiddleware
 {
-    private readonly ILogger<ErrorHandlerMiddleware> _logger = logger;
-
-    public void ConfigureExceptionHandler(IApplicationBuilder app)
+    public static void ConfigureExceptionHandler(this IApplicationBuilder app)
     {
         app.UseExceptionHandler(appError =>
         {
@@ -36,7 +34,7 @@ public class ErrorHandlerMiddleware(ILogger<ErrorHandlerMiddleware> logger)
         });
     }
 
-    private void ErrorLogGenerate(HttpContext context, Exception ex)
+    private static void ErrorLogGenerate(HttpContext context, Exception ex)
     {
         string IpAddress = context.Connection.LocalIpAddress.ToString();
         string userId = context.User.Claims.FirstOrDefault(c => c.Type == "UserId")?.Value;
@@ -48,6 +46,6 @@ public class ErrorHandlerMiddleware(ILogger<ErrorHandlerMiddleware> logger)
             $"UserId - {userId}, UserEmail - {context.User.Claims.FirstOrDefault(c => c.Type == "name")?.Value}, " +
             $"RequestPath - {context.Request.Path}, Response - {ex?.StackTrace} at {DateTime.Now}";
 
-        _logger.LogError(message);
+        //_logger.LogError(message);
     }
 }

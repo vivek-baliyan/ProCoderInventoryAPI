@@ -21,8 +21,6 @@ public class Category : BaseEntity
 
     public int? ParentCategoryId { get; set; }
 
-    public string ImagePath { get; set; }
-
     public VisibilityStatus Status { get; set; }
 
     public DateTime? PublishDate { get; set; }

@@ -6,4 +6,5 @@ namespace PCI.Application.Services.Interfaces;
 public interface ICategoryService
 {
     Task<ServiceResult<CategoryDto>> CreateCategory(string userId, CreateCategoryDto createCategoryDto);
+    Task<ServiceResult<List<CategoryDropdownDto>>> GetCategoriesForDropdown();
 }

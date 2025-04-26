@@ -46,7 +46,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             category.Property(e => e.PageTitle).IsRequired().HasMaxLength(100);
             category.Property(e => e.UrlIdentifier).IsRequired().HasMaxLength(255);
             category.Property(e => e.Description).HasMaxLength(1000);
-            category.Property(e => e.ImagePath).HasMaxLength(255);
 
             // Configure relationships
             category.HasMany(e => e.ChildCategories)

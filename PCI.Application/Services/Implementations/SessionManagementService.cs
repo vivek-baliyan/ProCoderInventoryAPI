@@ -69,7 +69,7 @@ public class SessionManagementService(IUnitOfWork unitOfWork) : ISessionManageme
             .GetFirstOrDefaultAsync(s => s.SessionToken == sessionToken && s.IsActive);
         if (session == null)
         {
-            return ServiceResult<bool>.Error(new Problem(Constants.SessionNotFound, Messages.SessionNotFound));
+            return ServiceResult<bool>.Error(new Problem(ErrorCodes.SessionNotFound, Messages.SessionNotFound));
         }
 
         var isValid = session.LogoutTime == null && session.IsActive;

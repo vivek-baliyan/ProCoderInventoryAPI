@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using PCI.Shared.Common;
+using System.ComponentModel.DataAnnotations;
 
 namespace PCI.Domain.Models;
 
@@ -43,6 +44,4 @@ public class CategoryViewModel
     public double? ScaleX { get; set; }
     public double? ScaleY { get; set; }
     public string AspectRatio { get; set; }
-}
-
 }

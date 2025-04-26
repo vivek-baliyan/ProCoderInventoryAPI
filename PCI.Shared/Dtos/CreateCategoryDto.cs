@@ -2,8 +2,6 @@
 
 public record CreateCategoryDto
 {
-    public string UserId { get; init; }
-
     public string Name { get; init; }
 
     public string PageTitle { get; init; }
@@ -14,7 +12,7 @@ public record CreateCategoryDto
 
     public int? ParentCategoryId { get; init; }
 
-    public string ImagePath { get; init; }
+    public string Image { get; init; }
 
     public int Status { get; init; }
 

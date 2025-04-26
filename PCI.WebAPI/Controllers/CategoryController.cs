@@ -28,4 +28,25 @@ public class CategoryController(ICategoryService categoryService) : BaseControll
                 ErrorResponse(ex.ToString(), $"An error occurred while creating category: {ex.Message}"));
         }
     }
+
+    [HttpGet("dropdown")]
+    public async Task<ActionResult<CategoryDropdownDto>> GetCategoriesForDropdown()
+    {
+        try
+        {
+            var result = await _categoryService.GetCategoriesForDropdown();
+
+            if (!result.Succeeded)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
+            }
+
+            return StatusCode(StatusCodes.Status200OK, SuccessResponse(result.ResultData, "Category created successfully."));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError,
+                ErrorResponse(ex.ToString(), $"An error occurred: {ex.Message}"));
+        }
+    }
 }
