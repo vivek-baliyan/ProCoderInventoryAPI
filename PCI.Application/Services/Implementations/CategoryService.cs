@@ -3,6 +3,8 @@ using PCI.Application.Repositories;
 using PCI.Application.Services.Interfaces;
 using PCI.Domain.Models;
 using PCI.Shared.Common;
+using PCI.Shared.Common.Constants;
+using PCI.Shared.Common.Enums;
 using PCI.Shared.Dtos;
 
 namespace PCI.Application.Services.Implementations;
@@ -11,10 +13,11 @@ public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
-    public async Task<ServiceResult<CategoryDto>> CreateCategory(string userId, CreateCategoryDto createCategoryDto)
+    public async Task<ServiceResult<CategoryDto>> CreateCategory(string userId, int organisationId, CreateCategoryDto createCategoryDto)
     {
         var existingCategory = await _unitOfWork.Repository<Category>()
-            .GetFirstOrDefaultAsync(x => x.Name == createCategoryDto.Name && x.UserId == userId);
+            .GetFirstOrDefaultAsync(x => x.Name == createCategoryDto.Name
+            && x.OrganisationId == organisationId);
 
         // Check if the category already exists
         if (existingCategory != null)
@@ -26,7 +29,7 @@ public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
         {
             var category = new Category
             {
-                UserId = userId,
+                OrganisationId = organisationId,
                 Name = createCategoryDto.Name,
                 PageTitle = createCategoryDto.PageTitle,
                 UrlIdentifier = createCategoryDto.UrlIdentifier,
@@ -41,23 +44,35 @@ public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
             _unitOfWork.Repository<Category>().Add(category);
             await _unitOfWork.SaveChangesAsync();
 
-            var imagePath = await UploadCategoryImage(createCategoryDto.Image);
-
-            var categoryImage = new CategoryImage()
+            try
             {
-                ImagePath = imagePath
-            };
+                if (!string.IsNullOrEmpty(createCategoryDto.Image))
+                {
+                    var imagePath = await UploadCategoryImage(createCategoryDto.Image);
 
-            category.CategoryImages.Add(categoryImage);
-            await _unitOfWork.SaveChangesAsync();
 
+                    List<CategoryImage> categoryImages = [new CategoryImage()
+                    {
+                        ImagePath = imagePath
+                    }];
+
+                    category.CategoryImages = categoryImages;
+                    _unitOfWork.Repository<Category>().Update(category);
+                    await _unitOfWork.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                return ServiceResult<CategoryDto>
+                    .Error(new Problem(ErrorCodes.CategoryImageUploadError, ex.Message));
+            }
             return ServiceResult<CategoryDto>
                 .Success(category.Adapt<CategoryDto>());
         }
         catch (Exception ex)
         {
             return ServiceResult<CategoryDto>
-                .Error(new Problem(ErrorCodes.CategoryCreationError, ex.ToString()));
+                .Error(new Problem(ErrorCodes.CategoryCreationError, ex.Message));
         }
     }
 
@@ -67,6 +82,15 @@ public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
 
         return ServiceResult<List<CategoryDropdownDto>>
             .Success(categories.Adapt<List<CategoryDropdownDto>>());
+    }
+
+    public async Task<ServiceResult<List<CategoryListItemDto>>> GetAllCategories(int pageIndex, int pageSize)
+    {
+        var categories = await _unitOfWork.Repository<Category>()
+            .GetPaginatedAsync(pageIndex, pageSize);
+
+        return ServiceResult<List<CategoryListItemDto>>
+            .Success(categories.Adapt<List<CategoryListItemDto>>());
     }
 
     private static async Task<string> UploadCategoryImage(string base64Data)

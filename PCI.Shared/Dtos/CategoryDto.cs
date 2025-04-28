@@ -1,4 +1,4 @@
-﻿using PCI.Shared.Common;
+﻿using PCI.Shared.Common.Enums;
 
 namespace PCI.Shared.Dtos;
 

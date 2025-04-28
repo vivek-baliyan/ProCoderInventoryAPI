@@ -20,9 +20,9 @@ public interface IIdentityService
     Task<ServiceResult<IdentityResult>> AssignRoleToUser(string userEmail, string roleName);
     Task<ServiceResult<UserDto>> GetUserById(string userId);
     Task<ServiceResult<UserDto>> GetUserByEmail(string userEmail);
-    Task<ServiceResult<UserDto>> UserLogin(UserLoginDto loginUserDto);
-    Task<ServiceResult<IdentityResult>> UpdateUser(UpdateUserPhoneNumberDto updateUserDto);
+    Task<ServiceResult<IdentityResult>> UpdateUserDetails(UpdateUserDetailsDto updateUserDetailsDto);
     Task<ServiceResult<IdentityResult>> UpdateLoginDetails(UpdateLoginDetailsDto updateLoginDetailsDto);
+    Task<ServiceResult<UserDto>> UserLogin(UserLoginDto loginUserDto);
 
     #endregion
 }

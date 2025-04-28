@@ -10,19 +10,27 @@ public record UserDto
 
     public string UserName { get; init; }
 
-    public bool EmailConfirmed { get; init; }
+    public string FirstName { get; set; }
 
-    public bool PhoneNumberConfirmed { get; init; }
+    public string LastName { get; set; }
 
-    public bool TwoFactorEnabled { get; init; }
+    public string ProfileImageUrl { get; set; }
 
-    public int AccessFailedCount { get; init; }
+    public DateTime? DateOfBirth { get; set; }
 
-    public bool LockoutEnabled { get; init; }
+    public string Country { get; set; }
+
+    public string Address { get; set; }
+
+    public string City { get; set; }
+
+    public string State { get; set; }
+
+    public string PostalCode { get; set; }
+
+    public string Bio { get; set; }
 
     public bool IsDeleted { get; init; }
-
-    public DateTimeOffset? LockoutEnd { get; init; }
 
     public DateTime? LastLogin { get; init; }
 
@@ -31,6 +39,8 @@ public record UserDto
     public DateTime? LastPasswordChange { get; init; }
 
     public List<string> Roles { get; init; } = [];
+
+    public int OrganisationId { get; init; }
 
     //Sessions: Count = 0
 }

@@ -36,6 +36,16 @@ namespace PCI.Persistence.Migrations.Identity
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
+                    FirstName = table.Column<string>(type: "TEXT", nullable: true),
+                    LastName = table.Column<string>(type: "TEXT", nullable: true),
+                    ProfileImageUrl = table.Column<string>(type: "TEXT", nullable: true),
+                    DateOfBirth = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    Country = table.Column<string>(type: "TEXT", nullable: true),
+                    Address = table.Column<string>(type: "TEXT", nullable: true),
+                    City = table.Column<string>(type: "TEXT", nullable: true),
+                    State = table.Column<string>(type: "TEXT", nullable: true),
+                    PostalCode = table.Column<string>(type: "TEXT", nullable: true),
+                    Bio = table.Column<string>(type: "TEXT", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "TEXT", nullable: false),
                     LastLogin = table.Column<DateTime>(type: "TEXT", nullable: true),
                     LastLoginDevice = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),

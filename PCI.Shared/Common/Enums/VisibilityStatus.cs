@@ -1,4 +1,4 @@
-﻿namespace PCI.Shared.Common;
+﻿namespace PCI.Shared.Common.Enums;
 
 /// <summary>
 /// Represents the visibility status of a category

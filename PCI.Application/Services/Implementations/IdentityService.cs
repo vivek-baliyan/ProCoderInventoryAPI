@@ -4,6 +4,7 @@ using PCI.Application.Repositories;
 using PCI.Application.Services.Interfaces;
 using PCI.Domain.Models;
 using PCI.Shared.Common;
+using PCI.Shared.Common.Constants;
 using PCI.Shared.Dtos;
 
 namespace PCI.Application.Services.Implementations;
@@ -48,8 +49,10 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
     {
         var user = new AppUser
         {
-            UserName = registerUserDto.Email,
+            UserName = registerUserDto.Email.Split('@')[0],
             Email = registerUserDto.Email,
+            FirstName = registerUserDto.FirstName,
+            LastName = registerUserDto.LastName,
             CreatedOn = DateTime.UtcNow,
             IsDeleted = false
         };
@@ -118,40 +121,27 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
         return ServiceResult<UserDto>.Success(user.Adapt<UserDto>());
     }
 
-    public async Task<ServiceResult<UserDto>> UserLogin(UserLoginDto loginUserDto)
+    public async Task<ServiceResult<IdentityResult>> UpdateUserDetails(UpdateUserDetailsDto updateUserDetailsDto)
     {
-        var user = await _unitOfWork.IdentityRepository.FindUserByEmailAsync(loginUserDto.Email);
+        var user = await _unitOfWork.IdentityRepository.FindUserByIdAsync(updateUserDetailsDto.UserId);
 
         if (user == null)
         {
-            return ServiceResult<UserDto>.Error(new Problem(ErrorCodes.InvalidCredentials, Messages.InvalidCredentials));
+            return ServiceResult<IdentityResult>
+                .Error(new Problem(ErrorCodes.UserNotFound, $"User with ID {updateUserDetailsDto.UserId} not found."));
         }
 
-        var result = await _unitOfWork.IdentityRepository.ValidateUserPasswordAsync(user, loginUserDto.Password);
-
-        if (!result)
-        {
-            return ServiceResult<UserDto>.Error(new Problem(ErrorCodes.InvalidCredentials, Messages.InvalidCredentials));
-        }
-
-        var userDto = user.Adapt<UserDto>() with
-        {
-            Roles = await _unitOfWork.IdentityRepository.GetUserRolesAsync(user)
-        };
-
-        return ServiceResult<UserDto>.Success(userDto);
-    }
-
-    public async Task<ServiceResult<IdentityResult>> UpdateUser(UpdateUserPhoneNumberDto updateUserPhoneNumberDto)
-    {
-        var user = await _unitOfWork.IdentityRepository.FindUserByIdAsync(updateUserPhoneNumberDto.UserId);
-
-        if (user == null)
-        {
-            return ServiceResult<IdentityResult>.Error(new Problem(ErrorCodes.UserNotFound, $"User with ID {updateUserPhoneNumberDto.UserId} not found."));
-        }
-
-        user.PhoneNumber = updateUserPhoneNumberDto.PhoneNumber;
+        user.FirstName = updateUserDetailsDto.FirstName;
+        user.LastName = updateUserDetailsDto.LastName;
+        user.ProfileImageUrl = updateUserDetailsDto.ProfileImageUrl;
+        user.Bio = updateUserDetailsDto.Bio;
+        user.DateOfBirth = updateUserDetailsDto.DateOfBirth;
+        user.PhoneNumber = updateUserDetailsDto.PhoneNumber;
+        user.Country = updateUserDetailsDto.Country;
+        user.Address = updateUserDetailsDto.Address;
+        user.City = updateUserDetailsDto.City;
+        user.State = updateUserDetailsDto.State;
+        user.PostalCode = updateUserDetailsDto.PostalCode;
 
         var result = await _unitOfWork.IdentityRepository.UpdateUserAsync(user);
 
@@ -175,7 +165,7 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
         }
 
         user.Email = updateLoginDetailsDto.Email;
-        user.UserName = updateLoginDetailsDto.Email;
+        user.UserName = updateLoginDetailsDto.Email.Split('@')[0];
         user.LastPasswordChange = DateTime.UtcNow;
 
         var result = await _unitOfWork.IdentityRepository.ChangeUserPasswordAsync(
@@ -190,6 +180,30 @@ public class IdentityService(IUnitOfWork unitOfWork) : IIdentityService
         }
 
         return ServiceResult<IdentityResult>.Success(result);
+    }
+
+    public async Task<ServiceResult<UserDto>> UserLogin(UserLoginDto loginUserDto)
+    {
+        var user = await _unitOfWork.IdentityRepository.FindUserByEmailAsync(loginUserDto.Email);
+
+        if (user == null)
+        {
+            return ServiceResult<UserDto>.Error(new Problem(ErrorCodes.InvalidCredentials, Messages.InvalidCredentials));
+        }
+
+        var result = await _unitOfWork.IdentityRepository.ValidateUserPasswordAsync(user, loginUserDto.Password);
+
+        if (!result)
+        {
+            return ServiceResult<UserDto>.Error(new Problem(ErrorCodes.InvalidCredentials, Messages.InvalidCredentials));
+        }
+
+        var userDto = user.Adapt<UserDto>() with
+        {
+            Roles = await _unitOfWork.IdentityRepository.GetUserRolesAsync(user)
+        };
+
+        return ServiceResult<UserDto>.Success(userDto);
     }
 
     #endregion

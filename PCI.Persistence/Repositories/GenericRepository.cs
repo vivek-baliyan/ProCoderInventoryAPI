@@ -71,6 +71,32 @@ public class GenericRepository<T>(ApplicationDbContext context) : IGenericReposi
         return await query.ToListAsync();
     }
 
+    public async Task<IEnumerable<T>> GetPaginatedAsync(
+        int pageIndex,
+        int pageSize,
+        Expression<Func<T, bool>> filter = null,
+        string includeroperties = null)
+    {
+        IQueryable<T> query = _dbSet;
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+
+        if (includeroperties != null)
+        {
+            foreach (var includeProp in includeroperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProp);
+            }
+        }
+        return await query
+            .Take(pageSize)
+            .Skip((pageIndex - 1) * pageSize)
+            .ToListAsync();
+    }
+
     public async Task<bool> AnyAsync(Expression<Func<T, bool>> filter)
     {
         return await _dbSet.AnyAsync(filter);

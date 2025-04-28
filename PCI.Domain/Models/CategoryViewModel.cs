@@ -1,4 +1,4 @@
-﻿using PCI.Shared.Common;
+﻿using PCI.Shared.Common.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace PCI.Domain.Models;

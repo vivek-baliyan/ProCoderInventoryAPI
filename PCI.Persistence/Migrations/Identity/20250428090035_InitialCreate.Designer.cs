@@ -11,7 +11,7 @@ using PCI.Persistence.Context;
 namespace PCI.Persistence.Migrations.Identity
 {
     [DbContext(typeof(AppIdentityDbContext))]
-    [Migration("20250420155155_InitialCreate")]
+    [Migration("20250428090035_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -83,11 +83,26 @@ namespace PCI.Persistence.Migrations.Identity
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Address")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("City")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Country")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
@@ -97,6 +112,9 @@ namespace PCI.Persistence.Migrations.Identity
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("FirstName")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("INTEGER");
 
@@ -105,6 +123,9 @@ namespace PCI.Persistence.Migrations.Identity
 
                     b.Property<string>("LastLoginDevice")
                         .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastName")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("LastPasswordChange")
@@ -133,7 +154,16 @@ namespace PCI.Persistence.Migrations.Identity
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("PostalCode")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ProfileImageUrl")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("SecurityStamp")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("State")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("TwoFactorEnabled")

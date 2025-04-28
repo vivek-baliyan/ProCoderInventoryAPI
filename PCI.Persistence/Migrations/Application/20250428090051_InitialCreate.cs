@@ -6,11 +6,42 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PCI.Persistence.Migrations.Application
 {
     /// <inheritdoc />
-    public partial class Category : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "APP");
+
+            migrationBuilder.CreateTable(
+                name: "Organisations",
+                schema: "APP",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserId = table.Column<string>(type: "TEXT", maxLength: 36, nullable: true),
+                    CompanyName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    ContactPerson = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: true),
+                    Email = table.Column<string>(type: "TEXT", nullable: true),
+                    WebsiteUrl = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
+                    Address = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
+                    Country = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    State = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    City = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    PostalCode = table.Column<string>(type: "TEXT", maxLength: 20, nullable: true),
+                    CreatedBy = table.Column<string>(type: "TEXT", nullable: true),
+                    UpdatedBy = table.Column<string>(type: "TEXT", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedOn = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Organisations", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Categories",
                 schema: "APP",
@@ -18,14 +49,14 @@ namespace PCI.Persistence.Migrations.Application
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<string>(type: "TEXT", maxLength: 36, nullable: true),
                     Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     PageTitle = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     UrlIdentifier = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
-                    ParentCategoryId = table.Column<int>(type: "INTEGER", nullable: true),
                     Status = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     PublishDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ParentCategoryId = table.Column<int>(type: "INTEGER", nullable: true),
+                    OrganisationId = table.Column<int>(type: "INTEGER", nullable: false),
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: true),
                     UpdatedBy = table.Column<string>(type: "TEXT", nullable: true),
                     CreatedOn = table.Column<DateTime>(type: "TEXT", nullable: false),
@@ -39,6 +70,13 @@ namespace PCI.Persistence.Migrations.Application
                         column: x => x.ParentCategoryId,
                         principalSchema: "APP",
                         principalTable: "Categories",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Categories_Organisations_OrganisationId",
+                        column: x => x.OrganisationId,
+                        principalSchema: "APP",
+                        principalTable: "Organisations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -86,6 +124,12 @@ namespace PCI.Persistence.Migrations.Application
                 columns: new[] { "Name", "UrlIdentifier" });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Categories_OrganisationId",
+                schema: "APP",
+                table: "Categories",
+                column: "OrganisationId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Categories_ParentCategoryId",
                 schema: "APP",
                 table: "Categories",
@@ -107,6 +151,10 @@ namespace PCI.Persistence.Migrations.Application
 
             migrationBuilder.DropTable(
                 name: "Categories",
+                schema: "APP");
+
+            migrationBuilder.DropTable(
+                name: "Organisations",
                 schema: "APP");
         }
     }

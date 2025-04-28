@@ -4,7 +4,9 @@ using PCI.Shared.Dtos;
 
 namespace PCI.WebAPI.Controllers;
 
-public class ApplicationRoleController(IIdentityService identityService) : BaseController
+public class UserRolesController(
+    IIdentityService identityService,
+    IHttpContextAccessor httpContextAccessor) : BaseController(httpContextAccessor)
 {
     [HttpPost("createRole")]
     public async Task<IActionResult> CreateRole(CreateRoleDto role)
@@ -20,7 +22,7 @@ public class ApplicationRoleController(IIdentityService identityService) : BaseC
 
     }
 
-    [HttpGet("getAllRoles")]
+    [HttpGet("all")]
     public async Task<IActionResult> GetAllRoles()
     {
         var result = await identityService.GetAllRoles();
@@ -33,7 +35,7 @@ public class ApplicationRoleController(IIdentityService identityService) : BaseC
         return StatusCode(StatusCodes.Status200OK, SuccessResponse(result));
     }
 
-    [HttpGet("getById/{roleName}")]
+    [HttpGet("{roleName}")]
     public async Task<IActionResult> GetRoleByName(string roleName)
     {
         var result = await identityService.GetRoleByName(roleName);

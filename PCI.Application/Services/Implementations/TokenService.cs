@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using PCI.Application.Services.Interfaces;
+using PCI.Shared.Common.Constants;
 using PCI.Shared.Dtos;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -20,7 +21,8 @@ public class TokenService(IConfiguration configuration) : ITokenService
         {
             new(JwtRegisteredClaimNames.NameId, userDto.Id),
             new(JwtRegisteredClaimNames.Name, userDto.UserName),
-            new(JwtRegisteredClaimNames.Email, userDto.Email)
+            new(JwtRegisteredClaimNames.Email, userDto.Email),
+            new(JwtClaimNames.OrganisationId, Convert.ToString(userDto.OrganisationId))
         };
 
         claims.AddRange(userDto.Roles.Select(role => new Claim(ClaimTypes.Role, role)));

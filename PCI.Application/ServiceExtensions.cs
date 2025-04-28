@@ -9,13 +9,13 @@ public static class ServiceExtensions
 {
     public static void ConfigureApplication(this IServiceCollection services)
     {
-        IdentityMapsterMappings.Configure();
+        ApplicationMapsterMappings.Configure();
 
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<ISessionManagementService, SessionManagementService>();
 
         services.AddScoped<ITokenService, TokenService>();
-        services.AddScoped<IAccountService, AccountService>();
+        services.AddScoped<IOrganisationService, OrganisationService>();
         services.AddScoped<ICategoryService, CategoryService>();
     }
 }

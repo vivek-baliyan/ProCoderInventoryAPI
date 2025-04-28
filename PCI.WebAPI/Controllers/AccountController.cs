@@ -1,241 +1,124 @@
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PCI.Application.Services.Interfaces;
-using PCI.Shared.Common;
+using PCI.Shared.Common.Constants;
 using PCI.Shared.Dtos;
 
 namespace PCI.WebAPI.Controllers;
 
 public class AccountController(
     IIdentityService identityService,
-    IAccountService accountService,
-    ITokenService tokenService) : BaseController
+    ITokenService tokenService,
+    IOrganisationService organisationService,
+    IHttpContextAccessor httpContextAccessor) : BaseController(httpContextAccessor)
 {
     private readonly IIdentityService _identityService = identityService;
-    private readonly IAccountService _accountService = accountService;
     private readonly ITokenService _tokenService = tokenService;
+    private readonly IOrganisationService _organisationService = organisationService;
 
     [AllowAnonymous]
     [HttpPost("register")]
     public async Task<IActionResult> Register(RegisterUserDto registerUserDto)
     {
-        try
+        var result = await _identityService.CreateUser(registerUserDto);
+
+        if (!result.Succeeded)
         {
-            // 1. Create the user in the identity database
-            var result = await _identityService.CreateUser(registerUserDto);
-
-            if (!result.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
-            }
-
-            try
-            {
-                var userResponse = await _identityService.GetUserByEmail(registerUserDto.Email);
-                if (!userResponse.Succeeded)
-                {
-                    return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(userResponse));
-                }
-
-                // 2. Create the user profile in the application database
-                var userProfile = await _accountService.CreateUserProfile(userResponse.ResultData.Id, registerUserDto);
-
-                if (!userProfile.Succeeded)
-                {
-                    return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(userProfile));
-                }
-
-                return StatusCode(StatusCodes.Status200OK,
-                    SuccessResponse(userProfile.ResultData.UserId, Messages.UserProfileCreated));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError,
-                    ErrorResponse(ex.ToString(), $"An error occurred while creating user profile: {ex.Message}"));
-            }
+            return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                ErrorResponse(ex.ToString(), $"An error occurred during registration: {ex.Message}"));
-        }
+
+        return StatusCode(StatusCodes.Status200OK,
+                SuccessResponse(result.ResultData, Messages.OrganisationCreated));
     }
 
     [AllowAnonymous]
     [HttpPost("login")]
     public async Task<ActionResult<LoginResponseDto>> Login(UserLoginDto loginUserDto)
     {
-        try
+        var logintResult = await _identityService.UserLogin(loginUserDto);
+
+        if (!logintResult.Succeeded)
         {
-            var logintResult = await _identityService.UserLogin(loginUserDto);
-
-            if (!logintResult.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(logintResult));
-            }
-
-            var userProfileResult = await _accountService.GetUserProfileByUserId(logintResult.ResultData.Id);
-
-            if (!userProfileResult.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(userProfileResult));
-            }
-
-            var accessToken = _tokenService.GenerateAccessToken(logintResult.ResultData);
-            var refreshToken = _tokenService.GenerateRefreshToken();
-
-            var loginResponse = BindLoginResponse(
-                logintResult.ResultData,
-                userProfileResult.ResultData,
-                accessToken,
-                refreshToken);
-
-            return StatusCode(StatusCodes.Status200OK,
-                SuccessResponse(loginResponse, Messages.UserLoggedIn));
+            return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(logintResult));
         }
-        catch (Exception ex)
+
+        var organisationResult = await _organisationService.GetOrganisationByUserId(logintResult.ResultData.Id);
+        var userDto = logintResult.ResultData with
         {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                ErrorResponse(ex.ToString(), $"An error occurred during login: {ex.Message}"));
-        }
+            OrganisationId = organisationResult.Succeeded ? organisationResult.ResultData.OrganisationId : 0
+        };
+
+        var accessToken = _tokenService.GenerateAccessToken(userDto);
+
+        var refreshToken = _tokenService.GenerateRefreshToken();
+
+        var loginResponse = BindLoginResponse(
+            userDto,
+            accessToken,
+            refreshToken);
+
+        return StatusCode(StatusCodes.Status200OK,
+            SuccessResponse(loginResponse, Messages.UserLoggedIn));
     }
 
     [HttpPost("assignRoleToUser")]
     public async Task<IActionResult> AssignRoleToUser(AssignUserRoleDto assignUserRoleDto)
     {
-        try
-        {
-            var result = await _identityService.AssignRoleToUser(assignUserRoleDto.UserEmail, assignUserRoleDto.RoleName);
+        var result = await _identityService.AssignRoleToUser(assignUserRoleDto.UserEmail, assignUserRoleDto.RoleName);
 
-            if (!result.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
-            }
-
-            return StatusCode(StatusCodes.Status200OK,
-                SuccessResponse(result.ResultData, Messages.RoleAssigned));
-        }
-        catch (Exception ex)
+        if (!result.Succeeded)
         {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                ErrorResponse(ex.ToString(), $"An error occurred while assigning role to user: {ex.Message}"));
+            return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
         }
+
+        return StatusCode(StatusCodes.Status200OK,
+            SuccessResponse(result.ResultData, Messages.RoleAssigned));
+    }
+
+    [HttpGet("getAccountByUserId/{userId}")]
+    public async Task<ActionResult<UserDto>> GetAccountByUserId(string userId)
+    {
+        var result = await _identityService.GetUserById(userId);
+
+        if (!result.Succeeded)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
+        }
+
+        return StatusCode(StatusCodes.Status200OK,
+            SuccessResponse(result.ResultData, Messages.OrganisationRetrieved));
+    }
+
+    [HttpPut("updateProfile")]
+    public async Task<IActionResult> UpdateProfile(UpdateUserDetailsDto updateUserDetailsDto)
+    {
+        var identityUpdateResult = await _identityService.UpdateUserDetails(updateUserDetailsDto);
+
+        if (!identityUpdateResult.Succeeded)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(identityUpdateResult));
+        }
+
+        return StatusCode(StatusCodes.Status200OK,
+            SuccessResponse(identityUpdateResult.ResultData, Messages.OrganisationUpdated));
     }
 
     [HttpPut("updateLoginDetails")]
     public async Task<IActionResult> UpdateLoginDetails(UpdateLoginDetailsDto updateLoginDetailsDto)
     {
-        try
+        var result = await _identityService.UpdateLoginDetails(updateLoginDetailsDto);
+
+        if (!result.Succeeded)
         {
-            var result = await _identityService.UpdateLoginDetails(updateLoginDetailsDto);
-
-            if (!result.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
-            }
-
-            return StatusCode(StatusCodes.Status200OK,
-                SuccessResponse(result.ResultData, Messages.UserLoginDetailsUpdated));
+            return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
         }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                ErrorResponse(ex.ToString(), $"An error occurred while updating user login details: {ex.Message}"));
-        }
-    }
 
-    [HttpGet("getAccountByUserId/{userId}")]
-    public async Task<ActionResult<UserProfileDetailDto>> GetAccountByUserId(string userId)
-    {
-        try
-        {
-            var result = await _identityService.GetUserById(userId);
-
-            if (!result.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
-            }
-
-            var userProfileResult = await _accountService.GetUserProfileByUserId(userId);
-
-            if (!userProfileResult.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(userProfileResult));
-            }
-
-            var userProfileDetail = userProfileResult.ResultData.Adapt<UserProfileDetailDto>() with
-            {
-                Email = result.ResultData.Email,
-                UserName = result.ResultData.UserName,
-                PhoneNumber = result.ResultData.PhoneNumber,
-            };
-
-            return StatusCode(StatusCodes.Status200OK,
-                SuccessResponse(userProfileDetail, Messages.UserProfileRetrieved));
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                ErrorResponse(ex.ToString(), $"An error occurred while retrieving user: {ex.Message}"));
-        }
-    }
-
-    [HttpPut("updateProfile")]
-    public async Task<IActionResult> UpdateProfile(UpdateProfileDto updateProfileDto)
-    {
-        try
-        {
-            var identityUpdateResult = await _identityService.UpdateUser(
-                new UpdateUserPhoneNumberDto(updateProfileDto.UserId, updateProfileDto.PhoneNumber));
-
-            if (!identityUpdateResult.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(identityUpdateResult));
-            }
-
-            var result = await _accountService.UpdateProfile(updateProfileDto);
-
-            if (!result.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
-            }
-
-            return StatusCode(StatusCodes.Status200OK,
-                SuccessResponse(result.ResultData, Messages.UserProfileUpdated));
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                ErrorResponse(ex.ToString(), $"An error occurred while updating user profile: {ex.Message}"));
-        }
-    }
-
-    [HttpPut("updateProfileSettings")]
-    public async Task<IActionResult> UpdateProfileSettings(UpdateProfileSettingsDto updateProfileSettingsDto)
-    {
-        try
-        {
-            var result = await _accountService.UpdateProfileSettings(updateProfileSettingsDto);
-
-            if (!result.Succeeded)
-            {
-                return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
-            }
-
-            return StatusCode(StatusCodes.Status200OK,
-                SuccessResponse(result.ResultData, Messages.UserProfileUpdated));
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(StatusCodes.Status500InternalServerError,
-                ErrorResponse(ex.ToString(), $"An error occurred while updating user profile: {ex.Message}"));
-        }
+        return StatusCode(StatusCodes.Status200OK,
+            SuccessResponse(result.ResultData, Messages.UserLoginDetailsUpdated));
     }
 
     private static LoginResponseDto BindLoginResponse(
         UserDto userDto,
-        UserProfileDto userProfileDto,
         string accessToken,
         string refreshToken)
     {
@@ -249,9 +132,9 @@ public class AccountController(
             LastPasswordChange = userDto.LastPasswordChange,
             UserRoles = userDto.Roles,
 
-            FirstName = userProfileDto.FirstName,
-            LastName = userProfileDto.LastName,
-            ProfileImageUrl = userProfileDto.ProfileImageUrl,
+            FirstName = userDto.FirstName,
+            LastName = userDto.LastName,
+            ProfileImageUrl = userDto.ProfileImageUrl,
             AccessToken = accessToken,
             RefreshToken = refreshToken
         };
