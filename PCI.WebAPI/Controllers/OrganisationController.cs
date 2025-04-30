@@ -38,7 +38,7 @@ public class OrganisationController(
             SuccessResponse(result.ResultData, Messages.OrganisationUpdated));
     }
 
-    [HttpGet("{userId}")]
+    [HttpGet("getByUserId/{userId}")]
     public async Task<ActionResult<OrganisationDto>> GetUserOrganisation(string userId)
     {
         //if (userId != UserId)

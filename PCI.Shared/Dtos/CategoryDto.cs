@@ -18,8 +18,6 @@ public record CategoryDto
 
     public int? ParentCategoryId { get; init; }
 
-    public string ImagePath { get; init; }
-
     public VisibilityStatus Status { get; init; }
 
     public DateTime? PublishDate { get; init; }

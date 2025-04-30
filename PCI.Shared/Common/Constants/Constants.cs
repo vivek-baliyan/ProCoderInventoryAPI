@@ -11,6 +11,7 @@
         public const string CategoryAlreadyExists = "CategoryAlreadyExists";
         public const string CategoryImageUploadError = "CategoryImageUploadError";
         public const string CategoryRetrievalError = "CategoryRetrievalError";
+        public const string CategoryNotFound = "CategoryNotFound";
     }
 
     public static class Messages
@@ -32,5 +33,6 @@
         public const string CategoryUpdated = "Category updated successfully.";
         public const string CategoryDeleted = "Category deleted successfully.";
         public const string CategoryCreationFailed = "Category creation failed. Please try again.";
+        public const string CategoryNotFound = "Category not found.";
     }
 }

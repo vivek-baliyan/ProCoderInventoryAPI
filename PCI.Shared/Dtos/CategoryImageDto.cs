@@ -4,6 +4,7 @@ public record CategoryImageDto
 {
     public int CategoryId { get; set; }
 
+    public string Image { get; set; }
     public string ImagePath { get; set; }
 
     public string AltText { get; set; }

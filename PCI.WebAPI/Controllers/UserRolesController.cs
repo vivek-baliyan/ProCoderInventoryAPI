@@ -35,7 +35,7 @@ public class UserRolesController(
         return StatusCode(StatusCodes.Status200OK, SuccessResponse(result));
     }
 
-    [HttpGet("{roleName}")]
+    [HttpGet("getByName/{roleName}")]
     public async Task<IActionResult> GetRoleByName(string roleName)
     {
         var result = await identityService.GetRoleByName(roleName);

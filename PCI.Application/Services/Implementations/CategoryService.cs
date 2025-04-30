@@ -9,11 +9,15 @@ using PCI.Shared.Dtos;
 
 namespace PCI.Application.Services.Implementations;
 
-public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
+public class CategoryService(IUnitOfWork unitOfWork, IImageService imageService) : ICategoryService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly IImageService _imageService = imageService;
 
-    public async Task<ServiceResult<CategoryDto>> CreateCategory(string userId, int organisationId, CreateCategoryDto createCategoryDto)
+    public async Task<ServiceResult<bool>> CreateCategory(
+        string userId,
+        int organisationId,
+        CreateCategoryDto createCategoryDto)
     {
         var existingCategory = await _unitOfWork.Repository<Category>()
             .GetFirstOrDefaultAsync(x => x.Name == createCategoryDto.Name
@@ -22,7 +26,7 @@ public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
         // Check if the category already exists
         if (existingCategory != null)
         {
-            return ServiceResult<CategoryDto>
+            return ServiceResult<bool>
                 .Error(new Problem(ErrorCodes.CategoryAlreadyExists, Messages.CategoryAlreadyExists));
         }
         try
@@ -36,7 +40,7 @@ public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
                 Description = createCategoryDto.Description,
                 ParentCategoryId = createCategoryDto.ParentCategoryId == 0 ? null : createCategoryDto.ParentCategoryId,
                 Status = (VisibilityStatus)createCategoryDto.Status,
-                PublishDate = DateTime.UtcNow,
+                PublishDate = createCategoryDto.PublishDate,
                 CreatedBy = userId,
                 CreatedOn = DateTime.UtcNow,
             };
@@ -48,32 +52,71 @@ public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
             {
                 if (!string.IsNullOrEmpty(createCategoryDto.Image))
                 {
-                    var imagePath = await UploadCategoryImage(createCategoryDto.Image);
+                    category.CategoryImages = await UploadCategoryImage(userId, createCategoryDto.Image);
 
-
-                    List<CategoryImage> categoryImages = [new CategoryImage()
-                    {
-                        ImagePath = imagePath
-                    }];
-
-                    category.CategoryImages = categoryImages;
                     _unitOfWork.Repository<Category>().Update(category);
                     await _unitOfWork.SaveChangesAsync();
                 }
             }
             catch (Exception ex)
             {
-                return ServiceResult<CategoryDto>
+                return ServiceResult<bool>
                     .Error(new Problem(ErrorCodes.CategoryImageUploadError, ex.Message));
             }
-            return ServiceResult<CategoryDto>
-                .Success(category.Adapt<CategoryDto>());
+
+            return ServiceResult<bool>.Success(true);
         }
         catch (Exception ex)
         {
-            return ServiceResult<CategoryDto>
+            return ServiceResult<bool>
                 .Error(new Problem(ErrorCodes.CategoryCreationError, ex.Message));
         }
+    }
+
+    public async Task<ServiceResult<bool>> UpdateCategory(
+        string userId,
+        int organisationId,
+        UpdateCategoryDto updateCategoryDto)
+    {
+        var category = await _unitOfWork.Repository<Category>()
+            .GetFirstOrDefaultAsync(x => x.Id == updateCategoryDto.CategoryId && x.OrganisationId == organisationId);
+
+        if (category == null)
+        {
+            return ServiceResult<bool>
+                .Error(new Problem(ErrorCodes.CategoryNotFound, Messages.CategoryNotFound));
+        }
+
+        category.Name = updateCategoryDto.Name;
+        category.PageTitle = updateCategoryDto.PageTitle;
+        category.UrlIdentifier = updateCategoryDto.UrlIdentifier;
+        category.Description = updateCategoryDto.Description;
+        category.ParentCategoryId = updateCategoryDto.ParentCategoryId == 0 ? null : updateCategoryDto.ParentCategoryId;
+        category.Status = (VisibilityStatus)updateCategoryDto.Status;
+        category.PublishDate = updateCategoryDto.PublishDate;
+        category.UpdatedBy = userId;
+        category.UpdatedOn = DateTime.UtcNow;
+
+        _unitOfWork.Repository<Category>().Update(category);
+        await _unitOfWork.SaveChangesAsync();
+
+        try
+        {
+            if (!string.IsNullOrEmpty(updateCategoryDto.Image))
+            {
+                category.CategoryImages = await UploadCategoryImage(userId, updateCategoryDto.Image);
+
+                _unitOfWork.Repository<Category>().Update(category);
+                await _unitOfWork.SaveChangesAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<bool>
+                .Error(new Problem(ErrorCodes.CategoryImageUploadError, ex.Message));
+        }
+
+        return ServiceResult<bool>.Success(true);
     }
 
     public async Task<ServiceResult<List<CategoryDropdownDto>>> GetCategoriesForDropdown()
@@ -93,27 +136,39 @@ public class CategoryService(IUnitOfWork unitOfWork) : ICategoryService
             .Success(categories.Adapt<List<CategoryListItemDto>>());
     }
 
-    private static async Task<string> UploadCategoryImage(string base64Data)
+    public async Task<ServiceResult<CategoryDto>> GetCategoryById(int id)
     {
-        if (base64Data.Contains(','))
+        var category = await _unitOfWork.Repository<Category>()
+            .GetFirstOrDefaultAsync(x => x.Id == id, "CategoryImages");
+
+        if (category == null)
         {
-            base64Data = base64Data.Split(',')[1];
+            return ServiceResult<CategoryDto>
+                .Error(new Problem(ErrorCodes.CategoryNotFound, Messages.CategoryNotFound));
         }
 
-        byte[] imageBytes = Convert.FromBase64String(base64Data);
+        var categoryDto = category.Adapt<CategoryDto>();
 
-        // Generate a unique file name
-        string fileName = $"{Guid.NewGuid()}.png";
-        string folderPath = Path.Combine(Environment.CurrentDirectory, "Uploads");
-        string filePath = Path.Combine(folderPath, fileName);
+        var imagePath = categoryDto.CategoryImages?.FirstOrDefault()?.ImagePath;
+        var image = await _imageService.ConvertImageToBase64(imagePath);
 
-        if (!Directory.Exists(folderPath))
+        if (!string.IsNullOrEmpty(image))
         {
-            Directory.CreateDirectory(folderPath);
+            categoryDto.CategoryImages.FirstOrDefault().Image = image;
         }
 
-        await File.WriteAllBytesAsync(filePath, imageBytes);
+        return ServiceResult<CategoryDto>.Success(categoryDto);
+    }
 
-        return $"/Uploads/{fileName}";
+    private async Task<List<CategoryImage>> UploadCategoryImage(string userId, string image)
+    {
+        var imagePath = await _imageService.UploadImage(image);
+
+        return [new CategoryImage()
+        {
+            ImagePath = imagePath,
+            CreatedBy = userId,
+            CreatedOn = DateTime.UtcNow,
+        }];
     }
 }

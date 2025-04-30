@@ -11,11 +11,12 @@ public static class ApplicationMapsterMappings
         var config = TypeAdapterConfig.GlobalSettings;
 
         config.ForType<Organisation, OrganisationDto>()
-              .Map(dest => dest.OrganisationId, src => src.Id);
+              .Map(destinationMember => destinationMember.OrganisationId, sourceMember => sourceMember.Id);
 
         config.ForType<Category, CategoryDto>()
-            .Map(dest => dest.ParentCategory, src => src.ParentCategory)
-            .Map(dest => dest.ChildCategories, src => src.ChildCategories.Adapt<List<CategoryDto>>())
+            .Map(destinationMember => destinationMember.ParentCategory, sourceMember => sourceMember.ParentCategory)
+            .Map(destinationMember => destinationMember.ChildCategories, sourceMember => sourceMember.ChildCategories.Adapt<List<CategoryDto>>())
+            .Map(destinationMember => destinationMember.CategoryImages, sourceMember => sourceMember.CategoryImages.Adapt<List<CategoryImageDto>>())
             .MaxDepth(2);
     }
 }
