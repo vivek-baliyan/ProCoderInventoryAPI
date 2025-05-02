@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using PCI.Shared.Common;
-using PCI.Shared.Dtos;
+using PCI.Shared.Dtos.Identity;
 
 namespace PCI.Application.Services.Interfaces;
 

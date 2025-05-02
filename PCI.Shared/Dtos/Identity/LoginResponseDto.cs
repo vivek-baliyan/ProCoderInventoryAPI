@@ -1,5 +1,4 @@
-﻿
-namespace PCI.Shared.Dtos;
+﻿namespace PCI.Shared.Dtos.Identity;
 
 public record LoginResponseDto
 {

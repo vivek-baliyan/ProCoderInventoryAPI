@@ -1,6 +1,6 @@
 ﻿using PCI.Shared.Common.Enums;
 
-namespace PCI.Shared.Dtos;
+namespace PCI.Shared.Dtos.Category;
 
 public record CategoryListItemDto
 {

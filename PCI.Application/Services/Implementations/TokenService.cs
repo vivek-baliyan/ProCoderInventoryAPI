@@ -2,7 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using PCI.Application.Services.Interfaces;
 using PCI.Shared.Common.Constants;
-using PCI.Shared.Dtos;
+using PCI.Shared.Dtos.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;

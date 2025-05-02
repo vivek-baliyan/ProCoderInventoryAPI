@@ -1,8 +1,9 @@
 ﻿using PCI.Shared.Common.Enums;
+using PCI.Shared.Dtos.Category;
 
-namespace PCI.Shared.Dtos;
+namespace PCI.Shared.Dtos.Product;
 
-public record CategoryDto
+public record ProductDto
 {
     public int Id { get; init; }
 

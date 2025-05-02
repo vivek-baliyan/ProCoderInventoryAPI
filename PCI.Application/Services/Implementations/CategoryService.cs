@@ -5,7 +5,7 @@ using PCI.Domain.Models;
 using PCI.Shared.Common;
 using PCI.Shared.Common.Constants;
 using PCI.Shared.Common.Enums;
-using PCI.Shared.Dtos;
+using PCI.Shared.Dtos.Category;
 
 namespace PCI.Application.Services.Implementations;
 
@@ -119,12 +119,12 @@ public class CategoryService(IUnitOfWork unitOfWork, IImageService imageService)
         return ServiceResult<bool>.Success(true);
     }
 
-    public async Task<ServiceResult<List<CategoryDropdownDto>>> GetCategoriesForDropdown()
+    public async Task<ServiceResult<List<CategoryDropdownResponseDto>>> GetCategoriesForDropdown()
     {
         var categories = await _unitOfWork.Repository<Category>().GetAllAsync();
 
-        return ServiceResult<List<CategoryDropdownDto>>
-            .Success(categories.Adapt<List<CategoryDropdownDto>>());
+        return ServiceResult<List<CategoryDropdownResponseDto>>
+            .Success(categories.Adapt<List<CategoryDropdownResponseDto>>());
     }
 
     public async Task<ServiceResult<List<CategoryListItemDto>>> GetAllCategories(int pageIndex, int pageSize)

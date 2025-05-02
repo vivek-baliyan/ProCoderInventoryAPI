@@ -32,4 +32,5 @@ public class Category : BaseEntity
 
     public virtual ICollection<Category> ChildCategories { get; set; }
     public virtual ICollection<CategoryImage> CategoryImages { get; set; }
+    public virtual ICollection<ProductCategory> ProductCategories { get; set; }
 }

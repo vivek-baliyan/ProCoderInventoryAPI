@@ -1,4 +1,4 @@
-﻿namespace PCI.Shared.Dtos;
+﻿namespace PCI.Shared.Dtos.Category;
 
 public record CreateCategoryDto
 {

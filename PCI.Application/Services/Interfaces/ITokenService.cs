@@ -1,4 +1,4 @@
-﻿using PCI.Shared.Dtos;
+﻿using PCI.Shared.Dtos.Identity;
 
 namespace PCI.Application.Services.Interfaces;
 

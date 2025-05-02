@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PCI.Application.Services.Interfaces;
-using PCI.Shared.Dtos;
+using PCI.Shared.Dtos.Category;
 
 namespace PCI.WebAPI.Controllers;
 public class CategoryController(
@@ -42,7 +42,7 @@ public class CategoryController(
     }
 
     [HttpGet("dropdown")]
-    public async Task<ActionResult<CategoryDropdownDto>> GetCategoriesForDropdown()
+    public async Task<ActionResult<CategoryDropdownResponseDto>> GetCategoriesForDropdown()
     {
 
         var result = await _categoryService.GetCategoriesForDropdown();

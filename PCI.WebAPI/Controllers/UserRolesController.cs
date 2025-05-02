@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PCI.Application.Services.Interfaces;
-using PCI.Shared.Dtos;
+using PCI.Shared.Dtos.Identity;
 
 namespace PCI.WebAPI.Controllers;
 
