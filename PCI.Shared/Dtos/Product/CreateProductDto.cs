@@ -37,9 +37,6 @@ public record CreateProductDto
     [DataType(DataType.Date)]
     public DateTime? PublishDate { get; set; }
 
-    [DataType(DataType.Time)]
-    public TimeSpan? PublishTime { get; set; }
-
     // Inventory Info
     [StringLength(50, ErrorMessage = "SKU cannot exceed 50 characters")]
     public string SKU { get; set; }

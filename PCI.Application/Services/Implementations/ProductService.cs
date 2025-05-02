@@ -61,7 +61,7 @@ public class ProductService(IUnitOfWork unitOfWork, IImageService imageService) 
         }
     }
 
-    public async Task<ServiceResult<bool>> UpdareProduct(
+    public async Task<ServiceResult<bool>> UpdateProduct(
         string userId,
         int OrganisationId,
         UpdateProductDto updateProductDto)
