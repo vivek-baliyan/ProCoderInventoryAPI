@@ -1,6 +1,6 @@
 ﻿namespace PCI.Shared.Common.Constants
 {
-    public static class ErrorCodes
+    public class ErrorCodes
     {
         public const string UserNotFound = "UserNotFound";
         public const string InvalidCredentials = "InvalidCredentials";
@@ -12,9 +12,12 @@
         public const string CategoryImageUploadError = "CategoryImageUploadError";
         public const string CategoryRetrievalError = "CategoryRetrievalError";
         public const string CategoryNotFound = "CategoryNotFound";
+        public const string ProductAlreadyExists = "ProductAlreadyExists";
+        public const string ProductCreationError = "ProductCreationError";
+        public const string ProductNotFound = "ProductNotFound";
     }
 
-    public static class Messages
+    public class Messages
     {
         public const string InvalidCredentials = "Invalid email or password.";
         public const string SessionNotFound = "Session not found or inactive.";

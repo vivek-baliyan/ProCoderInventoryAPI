@@ -24,7 +24,6 @@ public class Product : BaseEntity
 
     // Publishing Schedule
     public DateTime? PublishDate { get; set; }
-    public TimeSpan? PublishTime { get; set; }
 
     // Inventory Info
     public string SKU { get; set; }
