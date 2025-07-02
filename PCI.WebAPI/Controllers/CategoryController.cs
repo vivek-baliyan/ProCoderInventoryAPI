@@ -26,7 +26,7 @@ public class CategoryController(
     }
 
     [HttpPut("update")]
-    public async Task<ActionResult<CategoryDto>> UpdateCategory([FromBody] UpdateCategoryDto updateCategoryDto)
+    public async Task<ActionResult<bool>> UpdateCategory([FromBody] UpdateCategoryDto updateCategoryDto)
     {
         var result = await _categoryService.UpdateCategory(
             UserId,

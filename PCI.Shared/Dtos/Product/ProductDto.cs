@@ -14,7 +14,6 @@ public record ProductDto
     public string Coupon { get; set; }
     public string Status { get; set; }
     public DateTime? PublishDate { get; set; }
-    public TimeSpan? PublishTime { get; set; }
     public string SKU { get; set; }
     public int StockQuantity { get; set; }
     public List<CategoryDto> Categories { get; set; } = [];
@@ -26,6 +25,4 @@ public record ProductDto
     public bool HasSizeXL { get; set; }
     public List<ProductVariantDto> Variants { get; set; } = [];
     public List<ProductImageDto> Images { get; set; } = [];
-    public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
 }

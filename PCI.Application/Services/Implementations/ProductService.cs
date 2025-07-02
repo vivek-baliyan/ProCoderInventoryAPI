@@ -94,6 +94,15 @@ public class ProductService(IUnitOfWork unitOfWork, IImageService imageService) 
         return ServiceResult<bool>.Success(true);
     }
 
+    public async Task<ServiceResult<List<ProductListItemDto>>> GetAllProducts(int pageIndex, int pageSize)
+    {
+        var products = await _unitOfWork.Repository<Product>()
+            .GetPaginatedAsync(pageIndex, pageSize);
+
+        return ServiceResult<List<ProductListItemDto>>
+            .Success(products.Adapt<List<ProductListItemDto>>());
+    }
+
     public async Task<ServiceResult<ProductDto>> GetProductById(int id)
     {
         var product = await _unitOfWork.Repository<Product>()

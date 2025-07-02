@@ -26,7 +26,7 @@ public class ProductController(
     }
 
     [HttpPut("update")]
-    public async Task<ActionResult<ProductDto>> UpdateProduct([FromBody] UpdateProductDto updateProductDto)
+    public async Task<ActionResult<bool>> UpdateProduct([FromBody] UpdateProductDto updateProductDto)
     {
         var result = await _productService.UpdateProduct(
             UserId,
@@ -52,5 +52,18 @@ public class ProductController(
         }
 
         return StatusCode(StatusCodes.Status200OK, SuccessResponse(result.ResultData, "Product retreived successfully."));
+    }
+
+    [HttpGet("all/{pageIndex}/{pageSize}")]
+    public async Task<ActionResult<ProductListItemDto>> GetAllProducts(int pageIndex, int pageSize)
+    {
+        var result = await _productService.GetAllProducts(pageIndex, pageSize);
+
+        if (!result.Succeeded)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
+        }
+
+        return StatusCode(StatusCodes.Status200OK, SuccessResponse(result.ResultData, "Products retreived successfully."));
     }
 }
