@@ -1,81 +1,48 @@
-﻿using PCI.Domain.Common;
+using PCI.Domain.Common;
 using PCI.Shared.Common.Enums;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PCI.Domain.Models;
 
 public class Product : BaseEntity
 {
-    [StringLength(100)]
     public string SKU { get; set; }
-
-    [Required]
-    [StringLength(200)]
     public string Name { get; set; }
-
-    [StringLength(1000)]
     public string Description { get; set; }
-
     public ProductType ProductType { get; set; } = ProductType.Goods;
-
     public ProductStatus Status { get; set; } = ProductStatus.Active;
-
     public bool IsActive { get; set; } = true;
     public bool IsTaxable { get; set; } = true;
     public bool TrackInventory { get; set; } = true;
-
-    // Basic tracking settings
     public bool SerialNumberTracking { get; set; } = false;
     public bool BatchTracking { get; set; } = false;
 
-    // Item Group relationship
+    // Relationships
     public int? ItemGroupId { get; set; }
-    [ForeignKey("ItemGroupId")]
     public virtual ItemGroup ItemGroup { get; set; }
 
-    // Brand relationship
     public int? BrandId { get; set; }
-    [ForeignKey("BrandId")]
     public virtual Brand Brand { get; set; }
 
     // Product identification codes
-    [StringLength(100)]
     public string ManufacturerPartNumber { get; set; }
-
-    [StringLength(50)]
     public string UPC { get; set; }
-
-    [StringLength(50)]
     public string EAN { get; set; }
-
-    [StringLength(50)]
     public string ISBN { get; set; }
 
-    // Accounting Integration (GL Accounts)
+    // GL Accounts for accounting integration
     public int? SalesAccountId { get; set; }
-    public int? PurchaseAccountId { get; set; }  // COGS Account
-    public int? InventoryAccountId { get; set; }  // Asset Account
-
-    [ForeignKey("SalesAccountId")]
+    public int? PurchaseAccountId { get; set; }
+    public int? InventoryAccountId { get; set; }
     public virtual ChartOfAccounts SalesAccount { get; set; }
-
-    [ForeignKey("PurchaseAccountId")]
     public virtual ChartOfAccounts PurchaseAccount { get; set; }
-
-    [ForeignKey("InventoryAccountId")]
     public virtual ChartOfAccounts InventoryAccount { get; set; }
 
-    // Default pricing (for UI and default price list population)
-    [Column(TypeName = "decimal(18,2)")]
+    // Pricing
     public decimal? SellingPrice { get; set; }
-
-    [Column(TypeName = "decimal(18,2)")]
     public decimal? CostPrice { get; set; }
 
-    // Organization relationship for multi-tenancy
+    // Multi-tenancy
     public int OrganisationId { get; set; }
-    [ForeignKey("OrganisationId")]
     public virtual Organisation Organisation { get; set; }
 
     // Navigation properties

@@ -1,44 +1,33 @@
 using PCI.Domain.Common;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using PCI.Shared.Common.Enums;
 
 namespace PCI.Domain.Models;
 
 public class ChartOfAccounts : BaseEntity
 {
-    [Required]
-    [StringLength(20)]
     public string AccountCode { get; set; }
-
-    [Required]
-    [StringLength(200)]
     public string AccountName { get; set; }
-
-    [Required]
-    [StringLength(50)]
-    public string AccountType { get; set; } // Asset, Liability, Income, Expense, Equity
-
-    [StringLength(50)]
-    public string SubType { get; set; } // Current Asset, Fixed Asset, Sales Revenue, COGS, etc.
-
-    [StringLength(1000)]
+    public AccountType AccountType { get; set; }
+    public AccountSubType SubType { get; set; }
+    public BalanceType NormalBalanceType { get; set; }
     public string Description { get; set; }
-
     public bool IsActive { get; set; } = true;
-
-    // Sub-account hierarchy (up to 2 levels)
-    public int? ParentAccountId { get; set; }
-
-    [ForeignKey("ParentAccountId")]
-    public virtual ChartOfAccounts ParentAccount { get; set; }
-
-    // Current balance (for balance sheet accounts)
-    [Column(TypeName = "decimal(18,2)")]
+    public bool IsSystemAccount { get; set; } = false;
     public decimal CurrentBalance { get; set; } = 0;
 
-    public int OrganisationId { get; set; }
+    // Hierarchy
+    public int? ParentAccountId { get; set; }
+    public virtual ChartOfAccounts ParentAccount { get; set; }
 
-    [ForeignKey("OrganisationId")]
+    // Currency and integration
+    public int? CurrencyId { get; set; }
+    public virtual Currency Currency { get; set; }
+    public string ExternalAccountId { get; set; }
+    public string ExternalSystemName { get; set; }
+    public DateTime? LastSyncDate { get; set; }
+
+    // Multi-tenancy
+    public int OrganisationId { get; set; }
     public virtual Organisation Organisation { get; set; }
 
     // Navigation properties
