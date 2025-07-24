@@ -4,7 +4,6 @@ using PCI.Application.Services.Interfaces;
 using PCI.Domain.Models;
 using PCI.Shared.Common;
 using PCI.Shared.Common.Constants;
-using PCI.Shared.Common.Enums;
 using PCI.Shared.Dtos.Product;
 
 namespace PCI.Application.Services.Implementations;
@@ -33,17 +32,27 @@ public class ProductService(IUnitOfWork unitOfWork, IImageService imageService) 
         {
             var product = new Product
             {
-                Name = createProductDto.Name,
-                PageTitle = createProductDto.PageTitle,
-                UrlIdentifier = createProductDto.UrlIdentifier,
-                Description = createProductDto.Description,
-                OldPrice = createProductDto.OldPrice,
-                Price = createProductDto.Price,
-                Coupon = createProductDto.Coupon,
-                Status = (VisibilityStatus)createProductDto.Status,
-                PublishDate = createProductDto.PublishDate,
                 SKU = createProductDto.SKU,
-                StockQuantity = createProductDto.StockQuantity,
+                Name = createProductDto.Name,
+                Description = createProductDto.Description,
+                ProductType = createProductDto.ProductType,
+                Status = createProductDto.Status,
+                IsActive = createProductDto.IsActive,
+                IsTaxable = createProductDto.IsTaxable,
+                TrackInventory = createProductDto.TrackInventory,
+                SerialNumberTracking = createProductDto.SerialNumberTracking,
+                BatchTracking = createProductDto.BatchTracking,
+                ItemGroupId = createProductDto.ItemGroupId,
+                BrandId = createProductDto.BrandId,
+                ManufacturerPartNumber = createProductDto.ManufacturerPartNumber,
+                UPC = createProductDto.UPC,
+                EAN = createProductDto.EAN,
+                ISBN = createProductDto.ISBN,
+                SalesAccountId = createProductDto.SalesAccountId,
+                PurchaseAccountId = createProductDto.PurchaseAccountId,
+                InventoryAccountId = createProductDto.InventoryAccountId,
+                SellingPrice = createProductDto.SellingPrice,
+                CostPrice = createProductDto.CostPrice,
                 OrganisationId = OrganisationId,
                 CreatedBy = userId,
                 CreatedOn = DateTime.UtcNow,
@@ -76,48 +85,102 @@ public class ProductService(IUnitOfWork unitOfWork, IImageService imageService) 
                 .Error(new Problem(ErrorCodes.ProductNotFound, "Product not found"));
         }
 
-        existingProduct.Name = updateProductDto.Name;
-        existingProduct.PageTitle = updateProductDto.PageTitle;
-        existingProduct.UrlIdentifier = updateProductDto.UrlIdentifier;
-        existingProduct.Description = updateProductDto.Description;
-        existingProduct.OldPrice = updateProductDto.OldPrice;
-        existingProduct.Price = updateProductDto.Price;
-        existingProduct.Coupon = updateProductDto.Coupon;
-        existingProduct.Status = (VisibilityStatus)updateProductDto.Status;
-        existingProduct.PublishDate = updateProductDto.PublishDate;
         existingProduct.SKU = updateProductDto.SKU;
-        existingProduct.StockQuantity = updateProductDto.StockQuantity;
+        existingProduct.Name = updateProductDto.Name;
+        existingProduct.Description = updateProductDto.Description;
+        existingProduct.ProductType = updateProductDto.ProductType;
+        existingProduct.Status = updateProductDto.Status;
+        existingProduct.IsActive = updateProductDto.IsActive;
+        existingProduct.IsTaxable = updateProductDto.IsTaxable;
+        existingProduct.TrackInventory = updateProductDto.TrackInventory;
+        existingProduct.SerialNumberTracking = updateProductDto.SerialNumberTracking;
+        existingProduct.BatchTracking = updateProductDto.BatchTracking;
+        existingProduct.ItemGroupId = updateProductDto.ItemGroupId;
+        existingProduct.BrandId = updateProductDto.BrandId;
+        existingProduct.ManufacturerPartNumber = updateProductDto.ManufacturerPartNumber;
+        existingProduct.UPC = updateProductDto.UPC;
+        existingProduct.EAN = updateProductDto.EAN;
+        existingProduct.ISBN = updateProductDto.ISBN;
+        existingProduct.SalesAccountId = updateProductDto.SalesAccountId;
+        existingProduct.PurchaseAccountId = updateProductDto.PurchaseAccountId;
+        existingProduct.InventoryAccountId = updateProductDto.InventoryAccountId;
+        existingProduct.SellingPrice = updateProductDto.SellingPrice;
+        existingProduct.CostPrice = updateProductDto.CostPrice;
+        existingProduct.ModifiedBy = userId;
+        existingProduct.ModifiedOn = DateTime.UtcNow;
 
-        _unitOfWork.Repository<Product>().Update(existingProduct);
-        await _unitOfWork.SaveChangesAsync();
+        try
+        {
+            _unitOfWork.Repository<Product>().Update(existingProduct);
+            await _unitOfWork.SaveChangesAsync();
 
-        return ServiceResult<bool>.Success(true);
+            return ServiceResult<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<bool>
+                .Error(new Problem(ErrorCodes.ProductUpdateError, ex.Message));
+        }
     }
 
     public async Task<ServiceResult<List<ProductListItemDto>>> GetAllProducts(int pageIndex, int pageSize)
     {
-        var products = await _unitOfWork.Repository<Product>()
-            .GetPaginatedAsync(pageIndex, pageSize);
+        try
+        {
+            var products = await _unitOfWork.Repository<Product>()
+                .GetPaginatedAsync(
+                    pageIndex,
+                    pageSize,
+                    includeroperties: "Brand,ItemGroup,ProductImages");
 
-        return ServiceResult<List<ProductListItemDto>>
-            .Success(products.Adapt<List<ProductListItemDto>>());
+            var productDtos = products.Select(p => new ProductListItemDto
+            {
+                Id = p.Id,
+                SKU = p.SKU,
+                Name = p.Name,
+                Description = p.Description,
+                ProductType = p.ProductType,
+                Status = p.Status,
+                IsActive = p.IsActive,
+                SellingPrice = p.SellingPrice,
+                CostPrice = p.CostPrice,
+                BrandName = p.Brand?.Name,
+                ItemGroupName = p.ItemGroup?.GroupName,
+                Image = p.ProductImages?.FirstOrDefault()?.Adapt<ProductImageDto>()
+            }).ToList();
+
+            return ServiceResult<List<ProductListItemDto>>.Success(productDtos);
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<List<ProductListItemDto>>
+                .Error(new Problem(ErrorCodes.ProductRetrievalError, ex.Message));
+        }
     }
 
     public async Task<ServiceResult<ProductDto>> GetProductById(int id)
     {
-        var product = await _unitOfWork.Repository<Product>()
-            .GetFirstOrDefaultAsync(x => x.Id == id);
+        try
+        {
+            var product = await _unitOfWork.Repository<Product>()
+                .GetFirstOrDefaultAsync(
+                    x => x.Id == id,
+                    includeroperties: "Brand,ItemGroup,ProductImages,ProductCategories,ProductTax");
 
-        if (product == null)
+            if (product == null)
+            {
+                return ServiceResult<ProductDto>
+                    .Error(new Problem(ErrorCodes.ProductNotFound, "Product not found"));
+            }
+
+            var productDto = product.Adapt<ProductDto>();
+
+            return ServiceResult<ProductDto>.Success(productDto);
+        }
+        catch (Exception ex)
         {
             return ServiceResult<ProductDto>
-                .Error(new Problem(ErrorCodes.ProductNotFound, "Product not found"));
+                .Error(new Problem(ErrorCodes.ProductRetrievalError, ex.Message));
         }
-
-        var productDto = product.Adapt<ProductDto>();
-
-
-        return ServiceResult<ProductDto>.Success(productDto);
-
     }
 }

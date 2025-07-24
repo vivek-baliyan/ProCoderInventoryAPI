@@ -1,4 +1,5 @@
 ﻿using PCI.Domain.Common;
+using PCI.Shared.Common.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -16,14 +17,9 @@ public class Product : BaseEntity
     [StringLength(1000)]
     public string Description { get; set; }
 
-    [StringLength(50)]
-    public string ProductType { get; set; } = "goods"; // goods, service
+    public ProductType ProductType { get; set; } = ProductType.Goods;
 
-    [StringLength(50)]
-    public string ItemType { get; set; } = "inventory"; // inventory, sales, purchases, sales_and_purchases
-
-    [StringLength(20)]
-    public string Status { get; set; } = "active"; // active, inactive
+    public ProductStatus Status { get; set; } = ProductStatus.Active;
 
     public bool IsActive { get; set; } = true;
     public bool IsTaxable { get; set; } = true;
@@ -77,9 +73,10 @@ public class Product : BaseEntity
     [Column(TypeName = "decimal(18,2)")]
     public decimal? CostPrice { get; set; }
 
-    // Custom fields (JSON)
-    [StringLength(2000)]
-    public string CustomFields { get; set; }
+    // Organization relationship for multi-tenancy
+    public int OrganisationId { get; set; }
+    [ForeignKey("OrganisationId")]
+    public virtual Organisation Organisation { get; set; }
 
     // Navigation properties
     public virtual ProductInventory ProductInventory { get; set; }
@@ -94,3 +91,4 @@ public class Product : BaseEntity
     public virtual ICollection<SalesOrderItem> SalesOrderItems { get; set; } = new HashSet<SalesOrderItem>();
     public virtual ICollection<PriceListItem> PriceListItems { get; set; } = new HashSet<PriceListItem>();
 }
+

@@ -1,4 +1,6 @@
-﻿namespace PCI.Shared.Dtos.Product;
+﻿using PCI.Shared.Common.Enums;
+
+namespace PCI.Shared.Dtos.Product;
 
 public record UpdateProductDto : CreateProductDto
 {

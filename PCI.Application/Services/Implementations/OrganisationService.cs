@@ -90,8 +90,8 @@ public class OrganisationService(IUnitOfWork unitOfWork) : IOrganisationService
         organisation.City = updateOrganisationDto.City;
         organisation.State = updateOrganisationDto.State;
         organisation.Country = updateOrganisationDto.Country;
-        organisation.UpdatedBy = userId;
-        organisation.UpdatedOn = DateTime.UtcNow;
+        organisation.ModifiedBy = userId;
+        organisation.ModifiedOn = DateTime.UtcNow;
 
         _unitOfWork.Repository<Organisation>().Update(organisation);
         await _unitOfWork.SaveChangesAsync();

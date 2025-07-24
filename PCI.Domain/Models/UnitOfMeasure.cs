@@ -1,5 +1,7 @@
 using PCI.Domain.Common;
+using PCI.Shared.Common.Enums;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PCI.Domain.Models;
 
@@ -13,13 +15,17 @@ public class UnitOfMeasure : BaseEntity
     [StringLength(100)]
     public string Name { get; set; }
 
-    [StringLength(50)]
-    public string UnitType { get; set; } // Weight, Volume, Quantity, Dimension
+    public UnitType UnitType { get; set; } = UnitType.Quantity;
 
     [StringLength(500)]
     public string Description { get; set; }
 
     public bool IsActive { get; set; } = true;
+
+    public int? OrganisationId { get; set; }
+
+    [ForeignKey("OrganisationId")]
+    public virtual Organisation Organisation { get; set; }
 
     public virtual ICollection<Product> ProductsWithUnit { get; set; } = new HashSet<Product>();
     public virtual ICollection<Product> ProductsWithWeightUnit { get; set; } = new HashSet<Product>();

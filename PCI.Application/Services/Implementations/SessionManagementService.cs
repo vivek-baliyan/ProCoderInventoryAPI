@@ -39,7 +39,7 @@ public class SessionManagementService(IUnitOfWork unitOfWork) : ISessionManageme
         {
             session.LogoutTime = DateTime.UtcNow;
             session.IsActive = false;
-            session.UpdatedOn = DateTime.UtcNow;
+            session.ModifiedOn = DateTime.UtcNow;
 
             _unitOfWork.Repository<SessionManagement>().Update(session);
             await _unitOfWork.SaveChangesAsync();
@@ -55,7 +55,7 @@ public class SessionManagementService(IUnitOfWork unitOfWork) : ISessionManageme
         {
             session.LogoutTime = DateTime.UtcNow;
             session.IsActive = false;
-            session.UpdatedOn = DateTime.UtcNow;
+            session.ModifiedOn = DateTime.UtcNow;
 
             _unitOfWork.Repository<SessionManagement>().Update(session);
         }

@@ -15,6 +15,8 @@
         public const string ProductAlreadyExists = "ProductAlreadyExists";
         public const string ProductCreationError = "ProductCreationError";
         public const string ProductNotFound = "ProductNotFound";
+        public static string ProductUpdateError = "ProductUpdateError";
+        public static string ProductRetrievalError = "ProductRetrievalError";
     }
 
     public class Messages

@@ -94,8 +94,8 @@ public class CategoryService(IUnitOfWork unitOfWork, IImageService imageService)
         category.ParentCategoryId = updateCategoryDto.ParentCategoryId == 0 ? null : updateCategoryDto.ParentCategoryId;
         category.Status = (VisibilityStatus)updateCategoryDto.Status;
         category.PublishDate = updateCategoryDto.PublishDate;
-        category.UpdatedBy = userId;
-        category.UpdatedOn = DateTime.UtcNow;
+        category.ModifiedBy = userId;
+        category.ModifiedOn = DateTime.UtcNow;
 
         _unitOfWork.Repository<Category>().Update(category);
         await _unitOfWork.SaveChangesAsync();

@@ -8,7 +8,7 @@ public class ProductTax : BaseEntity
 {
     public int ProductId { get; set; }
 
-    public int? HSNMasterId { get; set; }
+    public int? TaxClassificationId { get; set; }
     public int? TaxMasterId { get; set; }
 
     public bool IsTaxExempt { get; set; } = false;
@@ -19,8 +19,8 @@ public class ProductTax : BaseEntity
     [ForeignKey("ProductId")]
     public virtual Product Product { get; set; }
 
-    [ForeignKey("HSNMasterId")]
-    public virtual HSNMaster HSNMaster { get; set; }
+    [ForeignKey("TaxClassificationId")]
+    public virtual TaxClassification TaxClassification { get; set; }
 
     [ForeignKey("TaxMasterId")]
     public virtual TaxMaster TaxMaster { get; set; }

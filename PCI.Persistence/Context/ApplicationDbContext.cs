@@ -7,17 +7,14 @@ namespace PCI.Persistence.Context;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IUserAccessorService userAccessor) : DbContext(options)
 {
-
     public DbSet<Organisation> Organisations { get; init; }
-    public DbSet<Tag> Tags { get; init; }
     public DbSet<Category> Categories { get; init; }
     public DbSet<CategoryImage> CategoryImages { get; init; }
     public DbSet<Product> Products { get; init; }
     public DbSet<ProductCategory> ProductCategories { get; init; }
-    public DbSet<ProductTag> ProductTags { get; init; }
-    public DbSet<ProductVariant> ProductVariants { get; init; }
     public DbSet<ProductImage> ProductImages { get; init; }
-
+    public DbSet<Currency> Currencies { get; init; }
+    public DbSet<TaxClassification> TaxClassifications { get; init; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
