@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PCI.Persistence.Context;
 
@@ -10,9 +11,11 @@ using PCI.Persistence.Context;
 namespace PCI.Persistence.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250724103220_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -541,6 +544,131 @@ namespace PCI.Persistence.Migrations.Application
                     b.HasIndex("OrganisationId");
 
                     b.ToTable("Brand", "APP");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OrganisationId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PageTitle")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("ParentCategoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("PublishDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UrlIdentifier")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganisationId");
+
+                    b.HasIndex("ParentCategoryId");
+
+                    b.HasIndex("Name", "UrlIdentifier");
+
+                    b.ToTable("Categories", "APP");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.CategoryImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AltText")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AspectRatio")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("Height")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ImagePath")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("Rotation")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double?>("ScaleX")
+                        .HasColumnType("REAL");
+
+                    b.Property<double?>("ScaleY")
+                        .HasColumnType("REAL");
+
+                    b.Property<int?>("Width")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("X")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("Y")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("CategoryImages", "APP");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.Currency", b =>
@@ -1266,6 +1394,28 @@ namespace PCI.Persistence.Migrations.Application
                     b.ToTable("ProductAttributeValue", "APP");
                 });
 
+            modelBuilder.Entity("PCI.Domain.Models.ProductCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("ProductId", "CategoryId")
+                        .IsUnique();
+
+                    b.ToTable("ProductCategories", "APP");
+                });
+
             modelBuilder.Entity("PCI.Domain.Models.ProductImage", b =>
                 {
                     b.Property<int>("Id")
@@ -1426,75 +1576,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.HasIndex("WeightUnitId");
 
                     b.ToTable("ProductPhysical", "APP");
-                });
-
-            modelBuilder.Entity("PCI.Domain.Models.ProductTag", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Color")
-                        .HasMaxLength(20)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("OrganisationId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrganisationId");
-
-                    b.HasIndex("Name", "OrganisationId")
-                        .IsUnique();
-
-                    b.ToTable("ProductTags", "APP");
-                });
-
-            modelBuilder.Entity("PCI.Domain.Models.ProductTagAssignment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ProductTagId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductTagId");
-
-                    b.HasIndex("ProductId", "ProductTagId")
-                        .IsUnique();
-
-                    b.ToTable("ProductTagAssignments", "APP");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.ProductTax", b =>
@@ -2275,6 +2356,35 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("Organisation");
                 });
 
+            modelBuilder.Entity("PCI.Domain.Models.Category", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
+                        .WithMany()
+                        .HasForeignKey("OrganisationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PCI.Domain.Models.Category", "ParentCategory")
+                        .WithMany("ChildCategories")
+                        .HasForeignKey("ParentCategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Organisation");
+
+                    b.Navigation("ParentCategory");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.CategoryImage", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.Category", "Category")
+                        .WithMany("CategoryImages")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("PCI.Domain.Models.Currency", b =>
                 {
                     b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
@@ -2486,6 +2596,25 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("PCI.Domain.Models.ProductCategory", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.Category", "Category")
+                        .WithMany("ProductCategories")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PCI.Domain.Models.Product", "Product")
+                        .WithMany("ProductCategories")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("PCI.Domain.Models.ProductImage", b =>
                 {
                     b.HasOne("PCI.Domain.Models.Product", "Product")
@@ -2541,36 +2670,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("Product");
 
                     b.Navigation("WeightUnit");
-                });
-
-            modelBuilder.Entity("PCI.Domain.Models.ProductTag", b =>
-                {
-                    b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
-                        .WithMany()
-                        .HasForeignKey("OrganisationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Organisation");
-                });
-
-            modelBuilder.Entity("PCI.Domain.Models.ProductTagAssignment", b =>
-                {
-                    b.HasOne("PCI.Domain.Models.Product", "Product")
-                        .WithMany("ProductTagAssignments")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PCI.Domain.Models.ProductTag", "ProductTag")
-                        .WithMany("ProductTagAssignments")
-                        .HasForeignKey("ProductTagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("ProductTag");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.ProductTax", b =>
@@ -2788,6 +2887,15 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("Products");
                 });
 
+            modelBuilder.Entity("PCI.Domain.Models.Category", b =>
+                {
+                    b.Navigation("CategoryImages");
+
+                    b.Navigation("ChildCategories");
+
+                    b.Navigation("ProductCategories");
+                });
+
             modelBuilder.Entity("PCI.Domain.Models.Currency", b =>
                 {
                     b.Navigation("ProductsWithCostCurrency");
@@ -2842,13 +2950,13 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.Navigation("ProductAttributeValues");
 
+                    b.Navigation("ProductCategories");
+
                     b.Navigation("ProductImages");
 
                     b.Navigation("ProductInventory");
 
                     b.Navigation("ProductPhysical");
-
-                    b.Navigation("ProductTagAssignments");
 
                     b.Navigation("ProductTax");
 
@@ -2857,11 +2965,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("SalesOrderItems");
 
                     b.Navigation("SerialNumbers");
-                });
-
-            modelBuilder.Entity("PCI.Domain.Models.ProductTag", b =>
-                {
-                    b.Navigation("ProductTagAssignments");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.PurchaseOrder", b =>

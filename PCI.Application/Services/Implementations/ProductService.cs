@@ -28,8 +28,10 @@ public class ProductService(IUnitOfWork unitOfWork, IImageService imageService) 
                 .Error(new Problem(ErrorCodes.ProductAlreadyExists, "Product already exists"));
         }
 
+        using var transaction = await _unitOfWork.BeginTransactionAsync();
         try
         {
+            // Create main Product entity
             var product = new Product
             {
                 SKU = createProductDto.SKU,
@@ -61,12 +63,86 @@ public class ProductService(IUnitOfWork unitOfWork, IImageService imageService) 
             _unitOfWork.Repository<Product>().Add(product);
             await _unitOfWork.SaveChangesAsync();
 
+            // Create ProductInventory
+            var productInventory = new ProductInventory
+            {
+                ProductId = product.Id,
+                UnitOfMeasureId = createProductDto.UnitOfMeasureId,
+                ReorderLevel = createProductDto.ReorderLevel,
+                ReorderQuantity = createProductDto.ReorderQuantity,
+                MinimumStock = createProductDto.MinimumStock,
+                MaximumStock = createProductDto.MaximumStock,
+                OpeningStock = createProductDto.OpeningStock,
+                OpeningStockValue = createProductDto.OpeningStockValue,
+                QuantityOnHand = createProductDto.OpeningStock ?? 0,
+                IsSaleable = createProductDto.IsSaleable,
+                IsPurchasable = createProductDto.IsPurchasable,
+                IsReturnable = createProductDto.IsReturnable,
+                VendorId = createProductDto.VendorId,
+                CreatedBy = userId,
+                CreatedOn = DateTime.UtcNow
+            };
+            _unitOfWork.Repository<ProductInventory>().Add(productInventory);
+
+            // Create ProductPhysical (if physical attributes provided)
+            if (createProductDto.Weight.HasValue || createProductDto.Length.HasValue ||
+                createProductDto.Width.HasValue || createProductDto.Height.HasValue)
+            {
+                var productPhysical = new ProductPhysical
+                {
+                    ProductId = product.Id,
+                    Weight = createProductDto.Weight,
+                    WeightUnitId = createProductDto.WeightUnitId,
+                    Length = createProductDto.Length,
+                    Width = createProductDto.Width,
+                    Height = createProductDto.Height,
+                    DimensionUnitId = createProductDto.DimensionUnitId,
+                    CreatedBy = userId,
+                    CreatedOn = DateTime.UtcNow
+                };
+                _unitOfWork.Repository<ProductPhysical>().Add(productPhysical);
+            }
+
+            // Create ProductTax
+            var productTax = new ProductTax
+            {
+                ProductId = product.Id,
+                TaxClassificationId = createProductDto.TaxClassificationId,
+                TaxMasterId = createProductDto.TaxMasterId,
+                IsTaxExempt = createProductDto.IsTaxExempt,
+                TaxExemptReason = createProductDto.TaxExemptReason,
+                CreatedBy = userId,
+                CreatedOn = DateTime.UtcNow
+            };
+            _unitOfWork.Repository<ProductTax>().Add(productTax);
+
+            // Create ProductImages
+            if (createProductDto.ImageUrls?.Any() == true)
+            {
+                for (int i = 0; i < createProductDto.ImageUrls.Count; i++)
+                {
+                    var productImage = new ProductImage
+                    {
+                        ProductId = product.Id,
+                        ImagePath = createProductDto.ImageUrls[i],
+                        IsMain = i == 0, // First image is primary
+                        CreatedBy = userId,
+                        CreatedOn = DateTime.UtcNow
+                    };
+                    _unitOfWork.Repository<ProductImage>().Add(productImage);
+                }
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            await transaction.CommitAsync();
+
             return ServiceResult<bool>.Success(true);
         }
         catch (Exception ex)
         {
+            await transaction.RollbackAsync();
             return ServiceResult<bool>
-                .Error(new Problem(ErrorCodes.ProductCreationError, ex.Message));
+                .Error(new Problem(ErrorCodes.ProductCreationError, ex.Message, ex.ToString()));
         }
     }
 

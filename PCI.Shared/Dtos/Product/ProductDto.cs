@@ -1,5 +1,4 @@
 ﻿using PCI.Shared.Common.Enums;
-using PCI.Shared.Dtos.Category;
 
 namespace PCI.Shared.Dtos.Product;
 
@@ -22,7 +21,6 @@ public record ProductDto
     public string ISBN { get; set; }
     public decimal? SellingPrice { get; set; }
     public decimal? CostPrice { get; set; }
-    public List<CategoryDto> Categories { get; set; } = [];
-    public List<string> Tags { get; set; } = [];
     public List<ProductImageDto> Images { get; set; } = [];
+    public List<ProductTagDto> Tags { get; set; } = [];
 }

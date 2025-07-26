@@ -11,8 +11,8 @@ using PCI.Persistence.Context;
 namespace PCI.Persistence.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250724093635_Initial")]
-    partial class Initial
+    [Migration("20250726183638_RemoveCategoriesAddTags")]
+    partial class RemoveCategoriesAddTags
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -21,6 +21,368 @@ namespace PCI.Persistence.Migrations.Application
             modelBuilder
                 .HasDefaultSchema("APP")
                 .HasAnnotation("ProductVersion", "8.0.13");
+
+            modelBuilder.Entity("PCI.Domain.Models.AccountSubType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AccountType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("DisplayOrder")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(0);
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountType")
+                        .HasDatabaseName("IX_AccountSubType_AccountType");
+
+                    b.HasIndex("Code")
+                        .IsUnique()
+                        .HasDatabaseName("IX_AccountSubType_Code");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_AccountSubType_IsActive");
+
+                    b.HasIndex("AccountType", "DisplayOrder")
+                        .HasDatabaseName("IX_AccountSubType_AccountType_DisplayOrder");
+
+                    b.ToTable("AccountSubType", "APP");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AccountType = 1,
+                            Code = "CASH",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Cash and cash equivalents",
+                            DisplayOrder = 1,
+                            IsActive = true,
+                            Name = "Cash"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AccountType = 1,
+                            Code = "BANK",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Bank accounts",
+                            DisplayOrder = 2,
+                            IsActive = true,
+                            Name = "Bank"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AccountType = 1,
+                            Code = "AR",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Money owed by customers",
+                            DisplayOrder = 3,
+                            IsActive = true,
+                            Name = "Accounts Receivable"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            AccountType = 1,
+                            Code = "INV",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Goods held for sale",
+                            DisplayOrder = 4,
+                            IsActive = true,
+                            Name = "Inventory"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            AccountType = 1,
+                            Code = "OCA",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Other current assets",
+                            DisplayOrder = 5,
+                            IsActive = true,
+                            Name = "Other Current Asset"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            AccountType = 1,
+                            Code = "FA",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Property, plant and equipment",
+                            DisplayOrder = 6,
+                            IsActive = true,
+                            Name = "Fixed Asset"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            AccountType = 1,
+                            Code = "AD",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Accumulated depreciation on fixed assets",
+                            DisplayOrder = 7,
+                            IsActive = true,
+                            Name = "Accumulated Depreciation"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            AccountType = 1,
+                            Code = "OA",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Other non-current assets",
+                            DisplayOrder = 8,
+                            IsActive = true,
+                            Name = "Other Asset"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            AccountType = 2,
+                            Code = "AP",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Money owed to suppliers",
+                            DisplayOrder = 1,
+                            IsActive = true,
+                            Name = "Accounts Payable"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            AccountType = 2,
+                            Code = "CC",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Credit card liabilities",
+                            DisplayOrder = 2,
+                            IsActive = true,
+                            Name = "Credit Card"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            AccountType = 2,
+                            Code = "TP",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Taxes owed",
+                            DisplayOrder = 3,
+                            IsActive = true,
+                            Name = "Tax Payable"
+                        },
+                        new
+                        {
+                            Id = 23,
+                            AccountType = 2,
+                            Code = "OCL",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Other current liabilities",
+                            DisplayOrder = 4,
+                            IsActive = true,
+                            Name = "Other Current Liability"
+                        },
+                        new
+                        {
+                            Id = 24,
+                            AccountType = 2,
+                            Code = "LTL",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Long-term debt and obligations",
+                            DisplayOrder = 5,
+                            IsActive = true,
+                            Name = "Long Term Liability"
+                        },
+                        new
+                        {
+                            Id = 40,
+                            AccountType = 3,
+                            Code = "OE",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Owner's equity",
+                            DisplayOrder = 1,
+                            IsActive = true,
+                            Name = "Owner Equity"
+                        },
+                        new
+                        {
+                            Id = 41,
+                            AccountType = 3,
+                            Code = "RE",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Accumulated profits",
+                            DisplayOrder = 2,
+                            IsActive = true,
+                            Name = "Retained Earnings"
+                        },
+                        new
+                        {
+                            Id = 42,
+                            AccountType = 3,
+                            Code = "OBE",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Opening balance adjustments",
+                            DisplayOrder = 3,
+                            IsActive = true,
+                            Name = "Opening Balance Equity"
+                        },
+                        new
+                        {
+                            Id = 60,
+                            AccountType = 4,
+                            Code = "SR",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Revenue from sales",
+                            DisplayOrder = 1,
+                            IsActive = true,
+                            Name = "Sales Revenue"
+                        },
+                        new
+                        {
+                            Id = 61,
+                            AccountType = 4,
+                            Code = "SER",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Revenue from services",
+                            DisplayOrder = 2,
+                            IsActive = true,
+                            Name = "Service Revenue"
+                        },
+                        new
+                        {
+                            Id = 62,
+                            AccountType = 4,
+                            Code = "OI",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Other income sources",
+                            DisplayOrder = 3,
+                            IsActive = true,
+                            Name = "Other Income"
+                        },
+                        new
+                        {
+                            Id = 63,
+                            AccountType = 4,
+                            Code = "II",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Interest earned",
+                            DisplayOrder = 4,
+                            IsActive = true,
+                            Name = "Interest Income"
+                        },
+                        new
+                        {
+                            Id = 80,
+                            AccountType = 5,
+                            Code = "COGS",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Direct costs of producing goods",
+                            DisplayOrder = 1,
+                            IsActive = true,
+                            Name = "Cost of Goods Sold"
+                        },
+                        new
+                        {
+                            Id = 81,
+                            AccountType = 5,
+                            Code = "OPEX",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Operating expenses",
+                            DisplayOrder = 2,
+                            IsActive = true,
+                            Name = "Operating Expense"
+                        },
+                        new
+                        {
+                            Id = 82,
+                            AccountType = 5,
+                            Code = "ADMIN",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Administrative expenses",
+                            DisplayOrder = 3,
+                            IsActive = true,
+                            Name = "Administrative Expense"
+                        },
+                        new
+                        {
+                            Id = 83,
+                            AccountType = 5,
+                            Code = "SELL",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Sales and marketing expenses",
+                            DisplayOrder = 4,
+                            IsActive = true,
+                            Name = "Selling Expense"
+                        },
+                        new
+                        {
+                            Id = 84,
+                            AccountType = 5,
+                            Code = "IE",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Interest paid on debt",
+                            DisplayOrder = 5,
+                            IsActive = true,
+                            Name = "Interest Expense"
+                        },
+                        new
+                        {
+                            Id = 85,
+                            AccountType = 5,
+                            Code = "TAX",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Tax expenses",
+                            DisplayOrder = 6,
+                            IsActive = true,
+                            Name = "Tax Expense"
+                        },
+                        new
+                        {
+                            Id = 86,
+                            AccountType = 5,
+                            Code = "OEXP",
+                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Description = "Other miscellaneous expenses",
+                            DisplayOrder = 7,
+                            IsActive = true,
+                            Name = "Other Expense"
+                        });
+                });
 
             modelBuilder.Entity("PCI.Domain.Models.AccountTransaction", b =>
                 {
@@ -184,264 +546,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.ToTable("Brand", "APP");
                 });
 
-            modelBuilder.Entity("PCI.Domain.Models.Category", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("OrganisationId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("PageTitle")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("ParentCategoryId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime?>("PublishDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UrlIdentifier")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrganisationId");
-
-                    b.HasIndex("ParentCategoryId");
-
-                    b.HasIndex("Name", "UrlIdentifier");
-
-                    b.ToTable("Categories", "APP");
-                });
-
-            modelBuilder.Entity("PCI.Domain.Models.CategoryImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("AltText")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("AspectRatio")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("Height")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ImagePath")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsPrimary")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("Rotation")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<double?>("ScaleX")
-                        .HasColumnType("REAL");
-
-                    b.Property<double?>("ScaleY")
-                        .HasColumnType("REAL");
-
-                    b.Property<int?>("Width")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("X")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("Y")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("CategoryImages", "APP");
-                });
-
-            modelBuilder.Entity("PCI.Domain.Models.ChartOfAccounts", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("AccountCode")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("AccountName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("AccountType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("CurrencyId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<decimal>("CurrentBalance")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(18,2)")
-                        .HasDefaultValue(0m);
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ExternalAccountId")
-                        .HasMaxLength(50)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ExternalSystemName")
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(true);
-
-                    b.Property<bool>("IsSystemAccount")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(false);
-
-                    b.Property<DateTime?>("LastSyncDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("NormalBalanceType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("OrganisationId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("ParentAccountId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("SubType")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountCode")
-                        .HasDatabaseName("IX_ChartOfAccounts_AccountCode");
-
-                    b.HasIndex("AccountName")
-                        .HasDatabaseName("IX_ChartOfAccounts_AccountName");
-
-                    b.HasIndex("AccountType")
-                        .HasDatabaseName("IX_ChartOfAccounts_AccountType");
-
-                    b.HasIndex("CurrencyId");
-
-                    b.HasIndex("ExternalAccountId")
-                        .HasDatabaseName("IX_ChartOfAccounts_ExternalAccountId");
-
-                    b.HasIndex("IsActive")
-                        .HasDatabaseName("IX_ChartOfAccounts_IsActive");
-
-                    b.HasIndex("IsSystemAccount")
-                        .HasDatabaseName("IX_ChartOfAccounts_IsSystemAccount");
-
-                    b.HasIndex("OrganisationId")
-                        .HasDatabaseName("IX_ChartOfAccounts_OrganisationId");
-
-                    b.HasIndex("ParentAccountId")
-                        .HasDatabaseName("IX_ChartOfAccounts_ParentAccountId");
-
-                    b.HasIndex("SubType")
-                        .HasDatabaseName("IX_ChartOfAccounts_SubType");
-
-                    b.HasIndex("OrganisationId", "AccountCode")
-                        .IsUnique()
-                        .HasDatabaseName("IX_ChartOfAccounts_OrganisationId_AccountCode");
-
-                    b.HasIndex("OrganisationId", "IsActive")
-                        .HasDatabaseName("IX_ChartOfAccounts_OrganisationId_IsActive");
-
-                    b.HasIndex("OrganisationId", "AccountType", "IsActive")
-                        .HasDatabaseName("IX_ChartOfAccounts_OrganisationId_AccountType_IsActive");
-
-                    b.ToTable("ChartOfAccounts", "APP", t =>
-                        {
-                            t.HasCheckConstraint("CK_ChartOfAccounts_AccountCode_Format", "AccountCode - '^[0-9A-Z-]+$'");
-
-                            t.HasCheckConstraint("CK_ChartOfAccounts_AccountCode_NotEmpty", "LENGTH(TRIM(AccountCode)) > 0");
-
-                            t.HasCheckConstraint("CK_ChartOfAccounts_AccountName_NotEmpty", "LENGTH(TRIM(AccountName)) > 0");
-
-                            t.HasCheckConstraint("CK_ChartOfAccounts_CurrentBalance_Valid", "CurrentBalance IS NOT NULL");
-
-                            t.HasCheckConstraint("CK_ChartOfAccounts_MaxDepth", "CASE \r\n                WHEN ParentAccountId IS NULL THEN 0\r\n                ELSE 1\r\n              END <= 1");
-
-                            t.HasCheckConstraint("CK_ChartOfAccounts_NoSelfReference", "ParentAccountId IS NULL OR ParentAccountId != Id");
-                        });
-                });
-
             modelBuilder.Entity("PCI.Domain.Models.Currency", b =>
                 {
                     b.Property<int>("Id")
@@ -528,6 +632,118 @@ namespace PCI.Persistence.Migrations.Application
                     b.HasIndex("PriceListId");
 
                     b.ToTable("CustomerPriceList", "APP");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.GLAccount", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AccountCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AccountName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("AccountSubTypeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AccountType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BalanceType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("CurrencyId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsSystemAccount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OrganisationId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("ParentAccountId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountCode")
+                        .HasDatabaseName("IX_GLAccount_AccountCode");
+
+                    b.HasIndex("AccountName")
+                        .HasDatabaseName("IX_GLAccount_AccountName");
+
+                    b.HasIndex("AccountSubTypeId")
+                        .HasDatabaseName("IX_GLAccount_AccountSubTypeId");
+
+                    b.HasIndex("AccountType")
+                        .HasDatabaseName("IX_GLAccount_AccountType");
+
+                    b.HasIndex("CurrencyId");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_GLAccount_IsActive");
+
+                    b.HasIndex("IsSystemAccount")
+                        .HasDatabaseName("IX_GLAccount_IsSystemAccount");
+
+                    b.HasIndex("OrganisationId")
+                        .HasDatabaseName("IX_GLAccount_OrganisationId");
+
+                    b.HasIndex("ParentAccountId")
+                        .HasDatabaseName("IX_GLAccount_ParentAccountId");
+
+                    b.HasIndex("OrganisationId", "AccountCode")
+                        .IsUnique()
+                        .HasDatabaseName("IX_GLAccount_OrganisationId_AccountCode");
+
+                    b.HasIndex("OrganisationId", "IsActive")
+                        .HasDatabaseName("IX_GLAccount_OrganisationId_IsActive");
+
+                    b.HasIndex("OrganisationId", "AccountType", "IsActive")
+                        .HasDatabaseName("IX_GLAccount_OrganisationId_AccountType_IsActive");
+
+                    b.ToTable("GLAccount", "APP", t =>
+                        {
+                            t.HasCheckConstraint("CK_GLAccount_AccountCode_Format", "AccountCode - '^[0-9A-Z-]+$'");
+
+                            t.HasCheckConstraint("CK_GLAccount_AccountCode_NotEmpty", "LENGTH(TRIM(AccountCode)) > 0");
+
+                            t.HasCheckConstraint("CK_GLAccount_AccountName_NotEmpty", "LENGTH(TRIM(AccountName)) > 0");
+
+                            t.HasCheckConstraint("CK_GLAccount_MaxDepth", "CASE \r\n                WHEN ParentAccountId IS NULL THEN 0\r\n                ELSE 1\r\n              END <= 1");
+
+                            t.HasCheckConstraint("CK_GLAccount_NoSelfReference", "ParentAccountId IS NULL OR ParentAccountId != Id");
+                        });
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.ItemAttribute", b =>
@@ -1053,28 +1269,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.ToTable("ProductAttributeValue", "APP");
                 });
 
-            modelBuilder.Entity("PCI.Domain.Models.ProductCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
-
-                    b.HasIndex("ProductId", "CategoryId")
-                        .IsUnique();
-
-                    b.ToTable("ProductCategories", "APP");
-                });
-
             modelBuilder.Entity("PCI.Domain.Models.ProductImage", b =>
                 {
                     b.Property<int>("Id")
@@ -1235,6 +1429,75 @@ namespace PCI.Persistence.Migrations.Application
                     b.HasIndex("WeightUnitId");
 
                     b.ToTable("ProductPhysical", "APP");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.ProductTag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Color")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OrganisationId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganisationId");
+
+                    b.HasIndex("Name", "OrganisationId")
+                        .IsUnique();
+
+                    b.ToTable("ProductTags", "APP");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.ProductTagAssignment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ProductTagId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductTagId");
+
+                    b.HasIndex("ProductId", "ProductTagId")
+                        .IsUnique();
+
+                    b.ToTable("ProductTagAssignments", "APP");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.ProductTax", b =>
@@ -1976,7 +2239,7 @@ namespace PCI.Persistence.Migrations.Application
 
             modelBuilder.Entity("PCI.Domain.Models.AccountTransaction", b =>
                 {
-                    b.HasOne("PCI.Domain.Models.ChartOfAccounts", "Account")
+                    b.HasOne("PCI.Domain.Models.GLAccount", "Account")
                         .WithMany("AccountTransactions")
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2015,60 +2278,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("Organisation");
                 });
 
-            modelBuilder.Entity("PCI.Domain.Models.Category", b =>
-                {
-                    b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
-                        .WithMany()
-                        .HasForeignKey("OrganisationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PCI.Domain.Models.Category", "ParentCategory")
-                        .WithMany("ChildCategories")
-                        .HasForeignKey("ParentCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Organisation");
-
-                    b.Navigation("ParentCategory");
-                });
-
-            modelBuilder.Entity("PCI.Domain.Models.CategoryImage", b =>
-                {
-                    b.HasOne("PCI.Domain.Models.Category", "Category")
-                        .WithMany("CategoryImages")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-                });
-
-            modelBuilder.Entity("PCI.Domain.Models.ChartOfAccounts", b =>
-                {
-                    b.HasOne("PCI.Domain.Models.Currency", "Currency")
-                        .WithMany()
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
-                        .WithMany()
-                        .HasForeignKey("OrganisationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("PCI.Domain.Models.ChartOfAccounts", "ParentAccount")
-                        .WithMany("SubAccounts")
-                        .HasForeignKey("ParentAccountId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("Currency");
-
-                    b.Navigation("Organisation");
-
-                    b.Navigation("ParentAccount");
-                });
-
             modelBuilder.Entity("PCI.Domain.Models.Currency", b =>
                 {
                     b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
@@ -2089,6 +2298,39 @@ namespace PCI.Persistence.Migrations.Application
                         .IsRequired();
 
                     b.Navigation("PriceList");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.GLAccount", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.AccountSubType", "AccountSubType")
+                        .WithMany("GLAccounts")
+                        .HasForeignKey("AccountSubTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PCI.Domain.Models.Currency", "Currency")
+                        .WithMany()
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
+                        .WithMany()
+                        .HasForeignKey("OrganisationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("PCI.Domain.Models.GLAccount", "ParentAccount")
+                        .WithMany("SubAccounts")
+                        .HasForeignKey("ParentAccountId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("AccountSubType");
+
+                    b.Navigation("Currency");
+
+                    b.Navigation("Organisation");
+
+                    b.Navigation("ParentAccount");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.ItemAttribute", b =>
@@ -2169,7 +2411,7 @@ namespace PCI.Persistence.Migrations.Application
                         .WithMany("ProductsWithSellingCurrency")
                         .HasForeignKey("CurrencyId1");
 
-                    b.HasOne("PCI.Domain.Models.ChartOfAccounts", "InventoryAccount")
+                    b.HasOne("PCI.Domain.Models.GLAccount", "InventoryAccount")
                         .WithMany("ProductsInventoryAccount")
                         .HasForeignKey("InventoryAccountId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -2185,12 +2427,12 @@ namespace PCI.Persistence.Migrations.Application
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PCI.Domain.Models.ChartOfAccounts", "PurchaseAccount")
+                    b.HasOne("PCI.Domain.Models.GLAccount", "PurchaseAccount")
                         .WithMany("ProductsPurchaseAccount")
                         .HasForeignKey("PurchaseAccountId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("PCI.Domain.Models.ChartOfAccounts", "SalesAccount")
+                    b.HasOne("PCI.Domain.Models.GLAccount", "SalesAccount")
                         .WithMany("ProductsSalesAccount")
                         .HasForeignKey("SalesAccountId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -2243,25 +2485,6 @@ namespace PCI.Persistence.Migrations.Application
                         .IsRequired();
 
                     b.Navigation("ItemAttributeOption");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("PCI.Domain.Models.ProductCategory", b =>
-                {
-                    b.HasOne("PCI.Domain.Models.Category", "Category")
-                        .WithMany("ProductCategories")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PCI.Domain.Models.Product", "Product")
-                        .WithMany("ProductCategories")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
 
                     b.Navigation("Product");
                 });
@@ -2321,6 +2544,36 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("Product");
 
                     b.Navigation("WeightUnit");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.ProductTag", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
+                        .WithMany()
+                        .HasForeignKey("OrganisationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Organisation");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.ProductTagAssignment", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.Product", "Product")
+                        .WithMany("ProductTagAssignments")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PCI.Domain.Models.ProductTag", "ProductTag")
+                        .WithMany("ProductTagAssignments")
+                        .HasForeignKey("ProductTagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("ProductTag");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.ProductTax", b =>
@@ -2528,21 +2781,24 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("Vendor");
                 });
 
+            modelBuilder.Entity("PCI.Domain.Models.AccountSubType", b =>
+                {
+                    b.Navigation("GLAccounts");
+                });
+
             modelBuilder.Entity("PCI.Domain.Models.Brand", b =>
                 {
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("PCI.Domain.Models.Category", b =>
+            modelBuilder.Entity("PCI.Domain.Models.Currency", b =>
                 {
-                    b.Navigation("CategoryImages");
+                    b.Navigation("ProductsWithCostCurrency");
 
-                    b.Navigation("ChildCategories");
-
-                    b.Navigation("ProductCategories");
+                    b.Navigation("ProductsWithSellingCurrency");
                 });
 
-            modelBuilder.Entity("PCI.Domain.Models.ChartOfAccounts", b =>
+            modelBuilder.Entity("PCI.Domain.Models.GLAccount", b =>
                 {
                     b.Navigation("AccountTransactions");
 
@@ -2553,13 +2809,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("ProductsSalesAccount");
 
                     b.Navigation("SubAccounts");
-                });
-
-            modelBuilder.Entity("PCI.Domain.Models.Currency", b =>
-                {
-                    b.Navigation("ProductsWithCostCurrency");
-
-                    b.Navigation("ProductsWithSellingCurrency");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.ItemAttribute", b =>
@@ -2596,13 +2845,13 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.Navigation("ProductAttributeValues");
 
-                    b.Navigation("ProductCategories");
-
                     b.Navigation("ProductImages");
 
                     b.Navigation("ProductInventory");
 
                     b.Navigation("ProductPhysical");
+
+                    b.Navigation("ProductTagAssignments");
 
                     b.Navigation("ProductTax");
 
@@ -2611,6 +2860,11 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("SalesOrderItems");
 
                     b.Navigation("SerialNumbers");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.ProductTag", b =>
+                {
+                    b.Navigation("ProductTagAssignments");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.PurchaseOrder", b =>

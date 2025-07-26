@@ -39,7 +39,7 @@ public class AccountTransaction : BaseEntity
     public int OrganisationId { get; set; }
 
     [ForeignKey("AccountId")]
-    public virtual ChartOfAccounts Account { get; set; }
+    public virtual GLAccount Account { get; set; }
 
     [ForeignKey("OrganisationId")]
     public virtual Organisation Organisation { get; set; }

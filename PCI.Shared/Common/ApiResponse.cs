@@ -8,4 +8,4 @@ public record ApiResponse<T>
     public string Message { get; set; } = string.Empty;
 }
 
-public record ApiError(string Code, string Description);
+public record ApiError(string Code, string Message, string Description);

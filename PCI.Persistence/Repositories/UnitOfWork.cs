@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.Storage;
 using PCI.Application.Repositories;
 using PCI.Domain.Common;
 using PCI.Persistence.Context;
@@ -12,6 +13,16 @@ public class UnitOfWork(ApplicationDbContext context, IIdentityRepository identi
     private readonly ApplicationDbContext _context = context;
 
     public IIdentityRepository IdentityRepository { get; private set; } = identityRepository;
+
+    // Begin transaction
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
+    {
+        if (_context.Database.CurrentTransaction is null)
+        {
+            return await _context.Database.BeginTransactionAsync();
+        }
+        throw new InvalidOperationException("A transaction is already in progress.");
+    }
 
     public async Task<int> SaveChangesAsync()
     {

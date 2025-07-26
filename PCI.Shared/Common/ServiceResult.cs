@@ -33,4 +33,4 @@ public record ServiceResult<TResult>
     public bool Succeeded => Problems.Count == 0;
 }
 
-public record Problem(string Code, string Description);
+public record Problem(string Code, string Message, string Description = "");

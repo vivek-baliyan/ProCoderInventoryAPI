@@ -24,7 +24,7 @@ public static class ErrorHandlerMiddleware
                     var problem = new ApiResponse<object>
                     {
                         Success = false,
-                        Errors = [new ApiError("ErrorOccurred", $"An error occurred: {ex}")],
+                        Errors = [new ApiError("ErrorOccurred", $"An error occurred: {ex.Message}", ex.ToString())],
                     };
 
                     ErrorLogGenerate(context, ex);

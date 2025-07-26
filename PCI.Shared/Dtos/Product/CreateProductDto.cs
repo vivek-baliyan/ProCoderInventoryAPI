@@ -58,13 +58,34 @@ public record CreateProductDto
     public int? PurchaseAccountId { get; set; }
     public int? InventoryAccountId { get; set; }
 
-    // Categories (list of category IDs)
-    public List<int> CategoryIds { get; set; } = [];
+    // Inventory Management (ProductInventory)
+    public int? UnitOfMeasureId { get; set; }
+    public int? ReorderLevel { get; set; }
+    public int? ReorderQuantity { get; set; }
+    public int? MinimumStock { get; set; }
+    public int? MaximumStock { get; set; }
+    public int? OpeningStock { get; set; }
+    public decimal? OpeningStockValue { get; set; }
+    public bool IsSaleable { get; set; } = true;
+    public bool IsPurchasable { get; set; } = true;
+    public bool IsReturnable { get; set; } = true;
+    public int? VendorId { get; set; }
 
-    // Tags (list of tag names to create or associate)
-    public List<string> Tags { get; set; } = [];
+    // Physical Attributes (ProductPhysical)
+    public decimal? Weight { get; set; }
+    public int? WeightUnitId { get; set; }
+    public decimal? Length { get; set; }
+    public decimal? Width { get; set; }
+    public decimal? Height { get; set; }
+    public int? DimensionUnitId { get; set; }
 
-    // Custom fields (JSON)
-    [StringLength(2000, ErrorMessage = "Custom fields cannot exceed 2000 characters")]
-    public string CustomFields { get; set; }
+    // Tax Configuration (ProductTax)
+    public int? TaxClassificationId { get; set; }
+    public int? TaxMasterId { get; set; }
+    public bool IsTaxExempt { get; set; } = false;
+    public string TaxExemptReason { get; set; }
+
+    // Product Tags and Images
+    public List<int> TagIds { get; set; } = new();
+    public List<string> ImageUrls { get; set; } = new();
 }

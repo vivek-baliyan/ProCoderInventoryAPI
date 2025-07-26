@@ -71,8 +71,8 @@ public class BaseController : ControllerBase
         return new ApiResponse<T>
         {
             Success = false,
-            Errors = result.Problems.Select(p =>
-                new ApiError(p.Code, p.Description)).ToList()
+            Errors = [.. result.Problems.Select(p =>
+                new ApiError(p.Code, p.Message, p.Description))]
         };
     }
 
@@ -81,7 +81,7 @@ public class BaseController : ControllerBase
         return new ApiResponse<object>
         {
             Success = false,
-            Errors = [new ApiError("ErrorOccurred", errorDescription)],
+            Errors = [new ApiError("ErrorOccurred", message, errorDescription)],
             Message = message
         };
     }

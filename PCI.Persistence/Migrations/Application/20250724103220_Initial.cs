@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace PCI.Persistence.Migrations.Application
 {
     /// <inheritdoc />
@@ -13,6 +15,29 @@ namespace PCI.Persistence.Migrations.Application
         {
             migrationBuilder.EnsureSchema(
                 name: "APP");
+
+            migrationBuilder.CreateTable(
+                name: "AccountSubType",
+                schema: "APP",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Code = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    AccountType = table.Column<int>(type: "INTEGER", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: true),
+                    DisplayOrder = table.Column<int>(type: "INTEGER", nullable: false, defaultValue: 0),
+                    CreatedBy = table.Column<string>(type: "TEXT", nullable: true),
+                    ModifiedBy = table.Column<string>(type: "TEXT", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    ModifiedOn = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AccountSubType", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Organisations",
@@ -372,7 +397,7 @@ namespace PCI.Persistence.Migrations.Application
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChartOfAccounts",
+                name: "GLAccount",
                 schema: "APP",
                 columns: table => new
                 {
@@ -381,17 +406,13 @@ namespace PCI.Persistence.Migrations.Application
                     AccountCode = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
                     AccountName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     AccountType = table.Column<int>(type: "INTEGER", nullable: false),
-                    SubType = table.Column<int>(type: "INTEGER", nullable: false),
-                    NormalBalanceType = table.Column<int>(type: "INTEGER", nullable: false),
+                    BalanceType = table.Column<int>(type: "INTEGER", nullable: false),
                     Description = table.Column<string>(type: "TEXT", maxLength: 1000, nullable: true),
                     IsActive = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: true),
                     IsSystemAccount = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false),
-                    CurrentBalance = table.Column<decimal>(type: "decimal(18,2)", nullable: false, defaultValue: 0m),
+                    AccountSubTypeId = table.Column<int>(type: "INTEGER", nullable: false),
                     ParentAccountId = table.Column<int>(type: "INTEGER", nullable: true),
                     CurrencyId = table.Column<int>(type: "INTEGER", nullable: true),
-                    ExternalAccountId = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
-                    ExternalSystemName = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
-                    LastSyncDate = table.Column<DateTime>(type: "TEXT", nullable: true),
                     OrganisationId = table.Column<int>(type: "INTEGER", nullable: false),
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: true),
                     ModifiedBy = table.Column<string>(type: "TEXT", nullable: true),
@@ -400,29 +421,35 @@ namespace PCI.Persistence.Migrations.Application
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ChartOfAccounts", x => x.Id);
-                    table.CheckConstraint("CK_ChartOfAccounts_AccountCode_Format", "AccountCode - '^[0-9A-Z-]+$'");
-                    table.CheckConstraint("CK_ChartOfAccounts_AccountCode_NotEmpty", "LENGTH(TRIM(AccountCode)) > 0");
-                    table.CheckConstraint("CK_ChartOfAccounts_AccountName_NotEmpty", "LENGTH(TRIM(AccountName)) > 0");
-                    table.CheckConstraint("CK_ChartOfAccounts_CurrentBalance_Valid", "CurrentBalance IS NOT NULL");
-                    table.CheckConstraint("CK_ChartOfAccounts_MaxDepth", "CASE \r\n                WHEN ParentAccountId IS NULL THEN 0\r\n                ELSE 1\r\n              END <= 1");
-                    table.CheckConstraint("CK_ChartOfAccounts_NoSelfReference", "ParentAccountId IS NULL OR ParentAccountId != Id");
+                    table.PrimaryKey("PK_GLAccount", x => x.Id);
+                    table.CheckConstraint("CK_GLAccount_AccountCode_Format", "AccountCode - '^[0-9A-Z-]+$'");
+                    table.CheckConstraint("CK_GLAccount_AccountCode_NotEmpty", "LENGTH(TRIM(AccountCode)) > 0");
+                    table.CheckConstraint("CK_GLAccount_AccountName_NotEmpty", "LENGTH(TRIM(AccountName)) > 0");
+                    table.CheckConstraint("CK_GLAccount_MaxDepth", "CASE \r\n                WHEN ParentAccountId IS NULL THEN 0\r\n                ELSE 1\r\n              END <= 1");
+                    table.CheckConstraint("CK_GLAccount_NoSelfReference", "ParentAccountId IS NULL OR ParentAccountId != Id");
                     table.ForeignKey(
-                        name: "FK_ChartOfAccounts_ChartOfAccounts_ParentAccountId",
-                        column: x => x.ParentAccountId,
+                        name: "FK_GLAccount_AccountSubType_AccountSubTypeId",
+                        column: x => x.AccountSubTypeId,
                         principalSchema: "APP",
-                        principalTable: "ChartOfAccounts",
+                        principalTable: "AccountSubType",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_ChartOfAccounts_Currencies_CurrencyId",
+                        name: "FK_GLAccount_Currencies_CurrencyId",
                         column: x => x.CurrencyId,
                         principalSchema: "APP",
                         principalTable: "Currencies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
-                        name: "FK_ChartOfAccounts_Organisations_OrganisationId",
+                        name: "FK_GLAccount_GLAccount_ParentAccountId",
+                        column: x => x.ParentAccountId,
+                        principalSchema: "APP",
+                        principalTable: "GLAccount",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_GLAccount_Organisations_OrganisationId",
                         column: x => x.OrganisationId,
                         principalSchema: "APP",
                         principalTable: "Organisations",
@@ -591,10 +618,10 @@ namespace PCI.Persistence.Migrations.Application
                 {
                     table.PrimaryKey("PK_AccountTransaction", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AccountTransaction_ChartOfAccounts_AccountId",
+                        name: "FK_AccountTransaction_GLAccount_AccountId",
                         column: x => x.AccountId,
                         principalSchema: "APP",
-                        principalTable: "ChartOfAccounts",
+                        principalTable: "GLAccount",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -660,27 +687,6 @@ namespace PCI.Persistence.Migrations.Application
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
-                        name: "FK_Products_ChartOfAccounts_InventoryAccountId",
-                        column: x => x.InventoryAccountId,
-                        principalSchema: "APP",
-                        principalTable: "ChartOfAccounts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_Products_ChartOfAccounts_PurchaseAccountId",
-                        column: x => x.PurchaseAccountId,
-                        principalSchema: "APP",
-                        principalTable: "ChartOfAccounts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "FK_Products_ChartOfAccounts_SalesAccountId",
-                        column: x => x.SalesAccountId,
-                        principalSchema: "APP",
-                        principalTable: "ChartOfAccounts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
                         name: "FK_Products_Currencies_CurrencyId",
                         column: x => x.CurrencyId,
                         principalSchema: "APP",
@@ -692,6 +698,27 @@ namespace PCI.Persistence.Migrations.Application
                         principalSchema: "APP",
                         principalTable: "Currencies",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Products_GLAccount_InventoryAccountId",
+                        column: x => x.InventoryAccountId,
+                        principalSchema: "APP",
+                        principalTable: "GLAccount",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Products_GLAccount_PurchaseAccountId",
+                        column: x => x.PurchaseAccountId,
+                        principalSchema: "APP",
+                        principalTable: "GLAccount",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "FK_Products_GLAccount_SalesAccountId",
+                        column: x => x.SalesAccountId,
+                        principalSchema: "APP",
+                        principalTable: "GLAccount",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "FK_Products_ItemGroup_ItemGroupId",
                         column: x => x.ItemGroupId,
@@ -1280,6 +1307,66 @@ namespace PCI.Persistence.Migrations.Application
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.InsertData(
+                schema: "APP",
+                table: "AccountSubType",
+                columns: new[] { "Id", "AccountType", "Code", "CreatedBy", "CreatedOn", "Description", "DisplayOrder", "IsActive", "ModifiedBy", "ModifiedOn", "Name" },
+                values: new object[,]
+                {
+                    { 1, 1, "CASH", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Cash and cash equivalents", 1, true, null, null, "Cash" },
+                    { 2, 1, "BANK", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Bank accounts", 2, true, null, null, "Bank" },
+                    { 3, 1, "AR", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Money owed by customers", 3, true, null, null, "Accounts Receivable" },
+                    { 4, 1, "INV", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Goods held for sale", 4, true, null, null, "Inventory" },
+                    { 5, 1, "OCA", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Other current assets", 5, true, null, null, "Other Current Asset" },
+                    { 6, 1, "FA", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Property, plant and equipment", 6, true, null, null, "Fixed Asset" },
+                    { 7, 1, "AD", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Accumulated depreciation on fixed assets", 7, true, null, null, "Accumulated Depreciation" },
+                    { 8, 1, "OA", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Other non-current assets", 8, true, null, null, "Other Asset" },
+                    { 20, 2, "AP", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Money owed to suppliers", 1, true, null, null, "Accounts Payable" },
+                    { 21, 2, "CC", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Credit card liabilities", 2, true, null, null, "Credit Card" },
+                    { 22, 2, "TP", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Taxes owed", 3, true, null, null, "Tax Payable" },
+                    { 23, 2, "OCL", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Other current liabilities", 4, true, null, null, "Other Current Liability" },
+                    { 24, 2, "LTL", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Long-term debt and obligations", 5, true, null, null, "Long Term Liability" },
+                    { 40, 3, "OE", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Owner's equity", 1, true, null, null, "Owner Equity" },
+                    { 41, 3, "RE", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Accumulated profits", 2, true, null, null, "Retained Earnings" },
+                    { 42, 3, "OBE", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Opening balance adjustments", 3, true, null, null, "Opening Balance Equity" },
+                    { 60, 4, "SR", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Revenue from sales", 1, true, null, null, "Sales Revenue" },
+                    { 61, 4, "SER", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Revenue from services", 2, true, null, null, "Service Revenue" },
+                    { 62, 4, "OI", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Other income sources", 3, true, null, null, "Other Income" },
+                    { 63, 4, "II", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Interest earned", 4, true, null, null, "Interest Income" },
+                    { 80, 5, "COGS", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Direct costs of producing goods", 1, true, null, null, "Cost of Goods Sold" },
+                    { 81, 5, "OPEX", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Operating expenses", 2, true, null, null, "Operating Expense" },
+                    { 82, 5, "ADMIN", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Administrative expenses", 3, true, null, null, "Administrative Expense" },
+                    { 83, 5, "SELL", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Sales and marketing expenses", 4, true, null, null, "Selling Expense" },
+                    { 84, 5, "IE", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Interest paid on debt", 5, true, null, null, "Interest Expense" },
+                    { 85, 5, "TAX", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Tax expenses", 6, true, null, null, "Tax Expense" },
+                    { 86, 5, "OEXP", null, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Other miscellaneous expenses", 7, true, null, null, "Other Expense" }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AccountSubType_AccountType",
+                schema: "APP",
+                table: "AccountSubType",
+                column: "AccountType");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AccountSubType_AccountType_DisplayOrder",
+                schema: "APP",
+                table: "AccountSubType",
+                columns: new[] { "AccountType", "DisplayOrder" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AccountSubType_Code",
+                schema: "APP",
+                table: "AccountSubType",
+                column: "Code",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AccountSubType_IsActive",
+                schema: "APP",
+                table: "AccountSubType",
+                column: "IsActive");
+
             migrationBuilder.CreateIndex(
                 name: "IX_AccountTransaction_AccountId",
                 schema: "APP",
@@ -1341,85 +1428,6 @@ namespace PCI.Persistence.Migrations.Application
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ChartOfAccounts_AccountCode",
-                schema: "APP",
-                table: "ChartOfAccounts",
-                column: "AccountCode");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartOfAccounts_AccountName",
-                schema: "APP",
-                table: "ChartOfAccounts",
-                column: "AccountName");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartOfAccounts_AccountType",
-                schema: "APP",
-                table: "ChartOfAccounts",
-                column: "AccountType");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartOfAccounts_CurrencyId",
-                schema: "APP",
-                table: "ChartOfAccounts",
-                column: "CurrencyId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartOfAccounts_ExternalAccountId",
-                schema: "APP",
-                table: "ChartOfAccounts",
-                column: "ExternalAccountId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartOfAccounts_IsActive",
-                schema: "APP",
-                table: "ChartOfAccounts",
-                column: "IsActive");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartOfAccounts_IsSystemAccount",
-                schema: "APP",
-                table: "ChartOfAccounts",
-                column: "IsSystemAccount");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartOfAccounts_OrganisationId",
-                schema: "APP",
-                table: "ChartOfAccounts",
-                column: "OrganisationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartOfAccounts_OrganisationId_AccountCode",
-                schema: "APP",
-                table: "ChartOfAccounts",
-                columns: new[] { "OrganisationId", "AccountCode" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartOfAccounts_OrganisationId_AccountType_IsActive",
-                schema: "APP",
-                table: "ChartOfAccounts",
-                columns: new[] { "OrganisationId", "AccountType", "IsActive" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartOfAccounts_OrganisationId_IsActive",
-                schema: "APP",
-                table: "ChartOfAccounts",
-                columns: new[] { "OrganisationId", "IsActive" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartOfAccounts_ParentAccountId",
-                schema: "APP",
-                table: "ChartOfAccounts",
-                column: "ParentAccountId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChartOfAccounts_SubType",
-                schema: "APP",
-                table: "ChartOfAccounts",
-                column: "SubType");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Currencies_Code",
                 schema: "APP",
                 table: "Currencies",
@@ -1448,6 +1456,79 @@ namespace PCI.Persistence.Migrations.Application
                 schema: "APP",
                 table: "CustomerPriceList",
                 column: "PriceListId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GLAccount_AccountCode",
+                schema: "APP",
+                table: "GLAccount",
+                column: "AccountCode");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GLAccount_AccountName",
+                schema: "APP",
+                table: "GLAccount",
+                column: "AccountName");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GLAccount_AccountSubTypeId",
+                schema: "APP",
+                table: "GLAccount",
+                column: "AccountSubTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GLAccount_AccountType",
+                schema: "APP",
+                table: "GLAccount",
+                column: "AccountType");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GLAccount_CurrencyId",
+                schema: "APP",
+                table: "GLAccount",
+                column: "CurrencyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GLAccount_IsActive",
+                schema: "APP",
+                table: "GLAccount",
+                column: "IsActive");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GLAccount_IsSystemAccount",
+                schema: "APP",
+                table: "GLAccount",
+                column: "IsSystemAccount");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GLAccount_OrganisationId",
+                schema: "APP",
+                table: "GLAccount",
+                column: "OrganisationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GLAccount_OrganisationId_AccountCode",
+                schema: "APP",
+                table: "GLAccount",
+                columns: new[] { "OrganisationId", "AccountCode" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GLAccount_OrganisationId_AccountType_IsActive",
+                schema: "APP",
+                table: "GLAccount",
+                columns: new[] { "OrganisationId", "AccountType", "IsActive" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GLAccount_OrganisationId_IsActive",
+                schema: "APP",
+                table: "GLAccount",
+                columns: new[] { "OrganisationId", "IsActive" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GLAccount_ParentAccountId",
+                schema: "APP",
+                table: "GLAccount",
+                column: "ParentAccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ItemAttribute_ItemGroupId",
@@ -1953,7 +2034,7 @@ namespace PCI.Persistence.Migrations.Application
                 schema: "APP");
 
             migrationBuilder.DropTable(
-                name: "ChartOfAccounts",
+                name: "GLAccount",
                 schema: "APP");
 
             migrationBuilder.DropTable(
@@ -1974,6 +2055,10 @@ namespace PCI.Persistence.Migrations.Application
 
             migrationBuilder.DropTable(
                 name: "ItemGroup",
+                schema: "APP");
+
+            migrationBuilder.DropTable(
+                name: "AccountSubType",
                 schema: "APP");
 
             migrationBuilder.DropTable(
