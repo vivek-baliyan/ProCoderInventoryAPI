@@ -1,0 +1,98 @@
+[
+  {
+    "Id": 1,
+    "Name": "Generic",
+    "Description": "Generic brand for unbranded products",
+    "LogoUrl": "",
+    "IsActive": true,
+    "OrganisationId": 1
+  },
+  {
+    "Id": 2,
+    "Name": "Apple",
+    "Description": "Technology and consumer electronics",
+    "LogoUrl": "",
+    "IsActive": true,
+    "OrganisationId": 1
+  },
+  {
+    "Id": 3,
+    "Name": "Samsung",
+    "Description": "Electronics and mobile devices",
+    "LogoUrl": "",
+    "IsActive": true,
+    "OrganisationId": 1
+  },
+  {
+    "Id": 4,
+    "Name": "Microsoft",
+    "Description": "Software and technology solutions",
+    "LogoUrl": "",
+    "IsActive": true,
+    "OrganisationId": 1
+  },
+  {
+    "Id": 5,
+    "Name": "Sony",
+    "Description": "Consumer electronics and entertainment",
+    "LogoUrl": "",
+    "IsActive": true,
+    "OrganisationId": 1
+  },
+  {
+    "Id": 6,
+    "Name": "LG",
+    "Description": "Home appliances and electronics",
+    "LogoUrl": "",
+    "IsActive": true,
+    "OrganisationId": 1
+  },
+  {
+    "Id": 7,
+    "Name": "HP",
+    "Description": "Computer hardware and printers",
+    "LogoUrl": "",
+    "IsActive": true,
+    "OrganisationId": 1
+  },
+  {
+    "Id": 8,
+    "Name": "Dell",
+    "Description": "Computer systems and technology",
+    "LogoUrl": "",
+    "IsActive": true,
+    "OrganisationId": 1
+  },
+  {
+    "Id": 9,
+    "Name": "Lenovo",
+    "Description": "Personal computers and mobile devices",
+    "LogoUrl": "",
+    "IsActive": true,
+    "OrganisationId": 1
+  },
+  {
+    "Id": 10,
+    "Name": "Canon",
+    "Description": "Imaging and optical products",
+    "LogoUrl": "",
+    "IsActive": true,
+    "OrganisationId": 1
+  },
+  {
+    "Id": 11,
+    "Name": "Epson",
+    "Description": "Printers and imaging equipment",
+    "LogoUrl": "",
+    "IsActive": true,
+    "OrganisationId": 1
+  },
+  {
+    "Id": 12,
+    "Name": "Logitech",
+    "Description": "Computer peripherals and accessories",
+    "LogoUrl": "",
+    "IsActive": true,
+    "OrganisationId": 1
+  }
+]

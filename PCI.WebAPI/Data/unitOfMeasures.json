@@ -1,0 +1,191 @@
+[
+  {
+    "Id": 1,
+    "Code": "PCS",
+    "Name": "Pieces",
+    "UnitType": 1,
+    "Description": "Individual units or pieces",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 2,
+    "Code": "EA",
+    "Name": "Each",
+    "UnitType": 1,
+    "Description": "Individual items",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 3,
+    "Code": "SET",
+    "Name": "Set",
+    "UnitType": 1,
+    "Description": "Complete set of items",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 4,
+    "Code": "DOZ",
+    "Name": "Dozen",
+    "UnitType": 1,
+    "Description": "12 pieces",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 10,
+    "Code": "KG",
+    "Name": "Kilogram",
+    "UnitType": 2,
+    "Description": "Weight measurement in kilograms",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 11,
+    "Code": "G",
+    "Name": "Gram",
+    "UnitType": 2,
+    "Description": "Weight measurement in grams",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 12,
+    "Code": "LB",
+    "Name": "Pound",
+    "UnitType": 2,
+    "Description": "Weight measurement in pounds",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 13,
+    "Code": "OZ",
+    "Name": "Ounce",
+    "UnitType": 2,
+    "Description": "Weight measurement in ounces",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 14,
+    "Code": "TON",
+    "Name": "Metric Ton",
+    "UnitType": 2,
+    "Description": "Weight measurement in metric tons",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 20,
+    "Code": "L",
+    "Name": "Liter",
+    "UnitType": 3,
+    "Description": "Volume measurement in liters",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 21,
+    "Code": "ML",
+    "Name": "Milliliter",
+    "UnitType": 3,
+    "Description": "Volume measurement in milliliters",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 22,
+    "Code": "GAL",
+    "Name": "Gallon",
+    "UnitType": 3,
+    "Description": "Volume measurement in gallons",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 23,
+    "Code": "QT",
+    "Name": "Quart",
+    "UnitType": 3,
+    "Description": "Volume measurement in quarts",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 30,
+    "Code": "M",
+    "Name": "Meter",
+    "UnitType": 4,
+    "Description": "Length measurement in meters",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 31,
+    "Code": "CM",
+    "Name": "Centimeter",
+    "UnitType": 4,
+    "Description": "Length measurement in centimeters",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 32,
+    "Code": "MM",
+    "Name": "Millimeter",
+    "UnitType": 4,
+    "Description": "Length measurement in millimeters",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 33,
+    "Code": "FT",
+    "Name": "Feet",
+    "UnitType": 4,
+    "Description": "Length measurement in feet",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 34,
+    "Code": "IN",
+    "Name": "Inch",
+    "UnitType": 4,
+    "Description": "Length measurement in inches",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 40,
+    "Code": "SQM",
+    "Name": "Square Meter",
+    "UnitType": 5,
+    "Description": "Area measurement in square meters",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 41,
+    "Code": "SQFT",
+    "Name": "Square Feet",
+    "UnitType": 5,
+    "Description": "Area measurement in square feet",
+    "IsActive": true,
+    "OrganisationId": null
+  },
+  {
+    "Id": 42,
+    "Code": "SQIN",
+    "Name": "Square Inch",
+    "UnitType": 5,
+    "Description": "Area measurement in square inches",
+    "IsActive": true,
+    "OrganisationId": null
+  }
+]

@@ -21,6 +21,9 @@ public class Invoice : BaseEntity
     public int CustomerId { get; set; }
     public int OrganisationId { get; set; }
 
+    [ForeignKey("CustomerId")]
+    public virtual Customer Customer { get; set; }
+
     // Reference to Sales Order (if applicable)
     public int? SalesOrderId { get; set; }
 

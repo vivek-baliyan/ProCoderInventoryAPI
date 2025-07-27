@@ -21,6 +21,9 @@ public class SalesOrder : BaseEntity
     public int CustomerId { get; set; }
     public int OrganisationId { get; set; }
 
+    [ForeignKey("CustomerId")]
+    public virtual Customer Customer { get; set; }
+
     // Pricing integration
     public int? PriceListId { get; set; }
     [ForeignKey("PriceListId")]

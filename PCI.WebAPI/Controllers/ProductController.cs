@@ -66,4 +66,17 @@ public class ProductController(
 
         return StatusCode(StatusCodes.Status200OK, SuccessResponse(result.ResultData, "Products retreived successfully."));
     }
+
+    [HttpPost("filter")]
+    public async Task<ActionResult<ProductListItemDto>> GetFilteredProducts(ProductFilterDto filter)
+    {
+        var result = await _productService.GetFilteredProducts(OrganisationId, filter);
+
+        if (!result.Succeeded)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
+        }
+
+        return StatusCode(StatusCodes.Status200OK, SuccessResponse(result.ResultData, "Filtered products retrieved successfully."));
+    }
 }

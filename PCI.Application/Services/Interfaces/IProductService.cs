@@ -9,4 +9,5 @@ public interface IProductService
     Task<ServiceResult<bool>> UpdateProduct(string userId, int OrganisationId, UpdateProductDto updateProductDto);
     Task<ServiceResult<ProductDto>> GetProductById(int id);
     Task<ServiceResult<List<ProductListItemDto>>> GetAllProducts(int pageIndex, int pageSize);
+    Task<ServiceResult<List<ProductListItemDto>>> GetFilteredProducts(int organisationId, ProductFilterDto filter);
 }

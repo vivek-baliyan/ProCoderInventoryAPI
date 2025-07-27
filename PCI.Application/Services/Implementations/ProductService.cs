@@ -1,10 +1,13 @@
 ﻿using Mapster;
+using Microsoft.EntityFrameworkCore;
 using PCI.Application.Repositories;
 using PCI.Application.Services.Interfaces;
+using PCI.Application.Specifications;
 using PCI.Domain.Models;
 using PCI.Shared.Common;
 using PCI.Shared.Common.Constants;
 using PCI.Shared.Dtos.Product;
+using System.Linq.Expressions;
 
 namespace PCI.Application.Services.Implementations;
 
@@ -256,6 +259,38 @@ public class ProductService(IUnitOfWork unitOfWork, IImageService imageService) 
         catch (Exception ex)
         {
             return ServiceResult<ProductDto>
+                .Error(new Problem(ErrorCodes.ProductRetrievalError, ex.Message));
+        }
+    }
+
+    public async Task<ServiceResult<List<ProductListItemDto>>> GetFilteredProducts(int organisationId, ProductFilterDto filter)
+    {
+        try
+        {
+            var specification = new ProductSpecification(organisationId, filter);
+            var products = await _unitOfWork.Repository<Product>().GetAsync(specification);
+
+            var productDtos = products.Select(p => new ProductListItemDto
+            {
+                Id = p.Id,
+                SKU = p.SKU,
+                Name = p.Name,
+                Description = p.Description,
+                ProductType = p.ProductType,
+                Status = p.Status,
+                IsActive = p.IsActive,
+                SellingPrice = p.SellingPrice,
+                CostPrice = p.CostPrice,
+                BrandName = p.Brand?.Name,
+                ItemGroupName = p.ItemGroup?.GroupName,
+                Image = p.ProductImages?.FirstOrDefault()?.Adapt<ProductImageDto>()
+            }).ToList();
+
+            return ServiceResult<List<ProductListItemDto>>.Success(productDtos);
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<List<ProductListItemDto>>
                 .Error(new Problem(ErrorCodes.ProductRetrievalError, ex.Message));
         }
     }

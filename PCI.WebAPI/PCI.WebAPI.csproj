@@ -7,10 +7,20 @@
 
   <ItemGroup>
     <Content Remove="Data\appRoles.json" />
+    <Content Remove="Data\accountSubTypes.json" />
+    <Content Remove="Data\currencies.json" />
+    <Content Remove="Data\unitOfMeasures.json" />
+    <Content Remove="Data\brands.json" />
+    <Content Remove="Data\taxClassifications.json" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="Data\appRoles.json" />
+    <None Include="Data\accountSubTypes.json" />
+    <None Include="Data\currencies.json" />
+    <None Include="Data\unitOfMeasures.json" />
+    <None Include="Data\brands.json" />
+    <None Include="Data\taxClassifications.json" />
   </ItemGroup>
 
   <ItemGroup>

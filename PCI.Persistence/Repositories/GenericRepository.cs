@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using PCI.Application.Repositories;
+using PCI.Application.Specifications;
 using PCI.Domain.Common;
 using PCI.Persistence.Context;
 using System.Linq.Expressions;
@@ -37,7 +38,7 @@ public class GenericRepository<T>(ApplicationDbContext context) : IGenericReposi
         IQueryable<T> query = _dbSet;
         if (includeroperties != null)
         {
-            foreach (var includeProp in includeroperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var includeProp in includeroperties.Split([','], StringSplitOptions.RemoveEmptyEntries))
             {
                 query = query.Include(includeProp);
             }
@@ -50,7 +51,7 @@ public class GenericRepository<T>(ApplicationDbContext context) : IGenericReposi
         IQueryable<T> query = _dbSet.Where(filter);
         if (includeroperties != null)
         {
-            foreach (var includeProp in includeroperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var includeProp in includeroperties.Split([','], StringSplitOptions.RemoveEmptyEntries))
             {
                 query = query.Include(includeProp);
             }
@@ -63,7 +64,7 @@ public class GenericRepository<T>(ApplicationDbContext context) : IGenericReposi
         IQueryable<T> query = _dbSet.Where(filter);
         if (includeroperties != null)
         {
-            foreach (var includeProp in includeroperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var includeProp in includeroperties.Split([','], StringSplitOptions.RemoveEmptyEntries))
             {
                 query = query.Include(includeProp);
             }
@@ -86,7 +87,7 @@ public class GenericRepository<T>(ApplicationDbContext context) : IGenericReposi
 
         if (includeroperties != null)
         {
-            foreach (var includeProp in includeroperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var includeProp in includeroperties.Split([','], StringSplitOptions.RemoveEmptyEntries))
             {
                 query = query.Include(includeProp);
             }
@@ -100,5 +101,55 @@ public class GenericRepository<T>(ApplicationDbContext context) : IGenericReposi
     public async Task<bool> AnyAsync(Expression<Func<T, bool>> filter)
     {
         return await _dbSet.AnyAsync(filter);
+    }
+
+    public async Task<IEnumerable<T>> GetAsync(ISpecification<T> specification)
+    {
+        return await ApplySpecification(specification).ToListAsync();
+    }
+
+    public async Task<T> GetFirstAsync(ISpecification<T> specification)
+    {
+        return await ApplySpecification(specification).FirstOrDefaultAsync();
+    }
+
+    public async Task<int> CountAsync(ISpecification<T> specification)
+    {
+        return await ApplySpecification(specification).CountAsync();
+    }
+
+    private IQueryable<T> ApplySpecification(ISpecification<T> specification)
+    {
+        var query = _dbSet.AsQueryable();
+
+        if (specification.Criteria != null)
+        {
+            query = query.Where(specification.Criteria);
+        }
+
+        query = specification.Includes.Aggregate(query, (current, include) => current.Include(include));
+
+        query = specification.IncludeStrings.Aggregate(query, (current, include) => current.Include(include));
+
+        if (specification.OrderBy != null)
+        {
+            query = query.OrderBy(specification.OrderBy);
+        }
+        else if (specification.OrderByDescending != null)
+        {
+            query = query.OrderByDescending(specification.OrderByDescending);
+        }
+
+        if (specification.GroupBy != null)
+        {
+            query = query.GroupBy(specification.GroupBy).SelectMany(x => x);
+        }
+
+        if (specification.IsPagingEnabled)
+        {
+            query = query.Skip(specification.Skip).Take(specification.Take);
+        }
+
+        return query;
     }
 }

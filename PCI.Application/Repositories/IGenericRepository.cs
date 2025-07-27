@@ -1,3 +1,4 @@
+using PCI.Application.Specifications;
 using PCI.Domain.Common;
 using System.Linq.Expressions;
 
@@ -15,4 +16,7 @@ public interface IGenericRepository<T> where T : BaseEntity
     Task<IEnumerable<T>> GetPaginatedAsync(int pageIndex, int pageSize, Expression<Func<T, bool>> filter = null,
         string includeroperties = null);
     Task<bool> AnyAsync(Expression<Func<T, bool>> filter);
+    Task<IEnumerable<T>> GetAsync(ISpecification<T> specification);
+    Task<T> GetFirstAsync(ISpecification<T> specification);
+    Task<int> CountAsync(ISpecification<T> specification);
 }

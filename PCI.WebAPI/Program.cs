@@ -71,8 +71,17 @@ try
 {
     var roleManager = services.GetRequiredService<RoleManager<AppRole>>();
     var identityContext = services.GetRequiredService<AppIdentityDbContext>();
+    var applicationContext = services.GetRequiredService<ApplicationDbContext>();
+
     await identityContext.Database.MigrateAsync();
+    await applicationContext.Database.MigrateAsync();
+
     await AppIdentityDbContextSeed.SeedRolesAsync(roleManager, loggerFactory);
+    await ApplicationDbContextSeed.SeedAccountSubTypesAsync(applicationContext, loggerFactory);
+    await ApplicationDbContextSeed.SeedCurrenciesAsync(applicationContext, loggerFactory);
+    await ApplicationDbContextSeed.SeedUnitOfMeasuresAsync(applicationContext, loggerFactory);
+    await ApplicationDbContextSeed.SeedBrandsAsync(applicationContext, loggerFactory);
+    await ApplicationDbContextSeed.SeedTaxClassificationsAsync(applicationContext, loggerFactory);
 }
 catch (Exception ex)
 {

@@ -17,6 +17,22 @@
         public const string ProductNotFound = "ProductNotFound";
         public static string ProductUpdateError = "ProductUpdateError";
         public static string ProductRetrievalError = "ProductRetrievalError";
+        public const string CustomerAlreadyExists = "CustomerAlreadyExists";
+        public const string CustomerEmailExists = "CustomerEmailExists";
+        public const string CustomerCreationError = "CustomerCreationError";
+        public const string CustomerNotFound = "CustomerNotFound";
+        public const string CustomerUpdateError = "CustomerUpdateError";
+        public const string CustomerRetrievalError = "CustomerRetrievalError";
+        public const string CustomerDeletionError = "CustomerDeletionError";
+        public const string CustomerHasTransactions = "CustomerHasTransactions";
+        public const string VendorAlreadyExists = "VendorAlreadyExists";
+        public const string VendorEmailExists = "VendorEmailExists";
+        public const string VendorCreationError = "VendorCreationError";
+        public const string VendorNotFound = "VendorNotFound";
+        public const string VendorUpdateError = "VendorUpdateError";
+        public const string VendorRetrievalError = "VendorRetrievalError";
+        public const string VendorDeletionError = "VendorDeletionError";
+        public const string VendorHasTransactions = "VendorHasTransactions";
     }
 
     public class Messages
