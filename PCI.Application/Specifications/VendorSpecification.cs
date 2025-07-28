@@ -20,31 +20,31 @@ public class VendorSpecification : BaseSpecification<Vendor>
         {
             var searchTerm = filter.SearchTerm.ToLower();
             AddCriteria(v =>
-                v.VendorName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-                v.VendorCode.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-                (v.CompanyName != null && v.CompanyName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
-                v.BusinessContacts.Any(bc => bc.Email != null && bc.Email.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
-                v.BusinessContacts.Any(bc => bc.ContactPersonName != null && bc.ContactPersonName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)));
+                v.VendorName.ToLower().Contains(searchTerm) ||
+                v.VendorCode.ToLower().Contains(searchTerm) ||
+                (v.CompanyName != null && v.CompanyName.ToLower().Contains(searchTerm)) ||
+                v.BusinessContacts.Any(bc => bc.Email != null && bc.Email.ToLower().Contains(searchTerm)) ||
+                v.BusinessContacts.Any(bc => bc.ContactPersonName != null && bc.ContactPersonName.ToLower().Contains(searchTerm)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.VendorCode))
         {
-            AddCriteria(v => v.VendorCode.Contains(filter.VendorCode, StringComparison.CurrentCultureIgnoreCase));
+            AddCriteria(v => v.VendorCode.ToLower().Contains(filter.VendorCode));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.VendorName))
         {
-            AddCriteria(v => v.VendorName.Contains(filter.VendorName, StringComparison.CurrentCultureIgnoreCase));
+            AddCriteria(v => v.VendorName.ToLower().Contains(filter.VendorName));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.CompanyName))
         {
-            AddCriteria(v => v.CompanyName != null && v.CompanyName.Contains(filter.CompanyName, StringComparison.CurrentCultureIgnoreCase));
+            AddCriteria(v => v.CompanyName != null && v.CompanyName.ToLower().Contains(filter.CompanyName));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.Email))
         {
-            AddCriteria(v => v.BusinessContacts.Any(bc => bc.Email != null && bc.Email.Contains(filter.Email, StringComparison.CurrentCultureIgnoreCase)));
+            AddCriteria(v => v.BusinessContacts.Any(bc => bc.Email != null && bc.Email.ToLower().Contains(filter.Email)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.PhoneNumber))
@@ -69,34 +69,28 @@ public class VendorSpecification : BaseSpecification<Vendor>
 
         if (!string.IsNullOrWhiteSpace(filter.Industry))
         {
-            AddCriteria(v => v.Industry != null && v.Industry.Contains(filter.Industry, StringComparison.CurrentCultureIgnoreCase));
+            AddCriteria(v => v.Industry != null && v.Industry.ToLower().Contains(filter.Industry));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.City))
         {
-            AddCriteria(v => v.BusinessAddresses.Any(ba => ba.City != null && ba.City.Contains(filter.City, StringComparison.CurrentCultureIgnoreCase)));
+            AddCriteria(v => v.BusinessAddresses.Any(ba => ba.City != null && ba.City.ToLower().Contains(filter.City)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.State))
         {
-            AddCriteria(v => v.BusinessAddresses.Any(ba => ba.State != null && ba.State.Contains(filter.State, StringComparison.CurrentCultureIgnoreCase)));
+            AddCriteria(v => v.BusinessAddresses.Any(ba => ba.State != null && ba.State.ToLower().Contains(filter.State)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.Country))
         {
-            AddCriteria(v => v.BusinessAddresses.Any(ba => ba.Country != null && ba.Country.Contains(filter.Country, StringComparison.CurrentCultureIgnoreCase)));
+            AddCriteria(v => v.BusinessAddresses.Any(ba => ba.Country != null && ba.Country.ToLower().Contains(filter.Country)));
         }
 
         if (filter.CurrencyId.HasValue)
         {
             AddCriteria(v => v.CurrencyId == filter.CurrencyId.Value);
         }
-
-        // TODO: Implement IsPreferredVendor via VendorPerformance or separate entity
-        // if (filter.IsPreferredVendor.HasValue)
-        // {
-        //     AddCriteria(v => v.IsPreferredVendor == filter.IsPreferredVendor.Value);
-        // }
 
         if (filter.IsBlacklisted.HasValue)
         {

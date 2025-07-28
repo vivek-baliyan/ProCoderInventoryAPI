@@ -5,7 +5,6 @@ namespace PCI.Shared.Dtos.Product;
 public class ProductFilterDto
 {
     public string? SearchTerm { get; set; }
-    public string? SKU { get; set; }
     public ProductType? ProductType { get; set; }
     public ProductStatus? Status { get; set; }
     public bool? IsActive { get; set; }

@@ -20,31 +20,31 @@ public class CustomerSpecification : BaseSpecification<Customer>
         {
             var searchTerm = filter.SearchTerm.ToLower();
             AddCriteria(c =>
-                c.CustomerName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-                c.CustomerCode.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-                (c.CompanyName != null && c.CompanyName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
-                c.BusinessContacts.Any(bc => bc.Email != null && bc.Email.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
-                c.BusinessContacts.Any(bc => bc.ContactPersonName != null && bc.ContactPersonName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)));
+                c.CustomerName.ToLower().Contains(searchTerm) ||
+                c.CustomerCode.ToLower().Contains(searchTerm) ||
+                (c.CompanyName != null && c.CompanyName.ToLower().Contains(searchTerm)) ||
+                c.BusinessContacts.Any(bc => bc.Email != null && bc.Email.ToLower().Contains(searchTerm)) ||
+                c.BusinessContacts.Any(bc => bc.ContactPersonName != null && bc.ContactPersonName.ToLower().Contains(searchTerm)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.CustomerCode))
         {
-            AddCriteria(c => c.CustomerCode.Contains(filter.CustomerCode, StringComparison.CurrentCultureIgnoreCase));
+            AddCriteria(c => c.CustomerCode.ToLower().Contains(filter.CustomerCode));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.CustomerName))
         {
-            AddCriteria(c => c.CustomerName.Contains(filter.CustomerName, StringComparison.CurrentCultureIgnoreCase));
+            AddCriteria(c => c.CustomerName.ToLower().Contains(filter.CustomerName));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.Email))
         {
-            AddCriteria(c => c.BusinessContacts.Any(bc => bc.Email != null && bc.Email.Contains(filter.Email, StringComparison.CurrentCultureIgnoreCase)));
+            AddCriteria(c => c.BusinessContacts.Any(bc => bc.Email != null && bc.Email.ToLower().Contains(filter.Email)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.PhoneNumber))
         {
-            AddCriteria(c => c.BusinessContacts.Any(bc => bc.PhoneNumber != null && bc.PhoneNumber.Contains(filter.PhoneNumber)));
+            AddCriteria(c => c.BusinessContacts.Any(bc => bc.PhoneNumber != null && bc.PhoneNumber.ToLower().Contains(filter.PhoneNumber)));
         }
 
         if (filter.CustomerType.HasValue)
@@ -54,17 +54,17 @@ public class CustomerSpecification : BaseSpecification<Customer>
 
         if (!string.IsNullOrWhiteSpace(filter.City))
         {
-            AddCriteria(c => c.BusinessAddresses.Any(ba => ba.City != null && ba.City.Contains(filter.City, StringComparison.CurrentCultureIgnoreCase)));
+            AddCriteria(c => c.BusinessAddresses.Any(ba => ba.City != null && ba.City.ToLower().Contains(filter.City)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.State))
         {
-            AddCriteria(c => c.BusinessAddresses.Any(ba => ba.State != null && ba.State.Contains(filter.State, StringComparison.CurrentCultureIgnoreCase)));
+            AddCriteria(c => c.BusinessAddresses.Any(ba => ba.State != null && ba.State.ToLower().Contains(filter.State)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.Country))
         {
-            AddCriteria(c => c.BusinessAddresses.Any(ba => ba.Country != null && ba.Country.Contains(filter.Country, StringComparison.CurrentCultureIgnoreCase)));
+            AddCriteria(c => c.BusinessAddresses.Any(ba => ba.Country != null && ba.Country.ToLower().Contains(filter.Country)));
         }
 
         if (filter.IsActive.HasValue)

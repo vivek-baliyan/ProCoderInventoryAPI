@@ -20,14 +20,9 @@ public class ProductSpecification : BaseSpecification<Product>
         {
             var searchTerm = filter.SearchTerm.ToLower();
             AddCriteria(p =>
-                p.Name.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-                p.Description.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
-                p.SKU.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase));
-        }
-
-        if (!string.IsNullOrWhiteSpace(filter.SKU))
-        {
-            AddCriteria(p => p.SKU.Contains(filter.SKU, StringComparison.CurrentCultureIgnoreCase));
+                p.Name.ToLower().Contains(searchTerm) ||
+                p.Description.ToLower().Contains(searchTerm) ||
+                p.SKU.ToLower().Contains(searchTerm));
         }
 
         if (filter.ProductType.HasValue)
