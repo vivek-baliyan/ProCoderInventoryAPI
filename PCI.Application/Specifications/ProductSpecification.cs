@@ -1,4 +1,5 @@
 using PCI.Domain.Models;
+using PCI.Shared.Common.Enums;
 using PCI.Shared.Dtos.Product;
 
 namespace PCI.Application.Specifications;
@@ -27,12 +28,12 @@ public class ProductSpecification : BaseSpecification<Product>
 
         if (filter.ProductType.HasValue)
         {
-            AddCriteria(p => p.ProductType == filter.ProductType.Value);
+            AddCriteria(p => p.ProductType == (ProductType)filter.ProductType.Value);
         }
 
         if (filter.Status.HasValue)
         {
-            AddCriteria(p => p.Status == filter.Status.Value);
+            AddCriteria(p => p.Status == (ProductStatus)filter.Status.Value);
         }
 
         if (filter.IsActive.HasValue)

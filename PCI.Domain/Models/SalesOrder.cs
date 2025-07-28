@@ -18,6 +18,13 @@ public class SalesOrder : BaseEntity
 
     public DateTime? ExpectedDeliveryDate { get; set; }
 
+    // Reference fields for customer tracking
+    [StringLength(100)]
+    public string ReferenceNumber { get; set; }
+    
+    [StringLength(100)]
+    public string QuoteNumber { get; set; }
+
     public int CustomerId { get; set; }
     public int OrganisationId { get; set; }
 
@@ -38,16 +45,17 @@ public class SalesOrder : BaseEntity
     [Column(TypeName = "decimal(18,2)")]
     public decimal TotalAmount { get; set; }
 
+    // Payment integration moved to SalesOrderPayment entity
+
     [StringLength(1000)]
     public string Notes { get; set; }
 
     [StringLength(500)]
-    public string ShippingAddress { get; set; }
-
-    [StringLength(500)]
     public string BillingAddress { get; set; }
 
-    public bool IsDropShipment { get; set; } = false;
+    // Shipping information moved to SalesOrderShipping entity
+
+    // Approval workflow moved to SalesOrderApproval entity
 
     // Workflow tracking
     public DateTime? ConfirmedDate { get; set; }
@@ -60,4 +68,12 @@ public class SalesOrder : BaseEntity
 
     public virtual ICollection<SalesOrderItem> SalesOrderItems { get; set; } = new HashSet<SalesOrderItem>();
     public virtual ICollection<StockTransaction> StockTransactions { get; set; } = new HashSet<StockTransaction>();
+    
+    // Normalized entities
+    public virtual SalesOrderPayment SalesOrderPayment { get; set; }
+    public virtual SalesOrderShipping SalesOrderShipping { get; set; }
+    public virtual ICollection<SalesOrderApproval> SalesOrderApprovals { get; set; } = new HashSet<SalesOrderApproval>();
+    
+    // Document attachments support
+    public virtual ICollection<SalesOrderDocument> SalesOrderDocuments { get; set; } = new HashSet<SalesOrderDocument>();
 }

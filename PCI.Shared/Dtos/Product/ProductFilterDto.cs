@@ -1,12 +1,10 @@
-using PCI.Shared.Common.Enums;
-
 namespace PCI.Shared.Dtos.Product;
 
 public class ProductFilterDto
 {
     public string? SearchTerm { get; set; }
-    public ProductType? ProductType { get; set; }
-    public ProductStatus? Status { get; set; }
+    public int? ProductType { get; set; }
+    public int? Status { get; set; }
     public bool? IsActive { get; set; }
     public int? BrandId { get; set; }
     public int? ItemGroupId { get; set; }

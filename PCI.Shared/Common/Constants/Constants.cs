@@ -33,6 +33,12 @@
         public const string VendorRetrievalError = "VendorRetrievalError";
         public const string VendorDeletionError = "VendorDeletionError";
         public const string VendorHasTransactions = "VendorHasTransactions";
+        public const string SalesOrderAlreadyExists = "SalesOrderAlreadyExists";
+        public const string SalesOrderCreationError = "SalesOrderCreationError";
+        public const string SalesOrderNotFound = "SalesOrderNotFound";
+        public const string SalesOrderUpdateError = "SalesOrderUpdateError";
+        public const string SalesOrderRetrievalError = "SalesOrderRetrievalError";
+        public const string SalesOrderDeletionError = "SalesOrderDeletionError";
     }
 
     public class Messages
