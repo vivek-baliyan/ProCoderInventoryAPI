@@ -23,8 +23,8 @@ public class VendorSpecification : BaseSpecification<Vendor>
                 v.VendorName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
                 v.VendorCode.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
                 (v.CompanyName != null && v.CompanyName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
-                (v.Email != null && v.Email.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
-                (v.ContactPerson != null && v.ContactPerson.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)));
+                v.BusinessContacts.Any(bc => bc.Email != null && bc.Email.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
+                v.BusinessContacts.Any(bc => bc.ContactPersonName != null && bc.ContactPersonName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.VendorCode))
@@ -44,12 +44,12 @@ public class VendorSpecification : BaseSpecification<Vendor>
 
         if (!string.IsNullOrWhiteSpace(filter.Email))
         {
-            AddCriteria(v => v.Email != null && v.Email.Contains(filter.Email, StringComparison.CurrentCultureIgnoreCase));
+            AddCriteria(v => v.BusinessContacts.Any(bc => bc.Email != null && bc.Email.Contains(filter.Email, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.PhoneNumber))
         {
-            AddCriteria(v => v.PhoneNumber != null && v.PhoneNumber.Contains(filter.PhoneNumber));
+            AddCriteria(v => v.BusinessContacts.Any(bc => bc.PhoneNumber != null && bc.PhoneNumber.Contains(filter.PhoneNumber)));
         }
 
         if (filter.VendorType.HasValue)
@@ -74,17 +74,17 @@ public class VendorSpecification : BaseSpecification<Vendor>
 
         if (!string.IsNullOrWhiteSpace(filter.City))
         {
-            AddCriteria(v => v.City != null && v.City.Contains(filter.City, StringComparison.CurrentCultureIgnoreCase));
+            AddCriteria(v => v.BusinessAddresses.Any(ba => ba.City != null && ba.City.Contains(filter.City, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.State))
         {
-            AddCriteria(v => v.State != null && v.State.Contains(filter.State, StringComparison.CurrentCultureIgnoreCase));
+            AddCriteria(v => v.BusinessAddresses.Any(ba => ba.State != null && ba.State.Contains(filter.State, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.Country))
         {
-            AddCriteria(v => v.Country != null && v.Country.Contains(filter.Country, StringComparison.CurrentCultureIgnoreCase));
+            AddCriteria(v => v.BusinessAddresses.Any(ba => ba.Country != null && ba.Country.Contains(filter.Country, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         if (filter.CurrencyId.HasValue)
@@ -92,14 +92,15 @@ public class VendorSpecification : BaseSpecification<Vendor>
             AddCriteria(v => v.CurrencyId == filter.CurrencyId.Value);
         }
 
-        if (filter.IsPreferredVendor.HasValue)
-        {
-            AddCriteria(v => v.IsPreferredVendor == filter.IsPreferredVendor.Value);
-        }
+        // TODO: Implement IsPreferredVendor via VendorPerformance or separate entity
+        // if (filter.IsPreferredVendor.HasValue)
+        // {
+        //     AddCriteria(v => v.IsPreferredVendor == filter.IsPreferredVendor.Value);
+        // }
 
         if (filter.IsBlacklisted.HasValue)
         {
-            AddCriteria(v => v.IsBlacklisted == filter.IsBlacklisted.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.IsBlacklisted == filter.IsBlacklisted.Value);
         }
 
         if (filter.IsManufacturer.HasValue)
@@ -125,63 +126,63 @@ public class VendorSpecification : BaseSpecification<Vendor>
         // Financial Filters
         if (filter.MinCreditLimit.HasValue)
         {
-            AddCriteria(v => v.CreditLimit >= filter.MinCreditLimit.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.CurrentBalance >= filter.MinCreditLimit.Value);
         }
 
         if (filter.MaxCreditLimit.HasValue)
         {
-            AddCriteria(v => v.CreditLimit <= filter.MaxCreditLimit.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.CurrentBalance <= filter.MaxCreditLimit.Value);
         }
 
         if (filter.MinCurrentBalance.HasValue)
         {
-            AddCriteria(v => v.CurrentBalance >= filter.MinCurrentBalance.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.CurrentBalance >= filter.MinCurrentBalance.Value);
         }
 
         if (filter.MaxCurrentBalance.HasValue)
         {
-            AddCriteria(v => v.CurrentBalance <= filter.MaxCurrentBalance.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.CurrentBalance <= filter.MaxCurrentBalance.Value);
         }
 
         if (filter.MinOutstandingAmount.HasValue)
         {
-            AddCriteria(v => v.OutstandingAmount >= filter.MinOutstandingAmount.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.OutstandingAmount >= filter.MinOutstandingAmount.Value);
         }
 
         if (filter.MaxOutstandingAmount.HasValue)
         {
-            AddCriteria(v => v.OutstandingAmount <= filter.MaxOutstandingAmount.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.OutstandingAmount <= filter.MaxOutstandingAmount.Value);
         }
 
         // Performance Filters
         if (filter.MinPerformanceRating.HasValue)
         {
-            AddCriteria(v => v.PerformanceRating >= filter.MinPerformanceRating.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.QualityRating >= filter.MinPerformanceRating.Value);
         }
 
         if (filter.MaxPerformanceRating.HasValue)
         {
-            AddCriteria(v => v.PerformanceRating <= filter.MaxPerformanceRating.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.QualityRating <= filter.MaxPerformanceRating.Value);
         }
 
         if (filter.MinOnTimeDeliveryPercentage.HasValue)
         {
-            AddCriteria(v => v.OnTimeDeliveryPercentage >= filter.MinOnTimeDeliveryPercentage.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.OnTimeDeliveryRate >= filter.MinOnTimeDeliveryPercentage.Value);
         }
 
         if (filter.MaxOnTimeDeliveryPercentage.HasValue)
         {
-            AddCriteria(v => v.OnTimeDeliveryPercentage <= filter.MaxOnTimeDeliveryPercentage.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.OnTimeDeliveryRate <= filter.MaxOnTimeDeliveryPercentage.Value);
         }
 
         if (filter.MinQualityRating.HasValue)
         {
-            AddCriteria(v => v.QualityRating >= filter.MinQualityRating.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.QualityRating >= filter.MinQualityRating.Value);
         }
 
         if (filter.MaxQualityRating.HasValue)
         {
-            AddCriteria(v => v.QualityRating <= filter.MaxQualityRating.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.QualityRating <= filter.MaxQualityRating.Value);
         }
 
         // Date Filters
@@ -197,22 +198,22 @@ public class VendorSpecification : BaseSpecification<Vendor>
 
         if (filter.LastOrderFrom.HasValue)
         {
-            AddCriteria(v => v.LastOrderDate >= filter.LastOrderFrom.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.LastPurchaseDate >= filter.LastOrderFrom.Value);
         }
 
         if (filter.LastOrderTo.HasValue)
         {
-            AddCriteria(v => v.LastOrderDate <= filter.LastOrderTo.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.LastPurchaseDate <= filter.LastOrderTo.Value);
         }
 
         if (filter.LastPaymentFrom.HasValue)
         {
-            AddCriteria(v => v.LastPaymentDate >= filter.LastPaymentFrom.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.LastPaymentDate >= filter.LastPaymentFrom.Value);
         }
 
         if (filter.LastPaymentTo.HasValue)
         {
-            AddCriteria(v => v.LastPaymentDate <= filter.LastPaymentTo.Value);
+            AddCriteria(v => v.VendorFinancial != null && v.VendorFinancial.LastPaymentDate <= filter.LastPaymentTo.Value);
         }
     }
 
@@ -242,21 +243,21 @@ public class VendorSpecification : BaseSpecification<Vendor>
                     break;
                 case "email":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(v => v.Email);
+                        ApplyOrderByDescending(v => v.BusinessContacts.FirstOrDefault().Email);
                     else
-                        ApplyOrderBy(v => v.Email);
+                        ApplyOrderBy(v => v.BusinessContacts.FirstOrDefault().Email);
                     break;
                 case "city":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(v => v.City);
+                        ApplyOrderByDescending(v => v.BusinessAddresses.FirstOrDefault().City);
                     else
-                        ApplyOrderBy(v => v.City);
+                        ApplyOrderBy(v => v.BusinessAddresses.FirstOrDefault().City);
                     break;
                 case "country":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(v => v.Country);
+                        ApplyOrderByDescending(v => v.BusinessAddresses.FirstOrDefault().Country);
                     else
-                        ApplyOrderBy(v => v.Country);
+                        ApplyOrderBy(v => v.BusinessAddresses.FirstOrDefault().Country);
                     break;
                 case "vendortype":
                     if (filter.SortDescending)
@@ -278,45 +279,45 @@ public class VendorSpecification : BaseSpecification<Vendor>
                     break;
                 case "creditlimit":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(v => v.CreditLimit);
+                        ApplyOrderByDescending(v => v.VendorFinancial.CurrentBalance);
                     else
-                        ApplyOrderBy(v => v.CreditLimit);
+                        ApplyOrderBy(v => v.VendorFinancial.CurrentBalance);
                     break;
                 case "currentbalance":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(v => v.CurrentBalance);
+                        ApplyOrderByDescending(v => v.VendorFinancial.CurrentBalance);
                     else
-                        ApplyOrderBy(v => v.CurrentBalance);
+                        ApplyOrderBy(v => v.VendorFinancial.CurrentBalance);
                     break;
                 case "outstandingamount":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(v => v.OutstandingAmount);
+                        ApplyOrderByDescending(v => v.VendorFinancial.OutstandingAmount);
                     else
-                        ApplyOrderBy(v => v.OutstandingAmount);
+                        ApplyOrderBy(v => v.VendorFinancial.OutstandingAmount);
                     break;
                 case "performancerating":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(v => v.PerformanceRating);
+                        ApplyOrderByDescending(v => v.VendorFinancial.QualityRating);
                     else
-                        ApplyOrderBy(v => v.PerformanceRating);
+                        ApplyOrderBy(v => v.VendorFinancial.QualityRating);
                     break;
                 case "ontimedeliverypercentage":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(v => v.OnTimeDeliveryPercentage);
+                        ApplyOrderByDescending(v => v.VendorFinancial.OnTimeDeliveryRate);
                     else
-                        ApplyOrderBy(v => v.OnTimeDeliveryPercentage);
+                        ApplyOrderBy(v => v.VendorFinancial.OnTimeDeliveryRate);
                     break;
                 case "lastorderdate":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(v => v.LastOrderDate);
+                        ApplyOrderByDescending(v => v.VendorFinancial.LastPurchaseDate);
                     else
-                        ApplyOrderBy(v => v.LastOrderDate);
+                        ApplyOrderBy(v => v.VendorFinancial.LastPurchaseDate);
                     break;
                 case "lastpaymentdate":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(v => v.LastPaymentDate);
+                        ApplyOrderByDescending(v => v.VendorFinancial.LastPaymentDate);
                     else
-                        ApplyOrderBy(v => v.LastPaymentDate);
+                        ApplyOrderBy(v => v.VendorFinancial.LastPaymentDate);
                     break;
                 case "createdon":
                     if (filter.SortDescending)
@@ -345,5 +346,8 @@ public class VendorSpecification : BaseSpecification<Vendor>
     {
         AddInclude("Currency");
         AddInclude("ParentVendor");
+        AddInclude("VendorFinancial");
+        AddInclude("BusinessContacts");
+        AddInclude("BusinessAddresses");
     }
 }

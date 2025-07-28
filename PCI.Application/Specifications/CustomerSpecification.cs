@@ -23,8 +23,8 @@ public class CustomerSpecification : BaseSpecification<Customer>
                 c.CustomerName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
                 c.CustomerCode.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase) ||
                 (c.CompanyName != null && c.CompanyName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
-                (c.Email != null && c.Email.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
-                (c.ContactPerson != null && c.ContactPerson.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)));
+                c.BusinessContacts.Any(bc => bc.Email != null && bc.Email.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)) ||
+                c.BusinessContacts.Any(bc => bc.ContactPersonName != null && bc.ContactPersonName.Contains(searchTerm, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.CustomerCode))
@@ -39,12 +39,12 @@ public class CustomerSpecification : BaseSpecification<Customer>
 
         if (!string.IsNullOrWhiteSpace(filter.Email))
         {
-            AddCriteria(c => c.Email != null && c.Email.Contains(filter.Email, StringComparison.CurrentCultureIgnoreCase));
+            AddCriteria(c => c.BusinessContacts.Any(bc => bc.Email != null && bc.Email.Contains(filter.Email, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.PhoneNumber))
         {
-            AddCriteria(c => c.PhoneNumber != null && c.PhoneNumber.Contains(filter.PhoneNumber));
+            AddCriteria(c => c.BusinessContacts.Any(bc => bc.PhoneNumber != null && bc.PhoneNumber.Contains(filter.PhoneNumber)));
         }
 
         if (filter.CustomerType.HasValue)
@@ -54,17 +54,17 @@ public class CustomerSpecification : BaseSpecification<Customer>
 
         if (!string.IsNullOrWhiteSpace(filter.City))
         {
-            AddCriteria(c => c.City != null && c.City.Contains(filter.City, StringComparison.CurrentCultureIgnoreCase));
+            AddCriteria(c => c.BusinessAddresses.Any(ba => ba.City != null && ba.City.Contains(filter.City, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.State))
         {
-            AddCriteria(c => c.State != null && c.State.Contains(filter.State, StringComparison.CurrentCultureIgnoreCase));
+            AddCriteria(c => c.BusinessAddresses.Any(ba => ba.State != null && ba.State.Contains(filter.State, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.Country))
         {
-            AddCriteria(c => c.Country != null && c.Country.Contains(filter.Country, StringComparison.CurrentCultureIgnoreCase));
+            AddCriteria(c => c.BusinessAddresses.Any(ba => ba.Country != null && ba.Country.Contains(filter.Country, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         if (filter.IsActive.HasValue)
@@ -79,12 +79,12 @@ public class CustomerSpecification : BaseSpecification<Customer>
 
         if (filter.MinCreditLimit.HasValue)
         {
-            AddCriteria(c => c.CreditLimit >= filter.MinCreditLimit.Value);
+            AddCriteria(c => c.CustomerFinancial != null && c.CustomerFinancial.CreditLimit >= filter.MinCreditLimit.Value);
         }
 
         if (filter.MaxCreditLimit.HasValue)
         {
-            AddCriteria(c => c.CreditLimit <= filter.MaxCreditLimit.Value);
+            AddCriteria(c => c.CustomerFinancial != null && c.CustomerFinancial.CreditLimit <= filter.MaxCreditLimit.Value);
         }
 
         if (filter.CreatedFrom.HasValue)
@@ -124,27 +124,27 @@ public class CustomerSpecification : BaseSpecification<Customer>
                     break;
                 case "email":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(c => c.Email);
+                        ApplyOrderByDescending(c => c.BusinessContacts.FirstOrDefault().Email);
                     else
-                        ApplyOrderBy(c => c.Email);
+                        ApplyOrderBy(c => c.BusinessContacts.FirstOrDefault().Email);
                     break;
                 case "city":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(c => c.City);
+                        ApplyOrderByDescending(c => c.BusinessAddresses.FirstOrDefault().City);
                     else
-                        ApplyOrderBy(c => c.City);
+                        ApplyOrderBy(c => c.BusinessAddresses.FirstOrDefault().City);
                     break;
                 case "country":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(c => c.Country);
+                        ApplyOrderByDescending(c => c.BusinessAddresses.FirstOrDefault().Country);
                     else
-                        ApplyOrderBy(c => c.Country);
+                        ApplyOrderBy(c => c.BusinessAddresses.FirstOrDefault().Country);
                     break;
                 case "creditlimit":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(c => c.CreditLimit);
+                        ApplyOrderByDescending(c => c.CustomerFinancial.CreditLimit);
                     else
-                        ApplyOrderBy(c => c.CreditLimit);
+                        ApplyOrderBy(c => c.CustomerFinancial.CreditLimit);
                     break;
                 case "createdon":
                     if (filter.SortDescending)
@@ -172,5 +172,8 @@ public class CustomerSpecification : BaseSpecification<Customer>
     private void ApplyIncludes()
     {
         AddInclude("Currency");
+        AddInclude("CustomerFinancial");
+        AddInclude("BusinessContacts");
+        AddInclude("BusinessAddresses");
     }
 }

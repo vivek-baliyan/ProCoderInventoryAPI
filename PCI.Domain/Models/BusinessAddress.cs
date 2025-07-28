@@ -1,18 +1,23 @@
 using PCI.Domain.Common;
 using PCI.Shared.Common.Enums;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PCI.Domain.Models;
 
-public class VendorAddress : BaseEntity
+public class BusinessAddress : BaseEntity
 {
-    public int VendorId { get; set; }
+    [Required]
+    [StringLength(50)]
+    public string EntityType { get; set; } // "Customer", "Vendor"
 
+    [Required]
+    public int EntityId { get; set; }
+
+    [Required]
     public AddressType AddressType { get; set; } = AddressType.Billing;
 
     [StringLength(100)]
-    public string AddressLabel { get; set; } // Custom label for the address
+    public string AddressLabel { get; set; }
 
     [Required]
     [StringLength(500)]
@@ -37,12 +42,15 @@ public class VendorAddress : BaseEntity
     public string Region { get; set; }
 
     public bool IsDefault { get; set; } = false;
+
     public bool IsActive { get; set; } = true;
 
     [StringLength(500)]
     public string Notes { get; set; }
 
-    // Navigation Properties
-    [ForeignKey("VendorId")]
-    public virtual Vendor Vendor { get; set; }
+    // Multi-tenancy
+    public int OrganisationId { get; set; }
+
+    // Navigation properties
+    public virtual Organisation Organisation { get; set; }
 }

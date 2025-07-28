@@ -21,38 +21,6 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.Property(e => e.CompanyName)
             .HasMaxLength(200);
 
-        builder.Property(e => e.ContactPerson)
-            .HasMaxLength(100);
-
-        // Contact information
-        builder.Property(e => e.PhoneNumber)
-            .HasMaxLength(20);
-
-        builder.Property(e => e.MobileNumber)
-            .HasMaxLength(20);
-
-        builder.Property(e => e.Email)
-            .HasMaxLength(100);
-
-        // Address information
-        builder.Property(e => e.BillingAddress)
-            .HasMaxLength(500);
-
-        builder.Property(e => e.ShippingAddress)
-            .HasMaxLength(500);
-
-        builder.Property(e => e.City)
-            .HasMaxLength(100);
-
-        builder.Property(e => e.State)
-            .HasMaxLength(100);
-
-        builder.Property(e => e.PostalCode)
-            .HasMaxLength(20);
-
-        builder.Property(e => e.Country)
-            .HasMaxLength(100);
-
         builder.Property(e => e.WebsiteUrl)
             .HasMaxLength(200);
 
@@ -61,23 +29,6 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .IsRequired()
             .HasConversion<int>()
             .HasDefaultValue(CustomerType.Individual);
-
-        builder.Property(e => e.PaymentTermDays)
-            .IsRequired()
-            .HasDefaultValue(30);
-
-        builder.Property(e => e.CreditLimit)
-            .HasColumnType("decimal(18,2)");
-
-        // Tax information
-        builder.Property(e => e.TaxNumber)
-            .HasMaxLength(50);
-
-        builder.Property(e => e.GSTNumber)
-            .HasMaxLength(50);
-
-        builder.Property(e => e.PANNumber)
-            .HasMaxLength(50);
 
         // Status
         builder.Property(e => e.IsActive)
@@ -105,12 +56,6 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.HasIndex(e => e.CustomerName)
             .HasDatabaseName("IX_Customer_CustomerName");
 
-        builder.HasIndex(e => e.Email)
-            .HasDatabaseName("IX_Customer_Email");
-
-        builder.HasIndex(e => e.PhoneNumber)
-            .HasDatabaseName("IX_Customer_PhoneNumber");
-
         builder.HasIndex(e => e.CustomerType)
             .HasDatabaseName("IX_Customer_CustomerType");
 
@@ -123,12 +68,6 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.HasIndex(e => e.CurrencyId)
             .HasDatabaseName("IX_Customer_CurrencyId");
 
-        builder.HasIndex(e => e.City)
-            .HasDatabaseName("IX_Customer_City");
-
-        builder.HasIndex(e => e.Country)
-            .HasDatabaseName("IX_Customer_Country");
-
         // Composite indexes for common queries
         builder.HasIndex(e => new { e.OrganisationId, e.IsActive })
             .HasDatabaseName("IX_Customer_OrganisationId_IsActive");
@@ -137,21 +76,9 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
             .IsUnique()
             .HasDatabaseName("IX_Customer_OrganisationId_CustomerCode");
 
-        builder.HasIndex(e => new { e.OrganisationId, e.Email })
-            .IsUnique()
-            .HasFilter("Email IS NOT NULL")
-            .HasDatabaseName("IX_Customer_OrganisationId_Email");
-
         builder.HasIndex(e => new { e.OrganisationId, e.CustomerType })
             .HasDatabaseName("IX_Customer_OrganisationId_CustomerType");
 
-        // Check constraints
-        builder.ToTable(t => t.HasCheckConstraint(
-            "CK_Customer_CreditLimit_NonNegative",
-            "CreditLimit IS NULL OR CreditLimit >= 0"));
-
-        builder.ToTable(t => t.HasCheckConstraint(
-            "CK_Customer_PaymentTermDays_NonNegative",
-            "PaymentTermDays >= 0"));
+        // No check constraints needed for core Customer entity
     }
 }
