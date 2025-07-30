@@ -23,6 +23,6 @@ public class ItemGroup : BaseEntity
     [ForeignKey("OrganisationId")]
     public virtual Organisation Organisation { get; set; }
 
-    public virtual ICollection<Product> Products { get; set; } = new HashSet<Product>();
+    public virtual ICollection<ProductItemGroup> ProductItemGroups { get; set; } = new HashSet<ProductItemGroup>();
     public virtual ICollection<ItemAttribute> ItemAttributes { get; set; } = new HashSet<ItemAttribute>();
 }

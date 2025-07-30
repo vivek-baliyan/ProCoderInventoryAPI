@@ -12,9 +12,6 @@ public record CreateProductDto
     [StringLength(200, ErrorMessage = "Name cannot exceed 200 characters")]
     public string Name { get; set; }
 
-    [StringLength(1000, ErrorMessage = "Description cannot exceed 1000 characters")]
-    public string Description { get; set; }
-
     public ProductType ProductType { get; set; } = ProductType.Goods;
 
     public ProductStatus Status { get; set; } = ProductStatus.Active;

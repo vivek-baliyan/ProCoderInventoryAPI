@@ -1,5 +1,4 @@
 ﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
 using PCI.Application.Repositories;
 using PCI.Application.Services.Interfaces;
 using PCI.Application.Specifications;
@@ -7,7 +6,6 @@ using PCI.Domain.Models;
 using PCI.Shared.Common;
 using PCI.Shared.Common.Constants;
 using PCI.Shared.Dtos.Product;
-using System.Linq.Expressions;
 
 namespace PCI.Application.Services.Implementations;
 
@@ -39,15 +37,10 @@ public class ProductService(IUnitOfWork unitOfWork, IImageService imageService) 
             {
                 SKU = createProductDto.SKU,
                 Name = createProductDto.Name,
-                Description = createProductDto.Description,
                 ProductType = createProductDto.ProductType,
                 Status = createProductDto.Status,
-                IsActive = createProductDto.IsActive,
-                IsTaxable = createProductDto.IsTaxable,
+                IsReturnable = createProductDto.IsTaxable,
                 TrackInventory = createProductDto.TrackInventory,
-                SerialNumberTracking = createProductDto.SerialNumberTracking,
-                BatchTracking = createProductDto.BatchTracking,
-                ItemGroupId = createProductDto.ItemGroupId,
                 BrandId = createProductDto.BrandId,
                 ManufacturerPartNumber = createProductDto.ManufacturerPartNumber,
                 UPC = createProductDto.UPC,
@@ -166,15 +159,10 @@ public class ProductService(IUnitOfWork unitOfWork, IImageService imageService) 
 
         existingProduct.SKU = updateProductDto.SKU;
         existingProduct.Name = updateProductDto.Name;
-        existingProduct.Description = updateProductDto.Description;
         existingProduct.ProductType = updateProductDto.ProductType;
         existingProduct.Status = updateProductDto.Status;
-        existingProduct.IsActive = updateProductDto.IsActive;
-        existingProduct.IsTaxable = updateProductDto.IsTaxable;
+        existingProduct.IsReturnable = updateProductDto.IsActive;
         existingProduct.TrackInventory = updateProductDto.TrackInventory;
-        existingProduct.SerialNumberTracking = updateProductDto.SerialNumberTracking;
-        existingProduct.BatchTracking = updateProductDto.BatchTracking;
-        existingProduct.ItemGroupId = updateProductDto.ItemGroupId;
         existingProduct.BrandId = updateProductDto.BrandId;
         existingProduct.ManufacturerPartNumber = updateProductDto.ManufacturerPartNumber;
         existingProduct.UPC = updateProductDto.UPC;
@@ -217,14 +205,12 @@ public class ProductService(IUnitOfWork unitOfWork, IImageService imageService) 
                 Id = p.Id,
                 SKU = p.SKU,
                 Name = p.Name,
-                Description = p.Description,
                 ProductType = p.ProductType,
                 Status = p.Status,
-                IsActive = p.IsActive,
+                IsReturnable = p.IsReturnable,
                 SellingPrice = p.SellingPrice,
                 CostPrice = p.CostPrice,
                 BrandName = p.Brand?.Name,
-                ItemGroupName = p.ItemGroup?.GroupName,
                 Image = p.ProductImages?.FirstOrDefault()?.Adapt<ProductImageDto>()
             }).ToList();
 
@@ -244,7 +230,7 @@ public class ProductService(IUnitOfWork unitOfWork, IImageService imageService) 
             var product = await _unitOfWork.Repository<Product>()
                 .GetFirstOrDefaultAsync(
                     x => x.Id == id,
-                    includeroperties: "Brand,ItemGroup,ProductImages,ProductCategories,ProductTax");
+                    includeroperties: "Brand,ItemGroup,ProductImages,ProductTax");
 
             if (product == null)
             {
@@ -275,14 +261,12 @@ public class ProductService(IUnitOfWork unitOfWork, IImageService imageService) 
                 Id = p.Id,
                 SKU = p.SKU,
                 Name = p.Name,
-                Description = p.Description,
                 ProductType = p.ProductType,
                 Status = p.Status,
-                IsActive = p.IsActive,
+                IsReturnable = p.IsReturnable,
                 SellingPrice = p.SellingPrice,
                 CostPrice = p.CostPrice,
                 BrandName = p.Brand?.Name,
-                ItemGroupName = p.ItemGroup?.GroupName,
                 Image = p.ProductImages?.FirstOrDefault()?.Adapt<ProductImageDto>()
             }).ToList();
 

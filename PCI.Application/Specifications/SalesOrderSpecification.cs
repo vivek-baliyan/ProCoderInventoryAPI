@@ -1,81 +1,84 @@
 using PCI.Domain.Models;
 using PCI.Shared.Dtos.SalesOrder;
-using System.Linq.Expressions;
 
 namespace PCI.Application.Specifications;
 
 public class SalesOrderSpecification : BaseSpecification<SalesOrder>
 {
-    public SalesOrderSpecification(int organisationId, SalesOrderFilterDto filter) : base()
+    public SalesOrderSpecification(int organisationId, SalesOrderFilterDto filter)
+        : base(x => x.OrganisationId == organisationId)
     {
-        // Base filter for organisation
-        ApplyFilter(x => x.OrganisationId == organisationId);
+        ApplyFilters(filter);
+        ApplySorting(filter);
+        ApplyPaging(filter);
+        ApplyIncludes();
+    }
 
-        // Apply filters
+    private void ApplyFilters(SalesOrderFilterDto filter)
+    {
         if (!string.IsNullOrEmpty(filter.OrderNumber))
         {
-            ApplyFilter(x => x.OrderNumber.Contains(filter.OrderNumber));
+            AddCriteria(x => x.OrderNumber.Contains(filter.OrderNumber));
         }
 
         if (!string.IsNullOrEmpty(filter.Status))
         {
-            ApplyFilter(x => x.Status == filter.Status);
+            AddCriteria(x => x.Status == filter.Status);
         }
 
         if (filter.CustomerId.HasValue)
         {
-            ApplyFilter(x => x.CustomerId == filter.CustomerId.Value);
+            AddCriteria(x => x.CustomerId == filter.CustomerId.Value);
         }
 
         if (!string.IsNullOrEmpty(filter.CustomerName))
         {
-            ApplyFilter(x => x.Customer.CompanyName.Contains(filter.CustomerName));
+            AddCriteria(x => x.Customer.CompanyName.Contains(filter.CustomerName));
         }
 
         if (filter.OrderDateFrom.HasValue)
         {
-            ApplyFilter(x => x.OrderDate >= filter.OrderDateFrom.Value);
+            AddCriteria(x => x.OrderDate >= filter.OrderDateFrom.Value);
         }
 
         if (filter.OrderDateTo.HasValue)
         {
-            ApplyFilter(x => x.OrderDate <= filter.OrderDateTo.Value);
+            AddCriteria(x => x.OrderDate <= filter.OrderDateTo.Value);
         }
 
         if (filter.ExpectedDeliveryDateFrom.HasValue)
         {
-            ApplyFilter(x => x.ExpectedDeliveryDate >= filter.ExpectedDeliveryDateFrom.Value);
+            AddCriteria(x => x.ExpectedDeliveryDate >= filter.ExpectedDeliveryDateFrom.Value);
         }
 
         if (filter.ExpectedDeliveryDateTo.HasValue)
         {
-            ApplyFilter(x => x.ExpectedDeliveryDate <= filter.ExpectedDeliveryDateTo.Value);
+            AddCriteria(x => x.ExpectedDeliveryDate <= filter.ExpectedDeliveryDateTo.Value);
         }
 
         if (filter.TotalAmountFrom.HasValue)
         {
-            ApplyFilter(x => x.TotalAmount >= filter.TotalAmountFrom.Value);
+            AddCriteria(x => x.TotalAmount >= filter.TotalAmountFrom.Value);
         }
 
         if (filter.TotalAmountTo.HasValue)
         {
-            ApplyFilter(x => x.TotalAmount <= filter.TotalAmountTo.Value);
+            AddCriteria(x => x.TotalAmount <= filter.TotalAmountTo.Value);
         }
 
         if (!string.IsNullOrEmpty(filter.ReferenceNumber))
         {
-            ApplyFilter(x => x.ReferenceNumber.Contains(filter.ReferenceNumber));
+            AddCriteria(x => x.ReferenceNumber.Contains(filter.ReferenceNumber));
         }
 
         if (!string.IsNullOrEmpty(filter.QuoteNumber))
         {
-            ApplyFilter(x => x.QuoteNumber.Contains(filter.QuoteNumber));
+            AddCriteria(x => x.QuoteNumber.Contains(filter.QuoteNumber));
         }
+    }
 
-        // Include related entities
-        ApplyInclude("Customer");
-
-        // Apply sorting
+    private void ApplySorting(SalesOrderFilterDto filter)
+    {
         if (!string.IsNullOrEmpty(filter.SortBy))
         {
             switch (filter.SortBy.ToLower())
@@ -119,8 +122,16 @@ public class SalesOrderSpecification : BaseSpecification<SalesOrder>
         {
             ApplyOrderByDescending(x => x.OrderDate);
         }
+    }
 
-        // Apply pagination
-        ApplyPaging(filter.PageIndex * filter.PageSize, filter.PageSize);
+    private void ApplyPaging(SalesOrderFilterDto filter)
+    {
+        var skip = filter.PageIndex * filter.PageSize;
+        ApplyPaging(skip, filter.PageSize);
+    }
+
+    private void ApplyIncludes()
+    {
+        AddInclude("Customer");
     }
 }

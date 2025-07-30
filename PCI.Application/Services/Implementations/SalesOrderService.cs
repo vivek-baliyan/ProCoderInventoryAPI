@@ -1,5 +1,4 @@
 using Mapster;
-using Microsoft.EntityFrameworkCore;
 using PCI.Application.Repositories;
 using PCI.Application.Services.Interfaces;
 using PCI.Application.Specifications;
@@ -111,7 +110,7 @@ public class SalesOrderService(IUnitOfWork unitOfWork) : ISalesOrderService
                     ShippingMethod = createSalesOrderDto.Shipping.ShippingMethod,
                     ShippingCost = createSalesOrderDto.Shipping.ShippingCost,
                     TrackingNumber = createSalesOrderDto.Shipping.TrackingNumber,
-                    ShippingDate = createSalesOrderDto.Shipping.ShippingDate,
+                    EstimatedDeliveryDate = createSalesOrderDto.Shipping.EstimatedDeliveryDate,
                     ShippingNotes = createSalesOrderDto.Shipping.ShippingNotes,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
@@ -168,10 +167,10 @@ public class SalesOrderService(IUnitOfWork unitOfWork) : ISalesOrderService
 
             // Remove existing items
             var existingItems = await _unitOfWork.Repository<SalesOrderItem>()
-                .GetAsync(x => x.SalesOrderId == existingSalesOrder.Id);
+                .GetFilteredAsync(x => x.SalesOrderId == existingSalesOrder.Id);
             foreach (var item in existingItems)
             {
-                _unitOfWork.Repository<SalesOrderItem>().Delete(item);
+                _unitOfWork.Repository<SalesOrderItem>().Remove(item);
             }
 
             // Calculate totals
@@ -243,7 +242,7 @@ public class SalesOrderService(IUnitOfWork unitOfWork) : ISalesOrderService
                     existingSalesOrder.SalesOrderShipping.ShippingMethod = updateSalesOrderDto.Shipping.ShippingMethod;
                     existingSalesOrder.SalesOrderShipping.ShippingCost = updateSalesOrderDto.Shipping.ShippingCost;
                     existingSalesOrder.SalesOrderShipping.TrackingNumber = updateSalesOrderDto.Shipping.TrackingNumber;
-                    existingSalesOrder.SalesOrderShipping.ShippingDate = updateSalesOrderDto.Shipping.ShippingDate;
+                    existingSalesOrder.SalesOrderShipping.EstimatedDeliveryDate = updateSalesOrderDto.Shipping.EstimatedDeliveryDate;
                     existingSalesOrder.SalesOrderShipping.ShippingNotes = updateSalesOrderDto.Shipping.ShippingNotes;
                     existingSalesOrder.SalesOrderShipping.ModifiedBy = userId;
                     existingSalesOrder.SalesOrderShipping.ModifiedOn = DateTime.UtcNow;
@@ -257,7 +256,7 @@ public class SalesOrderService(IUnitOfWork unitOfWork) : ISalesOrderService
                         ShippingMethod = updateSalesOrderDto.Shipping.ShippingMethod,
                         ShippingCost = updateSalesOrderDto.Shipping.ShippingCost,
                         TrackingNumber = updateSalesOrderDto.Shipping.TrackingNumber,
-                        ShippingDate = updateSalesOrderDto.Shipping.ShippingDate,
+                        EstimatedDeliveryDate = updateSalesOrderDto.Shipping.EstimatedDeliveryDate,
                         ShippingNotes = updateSalesOrderDto.Shipping.ShippingNotes,
                         CreatedBy = userId,
                         CreatedOn = DateTime.UtcNow
@@ -441,7 +440,7 @@ public class SalesOrderService(IUnitOfWork unitOfWork) : ISalesOrderService
                     .Error(new Problem(ErrorCodes.SalesOrderDeletionError, "Only draft sales orders can be deleted"));
             }
 
-            _unitOfWork.Repository<SalesOrder>().Delete(salesOrder);
+            _unitOfWork.Repository<SalesOrder>().Remove(salesOrder);
             await _unitOfWork.SaveChangesAsync();
 
             return ServiceResult<bool>.Success(true);

@@ -10,7 +10,7 @@ public class ProductFilterDto
     public int? ItemGroupId { get; set; }
     public decimal? MinPrice { get; set; }
     public decimal? MaxPrice { get; set; }
-    public bool? IsTaxable { get; set; }
+    public bool? IsReturnable { get; set; }
     public bool? TrackInventory { get; set; }
     public List<int>? TagIds { get; set; }
     public int PageIndex { get; set; } = 1;

@@ -98,7 +98,7 @@ public class UpdateSalesOrderShippingDto
     [StringLength(100)]
     public string TrackingNumber { get; set; }
 
-    public DateTime? ShippingDate { get; set; }
+    public DateTime? EstimatedDeliveryDate { get; set; }
 
     [StringLength(500)]
     public string ShippingNotes { get; set; }

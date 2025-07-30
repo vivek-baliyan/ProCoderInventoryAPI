@@ -17,9 +17,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasMaxLength(200);
 
-        builder.Property(e => e.Description)
-            .HasMaxLength(1000);
-
         // Product identification codes
         builder.Property(e => e.ManufacturerPartNumber)
             .HasMaxLength(100);
@@ -52,11 +49,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasDefaultValue(ProductStatus.Active);
 
         // Boolean defaults
-        builder.Property(e => e.IsActive)
-            .IsRequired()
-            .HasDefaultValue(true);
-
-        builder.Property(e => e.IsTaxable)
+        builder.Property(e => e.IsReturnable)
             .IsRequired()
             .HasDefaultValue(true);
 
@@ -64,20 +57,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasDefaultValue(true);
 
-        builder.Property(e => e.SerialNumberTracking)
-            .IsRequired()
-            .HasDefaultValue(false);
-
-        builder.Property(e => e.BatchTracking)
-            .IsRequired()
-            .HasDefaultValue(false);
-
         // Foreign key relationships
-        builder.HasOne(e => e.ItemGroup)
-            .WithMany(ig => ig.Products)
-            .HasForeignKey(e => e.ItemGroupId)
-            .OnDelete(DeleteBehavior.SetNull);
-
         builder.HasOne(e => e.Brand)
             .WithMany(b => b.Products)
             .HasForeignKey(e => e.BrandId)
@@ -117,22 +97,14 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasIndex(e => e.ProductType)
             .HasDatabaseName("IX_Product_ProductType");
 
-        builder.HasIndex(e => e.IsActive)
-            .HasDatabaseName("IX_Product_IsActive");
-
         builder.HasIndex(e => e.OrganisationId)
             .HasDatabaseName("IX_Product_OrganisationId");
 
         builder.HasIndex(e => e.BrandId)
             .HasDatabaseName("IX_Product_BrandId");
 
-        builder.HasIndex(e => e.ItemGroupId)
-            .HasDatabaseName("IX_Product_ItemGroupId");
 
         // Composite indexes for common queries
-        builder.HasIndex(e => new { e.OrganisationId, e.IsActive })
-            .HasDatabaseName("IX_Product_OrganisationId_IsActive");
-
         builder.HasIndex(e => new { e.OrganisationId, e.SKU })
             .IsUnique()
             .HasDatabaseName("IX_Product_OrganisationId_SKU");

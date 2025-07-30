@@ -22,7 +22,6 @@ public class ProductSpecification : BaseSpecification<Product>
             var searchTerm = filter.SearchTerm.ToLower();
             AddCriteria(p =>
                 p.Name.ToLower().Contains(searchTerm) ||
-                p.Description.ToLower().Contains(searchTerm) ||
                 p.SKU.ToLower().Contains(searchTerm));
         }
 
@@ -36,19 +35,9 @@ public class ProductSpecification : BaseSpecification<Product>
             AddCriteria(p => p.Status == (ProductStatus)filter.Status.Value);
         }
 
-        if (filter.IsActive.HasValue)
-        {
-            AddCriteria(p => p.IsActive == filter.IsActive.Value);
-        }
-
         if (filter.BrandId.HasValue)
         {
             AddCriteria(p => p.BrandId == filter.BrandId.Value);
-        }
-
-        if (filter.ItemGroupId.HasValue)
-        {
-            AddCriteria(p => p.ItemGroupId == filter.ItemGroupId.Value);
         }
 
         if (filter.MinPrice.HasValue)
@@ -61,9 +50,9 @@ public class ProductSpecification : BaseSpecification<Product>
             AddCriteria(p => p.SellingPrice <= filter.MaxPrice.Value);
         }
 
-        if (filter.IsTaxable.HasValue)
+        if (filter.IsReturnable.HasValue)
         {
-            AddCriteria(p => p.IsTaxable == filter.IsTaxable.Value);
+            AddCriteria(p => p.IsReturnable == filter.IsReturnable.Value);
         }
 
         if (filter.TrackInventory.HasValue)
