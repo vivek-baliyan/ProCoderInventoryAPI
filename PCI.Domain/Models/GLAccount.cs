@@ -8,7 +8,6 @@ public class GLAccount : BaseEntity
     public string AccountCode { get; set; }
     public string AccountName { get; set; }
     public AccountType AccountType { get; set; }
-    public BalanceType BalanceType { get; set; }
     public string Description { get; set; }
     public bool IsActive { get; set; } = true;
     public bool IsSystemAccount { get; set; } = false;
@@ -19,10 +18,6 @@ public class GLAccount : BaseEntity
     // Hierarchy
     public int? ParentAccountId { get; set; }
     public virtual GLAccount ParentAccount { get; set; }
-
-    // Currency support
-    public int? CurrencyId { get; set; }
-    public virtual Currency Currency { get; set; }
 
     // Multi-tenancy
     public int OrganisationId { get; set; }

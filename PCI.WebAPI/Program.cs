@@ -10,6 +10,8 @@ using PCI.WebAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpClient();
+
 // Add services to the container.
 builder.Services.ConfigurePersistence(builder.Configuration);
 builder.Services.ConfigureApplication();

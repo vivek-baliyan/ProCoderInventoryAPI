@@ -21,5 +21,16 @@ public static class ServiceExtensions
         services.AddScoped<IVendorService, VendorService>();
         services.AddScoped<ISalesOrderService, SalesOrderService>();
         services.AddScoped<IImageService, ImageService>();
+        
+        // Master Data Services
+        services.AddScoped<IBrandService, BrandService>();
+        services.AddScoped<ICountryService, CountryService>();
+        services.AddScoped<IStateService, StateService>();
+        services.AddScoped<ICurrencyService, CurrencyService>();
+        services.AddScoped<IUnitOfMeasureService, UnitOfMeasureService>();
+        services.AddScoped<ITaxClassificationService, TaxClassificationService>();
+        services.AddScoped<ITaxMasterService, TaxMasterService>();
+        services.AddScoped<IHSNMasterService, HSNMasterService>();
+        services.AddScoped<ICountryDataSeederService, CountryDataSeederService>();
     }
 }

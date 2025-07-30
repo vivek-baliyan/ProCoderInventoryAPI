@@ -4,9 +4,15 @@ namespace PCI.Domain.Models;
 
 public class State : BaseEntity
 {
-    public string Code { get; set; }
-
     public string Name { get; set; }
+
+    public string StateCode { get; set; }
+
+    public string Type { get; set; }
+
+    public decimal? Latitude { get; set; }
+
+    public decimal? Longitude { get; set; }
 
     public int CountryId { get; set; }
 

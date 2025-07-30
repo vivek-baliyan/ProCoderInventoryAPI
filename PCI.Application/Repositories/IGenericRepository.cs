@@ -16,6 +16,8 @@ public interface IGenericRepository<T> where T : BaseEntity
     Task<IEnumerable<T>> GetPaginatedAsync(int pageIndex, int pageSize, Expression<Func<T, bool>> filter = null,
         string includeroperties = null);
     Task<bool> AnyAsync(Expression<Func<T, bool>> filter);
+    Task<int> CountAsync();
+
     Task<IEnumerable<T>> GetAsync(ISpecification<T> specification);
     Task<T> GetFirstAsync(ISpecification<T> specification);
     Task<int> CountAsync(ISpecification<T> specification);

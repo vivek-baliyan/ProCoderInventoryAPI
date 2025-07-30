@@ -103,6 +103,11 @@ public class GenericRepository<T>(ApplicationDbContext context) : IGenericReposi
         return await _dbSet.AnyAsync(filter);
     }
 
+    public async Task<int> CountAsync()
+    {
+        return await _dbSet.CountAsync();
+    }
+
     public async Task<IEnumerable<T>> GetAsync(ISpecification<T> specification)
     {
         return await ApplySpecification(specification).ToListAsync();

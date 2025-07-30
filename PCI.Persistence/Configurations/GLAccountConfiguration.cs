@@ -31,10 +31,6 @@ public class GLAccountConfiguration : IEntityTypeConfiguration<GLAccount>
             .HasForeignKey(e => e.AccountSubTypeId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property(e => e.BalanceType)
-            .IsRequired()
-            .HasConversion<int>();
-
         // Boolean properties with defaults
         builder.Property(e => e.IsActive)
             .IsRequired()
@@ -54,11 +50,6 @@ public class GLAccountConfiguration : IEntityTypeConfiguration<GLAccount>
             .WithMany()
             .HasForeignKey(e => e.OrganisationId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(e => e.Currency)
-            .WithMany()
-            .HasForeignKey(e => e.CurrencyId)
-            .OnDelete(DeleteBehavior.SetNull);
 
         // Performance indexes
         builder.HasIndex(e => e.AccountCode)

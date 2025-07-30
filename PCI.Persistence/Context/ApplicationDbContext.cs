@@ -27,6 +27,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Invoice> Invoices { get; init; }
     public DbSet<Currency> Currencies { get; init; }
     public DbSet<TaxClassification> TaxClassifications { get; init; }
+    public DbSet<Country> Countries { get; init; }
+    public DbSet<State> States { get; init; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
