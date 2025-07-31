@@ -13,6 +13,7 @@ public static class ServiceExtensions
 
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<ISessionManagementService, SessionManagementService>();
+        services.AddScoped<ICodeGenerationService, CodeGenerationService>();
 
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IOrganisationService, OrganisationService>();

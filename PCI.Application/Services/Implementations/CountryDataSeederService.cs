@@ -113,7 +113,6 @@ public class CountryDataSeederService(
 
             var countries = countriesData.Select(c => new Country
             {
-                Id = c.Id,
                 Name = c.Name,
                 Iso2 = c.Iso2,
                 Iso3 = c.Iso3,
@@ -169,16 +168,20 @@ public class CountryDataSeederService(
 
             _logger.LogInformation($"Downloaded {statesData.Count} states. Converting to domain models...");
 
-            var states = statesData.Select(s => new State
-            {
-                Id = s.Id,
-                Name = s.Name,
-                StateCode = s.StateCode,
-                Type = s.Type,
-                CountryId = s.CountryId,
-                Latitude = ParseDecimal(s.Latitude),
-                Longitude = ParseDecimal(s.Longitude)
-            }).ToList();
+            // Get all countries to map states correctly
+            var countries = await _unitOfWork.Repository<Country>().GetAllAsync();
+            var countryLookup = countries.ToDictionary(c => c.Iso2, c => c.Id);
+
+            var states = statesData.Where(s => countryLookup.ContainsKey(s.CountryCode))
+                .Select(s => new State
+                {
+                    Name = s.Name,
+                    StateCode = s.StateCode,
+                    Type = s.Type,
+                    CountryId = countryLookup[s.CountryCode],
+                    Latitude = ParseDecimal(s.Latitude),
+                    Longitude = ParseDecimal(s.Longitude)
+                }).ToList();
 
             foreach (var state in states)
             {

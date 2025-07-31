@@ -25,6 +25,7 @@
         public const string CustomerRetrievalError = "CustomerRetrievalError";
         public const string CustomerDeletionError = "CustomerDeletionError";
         public const string CustomerHasTransactions = "CustomerHasTransactions";
+        public const string ConcurrencyError = "ConcurrencyError";
         public const string VendorAlreadyExists = "VendorAlreadyExists";
         public const string VendorEmailExists = "VendorEmailExists";
         public const string VendorCreationError = "VendorCreationError";
@@ -39,6 +40,25 @@
         public const string SalesOrderUpdateError = "SalesOrderUpdateError";
         public const string SalesOrderRetrievalError = "SalesOrderRetrievalError";
         public const string SalesOrderDeletionError = "SalesOrderDeletionError";
+    }
+
+    public class EntityTypes
+    {
+        public const string Customer = "Customer";
+        public const string Vendor = "Vendor";
+        public const string Product = "Product";
+        public const string Invoice = "Invoice";
+        public const string SalesOrder = "SalesOrder";
+    }
+
+    public class DefaultValues
+    {
+        public const string NotAvailable = "N/A";
+        public const decimal DefaultCreditLimit = 0;
+        public const int DefaultPaymentTermDays = 0;
+        public const bool DefaultIsActive = true;
+        public const bool DefaultIsPrimary = true;
+        public const bool DefaultIsDefault = true;
     }
 
     public class Messages

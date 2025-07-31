@@ -10,7 +10,7 @@ public class GLAccountController(
     private readonly IGLAccountService _accountService = gLAccountService;
 
     [HttpGet("dropdown")]
-    public async Task<IActionResult> GetBrandsForDropdown()
+    public async Task<IActionResult> GetGLAccountsForDropdown()
     {
         var result = await _accountService.GetGLAccountsForDropdown(OrganisationId);
 

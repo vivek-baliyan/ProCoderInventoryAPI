@@ -1,4 +1,5 @@
 using PCI.Domain.Models;
+using PCI.Shared.Common.Enums;
 using PCI.Shared.Dtos.Customer;
 
 namespace PCI.Application.Specifications;
@@ -47,9 +48,9 @@ public class CustomerSpecification : BaseSpecification<Customer>
             AddCriteria(c => c.BusinessContacts.Any(bc => bc.PhoneNumber != null && bc.PhoneNumber.ToLower().Contains(filter.PhoneNumber)));
         }
 
-        if (filter.CustomerType.HasValue)
+        if (filter.CustomerType.HasValue && filter.CustomerType > 0)
         {
-            AddCriteria(c => c.CustomerType == filter.CustomerType.Value);
+            AddCriteria(c => c.CustomerType == (CustomerType)filter.CustomerType.Value);
         }
 
         if (!string.IsNullOrWhiteSpace(filter.City))

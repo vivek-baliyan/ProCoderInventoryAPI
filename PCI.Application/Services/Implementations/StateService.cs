@@ -1,5 +1,6 @@
 using PCI.Application.Repositories;
 using PCI.Application.Services.Interfaces;
+using PCI.Application.Specifications;
 using PCI.Domain.Models;
 using PCI.Shared.Common;
 using PCI.Shared.Dtos.Common;
@@ -14,9 +15,8 @@ public class StateService(IUnitOfWork unitOfWork) : IStateService
     {
         try
         {
-            var states = countryId.HasValue
-                ? await _unitOfWork.Repository<State>().GetFilteredAsync(s => s.CountryId == countryId.Value)
-                : await _unitOfWork.Repository<State>().GetAllAsync();
+            var specification = new StateSpecification(countryId);
+            var states = await _unitOfWork.Repository<State>().GetAsync(specification);
 
             var result = states
                 .Select(s => new DropdownDto
@@ -24,9 +24,8 @@ public class StateService(IUnitOfWork unitOfWork) : IStateService
                     Value = s.Id,
                     Label = s.Name,
                     Code = s.StateCode,
-                    AdditionalData = new { CountryId = s.CountryId, Type = s.Type }
+                    AdditionalData = new { s.CountryId, s.Type }
                 })
-                .OrderBy(s => s.Label)
                 .ToList();
 
             return ServiceResult<List<DropdownDto>>.Success(result);

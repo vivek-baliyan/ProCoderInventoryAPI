@@ -1,16 +1,12 @@
 using PCI.Domain.Common;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PCI.Domain.Models;
 
 public class VendorPerformance : BaseEntity
 {
-    [Required]
     public int VendorId { get; set; }
 
     // Performance Ratings
-    [Column(TypeName = "decimal(3,2)")]
     public decimal PerformanceRating { get; set; } = 0; // 0-5 scale
 
     public int OnTimeDeliveryPercentage { get; set; } = 0; // 0-100
@@ -28,7 +24,6 @@ public class VendorPerformance : BaseEntity
 
     public DateTime ReviewPeriodEnd { get; set; }
 
-    [StringLength(100)]
     public string ReviewedBy { get; set; }
 
     // Performance Metrics
@@ -49,25 +44,19 @@ public class VendorPerformance : BaseEntity
 
     public bool IsBlacklisted { get; set; } = false;
 
-    [StringLength(500)]
     public string BlacklistReason { get; set; }
 
     public DateTime? BlacklistDate { get; set; }
 
-    [StringLength(100)]
     public string BlacklistedBy { get; set; }
 
     // Improvement Areas
-    [StringLength(1000)]
     public string StrengthsNoted { get; set; }
 
-    [StringLength(1000)]
     public string AreasForImprovement { get; set; }
 
-    [StringLength(1000)]
     public string ActionPlan { get; set; }
 
-    [StringLength(500)]
     public string Notes { get; set; }
 
     // Multi-tenancy

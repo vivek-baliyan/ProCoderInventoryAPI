@@ -680,6 +680,107 @@ namespace PCI.Persistence.Migrations.Application
                     b.ToTable("BusinessTaxInfos", "APP");
                 });
 
+            modelBuilder.Entity("PCI.Domain.Models.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Capital")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Currency")
+                        .HasMaxLength(3)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CurrencyName")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CurrencySymbol")
+                        .HasMaxLength(5)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Emoji")
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EmojiU")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Iso2")
+                        .HasMaxLength(2)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Iso3")
+                        .HasMaxLength(3)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("decimal(10,8)");
+
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(11,8)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Native")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NumericCode")
+                        .HasMaxLength(3)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneCode")
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Region")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subregion")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Tld")
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Iso2")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Countries_Iso2");
+
+                    b.HasIndex("Iso3")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Countries_Iso3");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Countries_Name");
+
+                    b.ToTable("Countries", "APP");
+                });
+
             modelBuilder.Entity("PCI.Domain.Models.Currency", b =>
                 {
                     b.Property<int>("Id")
@@ -791,6 +892,9 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.Property<int>("OrganisationId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("RowVersion")
+                        .HasColumnType("BLOB");
 
                     b.Property<string>("WebsiteUrl")
                         .HasMaxLength(200)
@@ -983,17 +1087,11 @@ namespace PCI.Persistence.Migrations.Application
                     b.Property<int>("AccountType")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("BalanceType")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
-
-                    b.Property<int?>("CurrencyId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
@@ -1034,8 +1132,6 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.HasIndex("AccountType")
                         .HasDatabaseName("IX_GLAccount_AccountType");
-
-                    b.HasIndex("CurrencyId");
 
                     b.HasIndex("IsActive")
                         .HasDatabaseName("IX_GLAccount_IsActive");
@@ -1083,7 +1179,9 @@ namespace PCI.Persistence.Migrations.Application
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("AmountPaid")
-                        .HasColumnType("decimal(18,2)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("TEXT");
@@ -1092,6 +1190,9 @@ namespace PCI.Persistence.Migrations.Application
                         .HasColumnType("TEXT");
 
                     b.Property<int>("CustomerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("CustomerId1")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("DueDate")
@@ -1129,8 +1230,10 @@ namespace PCI.Persistence.Migrations.Application
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Status")
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("Draft");
 
                     b.Property<decimal>("SubTotal")
                         .HasColumnType("decimal(18,2)");
@@ -1143,13 +1246,28 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("CustomerId")
+                        .HasDatabaseName("IX_Invoices_CustomerId");
 
-                    b.HasIndex("OrganisationId");
+                    b.HasIndex("CustomerId1");
+
+                    b.HasIndex("InvoiceDate")
+                        .HasDatabaseName("IX_Invoices_InvoiceDate");
+
+                    b.HasIndex("InvoiceNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Invoices_InvoiceNumber");
+
+                    b.HasIndex("OrganisationId")
+                        .HasDatabaseName("IX_Invoices_OrganisationId");
 
                     b.HasIndex("PriceListId");
 
-                    b.HasIndex("SalesOrderId");
+                    b.HasIndex("SalesOrderId")
+                        .HasDatabaseName("IX_Invoices_SalesOrderId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Invoices_Status");
 
                     b.ToTable("Invoices", "APP");
                 });
@@ -2659,6 +2777,60 @@ namespace PCI.Persistence.Migrations.Application
                     b.ToTable("SalesOrderShippings", "APP");
                 });
 
+            modelBuilder.Entity("PCI.Domain.Models.State", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CountryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("decimal(10,8)");
+
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(11,8)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("StateCode")
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountryId")
+                        .HasDatabaseName("IX_States_CountryId");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_States_Name");
+
+                    b.HasIndex("StateCode")
+                        .HasDatabaseName("IX_States_StateCode");
+
+                    b.ToTable("States", "APP");
+                });
+
             modelBuilder.Entity("PCI.Domain.Models.StockTransaction", b =>
                 {
                     b.Property<int>("Id")
@@ -3646,11 +3818,6 @@ namespace PCI.Persistence.Migrations.Application
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PCI.Domain.Models.Currency", "Currency")
-                        .WithMany()
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
                         .WithMany()
                         .HasForeignKey("OrganisationId")
@@ -3664,8 +3831,6 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.Navigation("AccountSubType");
 
-                    b.Navigation("Currency");
-
                     b.Navigation("Organisation");
 
                     b.Navigation("ParentAccount");
@@ -3674,24 +3839,30 @@ namespace PCI.Persistence.Migrations.Application
             modelBuilder.Entity("PCI.Domain.Models.Invoice", b =>
                 {
                     b.HasOne("PCI.Domain.Models.Customer", "Customer")
-                        .WithMany("Invoices")
+                        .WithMany()
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("PCI.Domain.Models.Customer", null)
+                        .WithMany("Invoices")
+                        .HasForeignKey("CustomerId1");
 
                     b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
                         .WithMany()
                         .HasForeignKey("OrganisationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("PCI.Domain.Models.PriceList", "PriceList")
                         .WithMany()
-                        .HasForeignKey("PriceListId");
+                        .HasForeignKey("PriceListId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("PCI.Domain.Models.SalesOrder", "SalesOrder")
                         .WithMany()
-                        .HasForeignKey("SalesOrderId");
+                        .HasForeignKey("SalesOrderId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Customer");
 
@@ -4144,6 +4315,17 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("SalesOrder");
                 });
 
+            modelBuilder.Entity("PCI.Domain.Models.State", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.Country", "Country")
+                        .WithMany("States")
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
+                });
+
             modelBuilder.Entity("PCI.Domain.Models.StockTransaction", b =>
                 {
                     b.HasOne("PCI.Domain.Models.Product", "Product")
@@ -4300,6 +4482,11 @@ namespace PCI.Persistence.Migrations.Application
             modelBuilder.Entity("PCI.Domain.Models.Brand", b =>
                 {
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.Country", b =>
+                {
+                    b.Navigation("States");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.Currency", b =>

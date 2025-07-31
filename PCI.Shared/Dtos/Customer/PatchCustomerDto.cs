@@ -1,76 +1,83 @@
+using PCI.Shared.Common.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace PCI.Shared.Dtos.Customer;
 
-public record CreateCustomerDto
+public record PatchCustomerDto
 {
-    // CustomerCode is now auto-generated, no longer required from frontend
+    [Required(ErrorMessage = "Customer ID is required")]
+    public int Id { get; set; }
 
-    [Required(ErrorMessage = "Customer name is required")]
+    [Required(ErrorMessage = "Row version is required for concurrency control")]
+    public byte[] RowVersion { get; set; }
+
+    // Nullable properties to indicate which fields should be updated
+    // null = don't update, has value = update with this value
+    
     [StringLength(200, ErrorMessage = "Customer name cannot exceed 200 characters")]
-    public string CustomerName { get; set; }
+    public string? CustomerName { get; set; }
 
     [StringLength(200, ErrorMessage = "Company name cannot exceed 200 characters")]
-    public string CompanyName { get; set; }
+    public string? CompanyName { get; set; }
 
     [StringLength(100, ErrorMessage = "Contact person cannot exceed 100 characters")]
-    public string ContactPerson { get; set; }
+    public string? ContactPerson { get; set; }
 
     [StringLength(20, ErrorMessage = "Phone number cannot exceed 20 characters")]
     [Phone(ErrorMessage = "Invalid phone number format")]
-    public string PhoneNumber { get; set; }
+    public string? PhoneNumber { get; set; }
 
     [StringLength(20, ErrorMessage = "Mobile number cannot exceed 20 characters")]
     [Phone(ErrorMessage = "Invalid mobile number format")]
-    public string MobileNumber { get; set; }
+    public string? MobileNumber { get; set; }
 
     [StringLength(100, ErrorMessage = "Email cannot exceed 100 characters")]
     [EmailAddress(ErrorMessage = "Invalid email format")]
-    public string Email { get; set; }
+    public string? Email { get; set; }
 
     [StringLength(500, ErrorMessage = "Billing address cannot exceed 500 characters")]
-    public string BillingAddress { get; set; }
+    public string? BillingAddress { get; set; }
 
     [StringLength(500, ErrorMessage = "Shipping address cannot exceed 500 characters")]
-    public string ShippingAddress { get; set; }
+    public string? ShippingAddress { get; set; }
 
     [StringLength(100, ErrorMessage = "City cannot exceed 100 characters")]
-    public string City { get; set; }
+    public string? City { get; set; }
 
     [StringLength(100, ErrorMessage = "State cannot exceed 100 characters")]
-    public string State { get; set; }
+    public string? State { get; set; }
 
     [StringLength(20, ErrorMessage = "Postal code cannot exceed 20 characters")]
-    public string PostalCode { get; set; }
+    public string? PostalCode { get; set; }
 
     [StringLength(100, ErrorMessage = "Country cannot exceed 100 characters")]
-    public string Country { get; set; }
+    public string? Country { get; set; }
 
     [StringLength(200, ErrorMessage = "Website URL cannot exceed 200 characters")]
     [Url(ErrorMessage = "Invalid website URL format")]
-    public string WebsiteUrl { get; set; }
+    public string? WebsiteUrl { get; set; }
 
-    public int CustomerType { get; set; }
+    public CustomerType? CustomerType { get; set; }
 
     [Range(0, 365, ErrorMessage = "Payment term days must be between 0 and 365")]
-    public int PaymentTermDays { get; set; } = 30;
+    public int? PaymentTermDays { get; set; }
 
     [Range(0, 999999999.99, ErrorMessage = "Credit limit must be between 0 and 999,999,999.99")]
     public decimal? CreditLimit { get; set; }
 
     [StringLength(50, ErrorMessage = "Tax number cannot exceed 50 characters")]
-    public string TaxNumber { get; set; }
+    public string? TaxNumber { get; set; }
 
     [StringLength(50, ErrorMessage = "GST number cannot exceed 50 characters")]
-    public string GSTNumber { get; set; }
+    public string? GSTNumber { get; set; }
 
     [StringLength(50, ErrorMessage = "PAN number cannot exceed 50 characters")]
-    public string PANNumber { get; set; }
+    public string? PANNumber { get; set; }
 
     public int? CurrencyId { get; set; }
 
-    public bool IsActive { get; set; } = true;
+    public bool? IsActive { get; set; }
 
     [StringLength(1000, ErrorMessage = "Notes cannot exceed 1000 characters")]
-    public string Notes { get; set; }
+    public string? Notes { get; set; }
 }

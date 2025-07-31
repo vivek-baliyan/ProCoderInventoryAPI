@@ -11,8 +11,8 @@ using PCI.Persistence.Context;
 namespace PCI.Persistence.Migrations.Application
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250728071730_CustomersAndVendors")]
-    partial class CustomersAndVendors
+    [Migration("20250731182240_CountriesAndOptimizations")]
+    partial class CountriesAndOptimizations
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -156,52 +156,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.HasIndex("OrganisationId");
 
                     b.ToTable("AccountTransaction", "APP");
-                });
-
-            modelBuilder.Entity("PCI.Domain.Models.BatchNumber", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("BatchNumberValue")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ExpiryDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ManufactureDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("QuantityAvailable")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Status")
-                        .HasMaxLength(20)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("BatchNumber", "APP");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.Brand", b =>
@@ -729,6 +683,107 @@ namespace PCI.Persistence.Migrations.Application
                     b.ToTable("BusinessTaxInfos", "APP");
                 });
 
+            modelBuilder.Entity("PCI.Domain.Models.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Capital")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Currency")
+                        .HasMaxLength(3)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CurrencyName")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CurrencySymbol")
+                        .HasMaxLength(5)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Emoji")
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EmojiU")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Iso2")
+                        .HasMaxLength(2)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Iso3")
+                        .HasMaxLength(3)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("decimal(10,8)");
+
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(11,8)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Native")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NumericCode")
+                        .HasMaxLength(3)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneCode")
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Region")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Subregion")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Tld")
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Iso2")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Countries_Iso2");
+
+                    b.HasIndex("Iso3")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Countries_Iso3");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_Countries_Name");
+
+                    b.ToTable("Countries", "APP");
+                });
+
             modelBuilder.Entity("PCI.Domain.Models.Currency", b =>
                 {
                     b.Property<int>("Id")
@@ -840,6 +895,9 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.Property<int>("OrganisationId")
                         .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("RowVersion")
+                        .HasColumnType("BLOB");
 
                     b.Property<string>("WebsiteUrl")
                         .HasMaxLength(200)
@@ -1032,17 +1090,11 @@ namespace PCI.Persistence.Migrations.Application
                     b.Property<int>("AccountType")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("BalanceType")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("CreatedBy")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
-
-                    b.Property<int?>("CurrencyId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
@@ -1083,8 +1135,6 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.HasIndex("AccountType")
                         .HasDatabaseName("IX_GLAccount_AccountType");
-
-                    b.HasIndex("CurrencyId");
 
                     b.HasIndex("IsActive")
                         .HasDatabaseName("IX_GLAccount_IsActive");
@@ -1132,7 +1182,9 @@ namespace PCI.Persistence.Migrations.Application
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("AmountPaid")
-                        .HasColumnType("decimal(18,2)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("TEXT");
@@ -1141,6 +1193,9 @@ namespace PCI.Persistence.Migrations.Application
                         .HasColumnType("TEXT");
 
                     b.Property<int>("CustomerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("CustomerId1")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("DueDate")
@@ -1178,8 +1233,10 @@ namespace PCI.Persistence.Migrations.Application
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Status")
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("Draft");
 
                     b.Property<decimal>("SubTotal")
                         .HasColumnType("decimal(18,2)");
@@ -1192,13 +1249,28 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("CustomerId")
+                        .HasDatabaseName("IX_Invoices_CustomerId");
 
-                    b.HasIndex("OrganisationId");
+                    b.HasIndex("CustomerId1");
+
+                    b.HasIndex("InvoiceDate")
+                        .HasDatabaseName("IX_Invoices_InvoiceDate");
+
+                    b.HasIndex("InvoiceNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Invoices_InvoiceNumber");
+
+                    b.HasIndex("OrganisationId")
+                        .HasDatabaseName("IX_Invoices_OrganisationId");
 
                     b.HasIndex("PriceListId");
 
-                    b.HasIndex("SalesOrderId");
+                    b.HasIndex("SalesOrderId")
+                        .HasDatabaseName("IX_Invoices_SalesOrderId");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_Invoices_Status");
 
                     b.ToTable("Invoices", "APP");
                 });
@@ -1583,11 +1655,6 @@ namespace PCI.Persistence.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("BatchTracking")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(false);
-
                     b.Property<int?>("BrandId")
                         .HasColumnType("INTEGER");
 
@@ -1606,10 +1673,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.Property<int?>("CurrencyId1")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("EAN")
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
@@ -1621,18 +1684,10 @@ namespace PCI.Persistence.Migrations.Application
                     b.Property<int?>("InventoryAccountId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<bool>("IsActive")
+                    b.Property<bool>("IsReturnable")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(true);
-
-                    b.Property<bool>("IsTaxable")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(true);
-
-                    b.Property<int?>("ItemGroupId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ManufacturerPartNumber")
                         .HasMaxLength(100)
@@ -1669,11 +1724,6 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.Property<decimal?>("SellingPrice")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<bool>("SerialNumberTracking")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(false);
 
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
@@ -1715,12 +1765,6 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.HasIndex("InventoryAccountId");
 
-                    b.HasIndex("IsActive")
-                        .HasDatabaseName("IX_Product_IsActive");
-
-                    b.HasIndex("ItemGroupId")
-                        .HasDatabaseName("IX_Product_ItemGroupId");
-
                     b.HasIndex("Name")
                         .HasDatabaseName("IX_Product_Name");
 
@@ -1749,9 +1793,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.HasIndex("UnitOfMeasureId2");
 
                     b.HasIndex("VendorId");
-
-                    b.HasIndex("OrganisationId", "IsActive")
-                        .HasDatabaseName("IX_Product_OrganisationId_IsActive");
 
                     b.HasIndex("OrganisationId", "SKU")
                         .IsUnique()
@@ -1892,6 +1933,53 @@ namespace PCI.Persistence.Migrations.Application
                     b.HasIndex("VendorId");
 
                     b.ToTable("ProductInventory", "APP");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.ProductItemGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsPrimary")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
+
+                    b.Property<int>("ItemGroupId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ItemGroupId")
+                        .HasDatabaseName("IX_ProductItemGroup_ItemGroupId");
+
+                    b.HasIndex("ProductId")
+                        .HasDatabaseName("IX_ProductItemGroup_ProductId");
+
+                    b.HasIndex("ProductId", "IsPrimary")
+                        .HasDatabaseName("IX_ProductItemGroup_ProductId_IsPrimary");
+
+                    b.HasIndex("ProductId", "ItemGroupId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_ProductItemGroup_ProductId_ItemGroupId");
+
+                    b.ToTable("ProductItemGroups", "APP");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.ProductPhysical", b =>
@@ -2053,8 +2141,7 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId")
-                        .IsUnique();
+                    b.HasIndex("ProductId");
 
                     b.HasIndex("TaxClassificationId");
 
@@ -2237,9 +2324,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.Property<DateTime?>("ExpectedDeliveryDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("IsDropShipment")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("TEXT");
 
@@ -2267,35 +2351,219 @@ namespace PCI.Persistence.Migrations.Application
                     b.Property<int?>("PriceListId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("QuoteNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReferenceNumber")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime?>("ShippedDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ShippingAddress")
-                        .HasMaxLength(500)
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Status")
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("Draft");
 
                     b.Property<decimal>("SubTotal")
-                        .HasColumnType("decimal(18,2)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
 
                     b.Property<decimal>("TaxAmount")
-                        .HasColumnType("decimal(18,2)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
 
                     b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("CustomerId")
+                        .HasDatabaseName("IX_SalesOrder_CustomerId");
 
-                    b.HasIndex("OrganisationId");
+                    b.HasIndex("OrderDate")
+                        .HasDatabaseName("IX_SalesOrder_OrderDate");
+
+                    b.HasIndex("OrderNumber")
+                        .IsUnique()
+                        .HasDatabaseName("IX_SalesOrder_OrderNumber");
+
+                    b.HasIndex("OrganisationId")
+                        .HasDatabaseName("IX_SalesOrder_OrganisationId");
 
                     b.HasIndex("PriceListId");
 
-                    b.ToTable("SalesOrders", "APP");
+                    b.HasIndex("ReferenceNumber")
+                        .HasDatabaseName("IX_SalesOrder_ReferenceNumber");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_SalesOrder_Status");
+
+                    b.HasIndex("OrganisationId", "CustomerId")
+                        .HasDatabaseName("IX_SalesOrder_OrganisationId_CustomerId");
+
+                    b.HasIndex("OrganisationId", "OrderDate")
+                        .HasDatabaseName("IX_SalesOrder_OrganisationId_OrderDate");
+
+                    b.HasIndex("OrganisationId", "Status")
+                        .HasDatabaseName("IX_SalesOrder_OrganisationId_Status");
+
+                    b.ToTable("SalesOrders", "APP", t =>
+                        {
+                            t.HasCheckConstraint("CK_SalesOrder_SubTotal_NonNegative", "SubTotal >= 0");
+
+                            t.HasCheckConstraint("CK_SalesOrder_TaxAmount_NonNegative", "TaxAmount >= 0");
+
+                            t.HasCheckConstraint("CK_SalesOrder_TotalAmount_NonNegative", "TotalAmount >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.SalesOrderApproval", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ApprovalNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ApprovalStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("Pending");
+
+                    b.Property<string>("ApprovedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ApprovedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SalesOrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovalStatus");
+
+                    b.HasIndex("ApprovedDate");
+
+                    b.HasIndex("SalesOrderId");
+
+                    b.ToTable("SalesOrderApprovals", "APP");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.SalesOrderDocument", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocumentName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DocumentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FileExtension")
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("FileSizeBytes")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsConfidential")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SalesOrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UploadedBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("UploadedOn")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentType")
+                        .HasDatabaseName("IX_SalesOrderDocument_DocumentType");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_SalesOrderDocument_IsActive");
+
+                    b.HasIndex("SalesOrderId")
+                        .HasDatabaseName("IX_SalesOrderDocument_SalesOrderId");
+
+                    b.HasIndex("UploadedOn")
+                        .HasDatabaseName("IX_SalesOrderDocument_UploadedOn");
+
+                    b.ToTable("SalesOrderDocuments", "APP", t =>
+                        {
+                            t.HasCheckConstraint("CK_SalesOrderDocument_FileSizeBytes_Positive", "FileSizeBytes > 0");
+                        });
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.SalesOrderItem", b =>
@@ -2362,16 +2630,24 @@ namespace PCI.Persistence.Migrations.Application
                     b.ToTable("SalesOrderItem", "APP");
                 });
 
-            modelBuilder.Entity("PCI.Domain.Models.SerialNumber", b =>
+            modelBuilder.Entity("PCI.Domain.Models.SalesOrderPayment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<decimal>("BalanceAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
                     b.Property<string>("CreatedBy")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("DueDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ModifiedBy")
@@ -2380,29 +2656,182 @@ namespace PCI.Persistence.Migrations.Application
                     b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ProductId")
-                        .HasColumnType("INTEGER");
+                    b.Property<decimal>("PaidAmount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
 
-                    b.Property<DateTime?>("ReturnedDate")
+                    b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("SerialNumberValue")
-                        .IsRequired()
+                    b.Property<string>("PaymentMethod")
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime?>("SoldDate")
+                    b.Property<string>("PaymentNotes")
+                        .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Status")
+                    b.Property<string>("PaymentReference")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PaymentStatus")
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("Pending");
+
+                    b.Property<string>("PaymentTerms")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("Net30");
+
+                    b.Property<int>("SalesOrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DueDate");
+
+                    b.HasIndex("PaymentStatus");
+
+                    b.HasIndex("SalesOrderId")
+                        .IsUnique();
+
+                    b.ToTable("SalesOrderPayments", "APP");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.SalesOrderShipping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ActualDeliveryDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CarrierName")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("EstimatedDeliveryDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDropShipment")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SalesOrderId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ShippingAddress")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal>("ShippingCost")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(18,2)")
+                        .HasDefaultValue(0m);
+
+                    b.Property<string>("ShippingMethod")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ShippingNotes")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ShippingStatus")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("Pending");
+
+                    b.Property<string>("TrackingNumber")
+                        .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("EstimatedDeliveryDate");
 
-                    b.ToTable("SerialNumber", "APP");
+                    b.HasIndex("SalesOrderId")
+                        .IsUnique();
+
+                    b.HasIndex("ShippingStatus");
+
+                    b.HasIndex("TrackingNumber");
+
+                    b.ToTable("SalesOrderShippings", "APP");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.State", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CountryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<decimal?>("Latitude")
+                        .HasColumnType("decimal(10,8)");
+
+                    b.Property<decimal?>("Longitude")
+                        .HasColumnType("decimal(11,8)");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("StateCode")
+                        .HasMaxLength(10)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountryId")
+                        .HasDatabaseName("IX_States_CountryId");
+
+                    b.HasIndex("Name")
+                        .HasDatabaseName("IX_States_Name");
+
+                    b.HasIndex("StateCode")
+                        .HasDatabaseName("IX_States_StateCode");
+
+                    b.ToTable("States", "APP");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.StockTransaction", b =>
@@ -3232,17 +3661,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("Organisation");
                 });
 
-            modelBuilder.Entity("PCI.Domain.Models.BatchNumber", b =>
-                {
-                    b.HasOne("PCI.Domain.Models.Product", "Product")
-                        .WithMany("BatchNumbers")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("PCI.Domain.Models.Brand", b =>
                 {
                     b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
@@ -3403,11 +3821,6 @@ namespace PCI.Persistence.Migrations.Application
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("PCI.Domain.Models.Currency", "Currency")
-                        .WithMany()
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
                         .WithMany()
                         .HasForeignKey("OrganisationId")
@@ -3421,8 +3834,6 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.Navigation("AccountSubType");
 
-                    b.Navigation("Currency");
-
                     b.Navigation("Organisation");
 
                     b.Navigation("ParentAccount");
@@ -3431,24 +3842,30 @@ namespace PCI.Persistence.Migrations.Application
             modelBuilder.Entity("PCI.Domain.Models.Invoice", b =>
                 {
                     b.HasOne("PCI.Domain.Models.Customer", "Customer")
-                        .WithMany("Invoices")
+                        .WithMany()
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("PCI.Domain.Models.Customer", null)
+                        .WithMany("Invoices")
+                        .HasForeignKey("CustomerId1");
 
                     b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
                         .WithMany()
                         .HasForeignKey("OrganisationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("PCI.Domain.Models.PriceList", "PriceList")
                         .WithMany()
-                        .HasForeignKey("PriceListId");
+                        .HasForeignKey("PriceListId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("PCI.Domain.Models.SalesOrder", "SalesOrder")
                         .WithMany()
-                        .HasForeignKey("SalesOrderId");
+                        .HasForeignKey("SalesOrderId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Customer");
 
@@ -3567,11 +3984,6 @@ namespace PCI.Persistence.Migrations.Application
                         .HasForeignKey("InventoryAccountId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("PCI.Domain.Models.ItemGroup", "ItemGroup")
-                        .WithMany("Products")
-                        .HasForeignKey("ItemGroupId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
                         .WithMany()
                         .HasForeignKey("OrganisationId")
@@ -3611,8 +4023,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("Brand");
 
                     b.Navigation("InventoryAccount");
-
-                    b.Navigation("ItemGroup");
 
                     b.Navigation("Organisation");
 
@@ -3674,6 +4084,25 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("Vendor");
                 });
 
+            modelBuilder.Entity("PCI.Domain.Models.ProductItemGroup", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.ItemGroup", "ItemGroup")
+                        .WithMany("ProductItemGroups")
+                        .HasForeignKey("ItemGroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PCI.Domain.Models.Product", "Product")
+                        .WithMany("ProductItemGroups")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ItemGroup");
+
+                    b.Navigation("Product");
+                });
+
             modelBuilder.Entity("PCI.Domain.Models.ProductPhysical", b =>
                 {
                     b.HasOne("PCI.Domain.Models.UnitOfMeasure", "DimensionUnit")
@@ -3730,8 +4159,8 @@ namespace PCI.Persistence.Migrations.Application
             modelBuilder.Entity("PCI.Domain.Models.ProductTax", b =>
                 {
                     b.HasOne("PCI.Domain.Models.Product", "Product")
-                        .WithOne("ProductTax")
-                        .HasForeignKey("PCI.Domain.Models.ProductTax", "ProductId")
+                        .WithMany()
+                        .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -3805,24 +4234,47 @@ namespace PCI.Persistence.Migrations.Application
                     b.HasOne("PCI.Domain.Models.Customer", "Customer")
                         .WithMany("SalesOrders")
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
                         .WithMany()
                         .HasForeignKey("OrganisationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("PCI.Domain.Models.PriceList", "PriceList")
                         .WithMany()
-                        .HasForeignKey("PriceListId");
+                        .HasForeignKey("PriceListId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Customer");
 
                     b.Navigation("Organisation");
 
                     b.Navigation("PriceList");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.SalesOrderApproval", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.SalesOrder", "SalesOrder")
+                        .WithMany("SalesOrderApprovals")
+                        .HasForeignKey("SalesOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SalesOrder");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.SalesOrderDocument", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.SalesOrder", "SalesOrder")
+                        .WithMany("SalesOrderDocuments")
+                        .HasForeignKey("SalesOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SalesOrder");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.SalesOrderItem", b =>
@@ -3844,15 +4296,37 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("SalesOrder");
                 });
 
-            modelBuilder.Entity("PCI.Domain.Models.SerialNumber", b =>
+            modelBuilder.Entity("PCI.Domain.Models.SalesOrderPayment", b =>
                 {
-                    b.HasOne("PCI.Domain.Models.Product", "Product")
-                        .WithMany("SerialNumbers")
-                        .HasForeignKey("ProductId")
+                    b.HasOne("PCI.Domain.Models.SalesOrder", "SalesOrder")
+                        .WithOne("SalesOrderPayment")
+                        .HasForeignKey("PCI.Domain.Models.SalesOrderPayment", "SalesOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Product");
+                    b.Navigation("SalesOrder");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.SalesOrderShipping", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.SalesOrder", "SalesOrder")
+                        .WithOne("SalesOrderShipping")
+                        .HasForeignKey("PCI.Domain.Models.SalesOrderShipping", "SalesOrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SalesOrder");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.State", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.Country", "Country")
+                        .WithMany("States")
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Country");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.StockTransaction", b =>
@@ -4013,6 +4487,11 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("Products");
                 });
 
+            modelBuilder.Entity("PCI.Domain.Models.Country", b =>
+                {
+                    b.Navigation("States");
+                });
+
             modelBuilder.Entity("PCI.Domain.Models.Currency", b =>
                 {
                     b.Navigation("ProductsWithCostCurrency");
@@ -4073,7 +4552,7 @@ namespace PCI.Persistence.Migrations.Application
                 {
                     b.Navigation("ItemAttributes");
 
-                    b.Navigation("Products");
+                    b.Navigation("ProductItemGroups");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.PriceList", b =>
@@ -4087,8 +4566,6 @@ namespace PCI.Persistence.Migrations.Application
 
             modelBuilder.Entity("PCI.Domain.Models.Product", b =>
                 {
-                    b.Navigation("BatchNumbers");
-
                     b.Navigation("PriceListItems");
 
                     b.Navigation("ProductAttributeValues");
@@ -4097,17 +4574,15 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.Navigation("ProductInventory");
 
+                    b.Navigation("ProductItemGroups");
+
                     b.Navigation("ProductPhysical");
 
                     b.Navigation("ProductTagAssignments");
 
-                    b.Navigation("ProductTax");
-
                     b.Navigation("PurchaseOrderItems");
 
                     b.Navigation("SalesOrderItems");
-
-                    b.Navigation("SerialNumbers");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.ProductTag", b =>
@@ -4124,7 +4599,15 @@ namespace PCI.Persistence.Migrations.Application
 
             modelBuilder.Entity("PCI.Domain.Models.SalesOrder", b =>
                 {
+                    b.Navigation("SalesOrderApprovals");
+
+                    b.Navigation("SalesOrderDocuments");
+
                     b.Navigation("SalesOrderItems");
+
+                    b.Navigation("SalesOrderPayment");
+
+                    b.Navigation("SalesOrderShipping");
 
                     b.Navigation("StockTransactions");
                 });

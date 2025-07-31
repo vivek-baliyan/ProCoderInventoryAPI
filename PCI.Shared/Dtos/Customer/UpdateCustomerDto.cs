@@ -8,9 +8,8 @@ public record UpdateCustomerDto
     [Required(ErrorMessage = "Customer ID is required")]
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "Customer code is required")]
-    [StringLength(50, ErrorMessage = "Customer code cannot exceed 50 characters")]
-    public string CustomerCode { get; set; }
+    [Required(ErrorMessage = "Row version is required for concurrency control")]
+    public byte[] RowVersion { get; set; }
 
     [Required(ErrorMessage = "Customer name is required")]
     [StringLength(200, ErrorMessage = "Customer name cannot exceed 200 characters")]

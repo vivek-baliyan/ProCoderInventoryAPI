@@ -1,25 +1,17 @@
 using PCI.Domain.Common;
 using PCI.Shared.Common.Enums;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PCI.Domain.Models;
 
 public class Customer : BaseEntity
 {
-    [Required]
-    [StringLength(50)]
     public string CustomerCode { get; set; }
 
-    [Required]
-    [StringLength(200)]
     public string CustomerName { get; set; }
 
-    [StringLength(200)]
     public string CompanyName { get; set; }
 
 
-    [StringLength(200)]
     public string WebsiteUrl { get; set; }
 
     // Customer Type (Individual, Business)
@@ -33,17 +25,17 @@ public class Customer : BaseEntity
     public bool IsActive { get; set; } = true;
 
     // Notes
-    [StringLength(1000)]
     public string Notes { get; set; }
+
+    // Concurrency control
+    public byte[] RowVersion { get; set; }
 
     // Multi-tenancy
     public int OrganisationId { get; set; }
 
     // Navigation properties
-    [ForeignKey("OrganisationId")]
     public virtual Organisation Organisation { get; set; }
 
-    [ForeignKey("CurrencyId")]
     public virtual Currency Currency { get; set; }
 
     // Related entities

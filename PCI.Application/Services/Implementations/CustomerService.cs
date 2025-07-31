@@ -10,30 +10,25 @@ using PCI.Shared.Dtos.Customer;
 
 namespace PCI.Application.Services.Implementations;
 
-public class CustomerService(IUnitOfWork unitOfWork) : ICustomerService
+public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService codeGenerationService) : ICustomerService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly ICodeGenerationService _codeGenerationService = codeGenerationService;
 
     public async Task<ServiceResult<bool>> CreateCustomer(
         string userId,
         int organisationId,
         CreateCustomerDto createCustomerDto)
     {
-        var existingCustomer = await _unitOfWork.Repository<Customer>()
-            .GetFirstOrDefaultAsync(x => x.CustomerCode == createCustomerDto.CustomerCode && x.OrganisationId == organisationId);
-
-        if (existingCustomer != null)
-        {
-            return ServiceResult<bool>
-                .Error(new Problem(ErrorCodes.CustomerAlreadyExists, "Customer with this code already exists"));
-        }
+        // Generate unique customer code
+        var customerCode = await _codeGenerationService.GenerateCustomerCodeAsync(organisationId);
 
         // Check if email already exists for this organization
         if (!string.IsNullOrEmpty(createCustomerDto.Email))
         {
             var existingEmail = await _unitOfWork.Repository<BusinessContact>()
                 .GetFirstOrDefaultAsync(x => x.Email == createCustomerDto.Email &&
-                                            x.EntityType == "Customer" &&
+                                            x.EntityType == EntityTypes.Customer &&
                                             x.OrganisationId == organisationId);
             if (existingEmail != null)
             {
@@ -46,11 +41,11 @@ public class CustomerService(IUnitOfWork unitOfWork) : ICustomerService
         {
             var customer = new Customer
             {
-                CustomerCode = createCustomerDto.CustomerCode,
+                CustomerCode = customerCode,
                 CustomerName = createCustomerDto.CustomerName,
                 CompanyName = createCustomerDto.CompanyName,
                 WebsiteUrl = createCustomerDto.WebsiteUrl,
-                CustomerType = createCustomerDto.CustomerType,
+                CustomerType = (CustomerType)createCustomerDto.CustomerType,
                 CurrencyId = createCustomerDto.CurrencyId,
                 IsActive = createCustomerDto.IsActive,
                 Notes = createCustomerDto.Notes,
@@ -70,15 +65,15 @@ public class CustomerService(IUnitOfWork unitOfWork) : ICustomerService
             {
                 var businessContact = new BusinessContact
                 {
-                    EntityType = "Customer",
+                    EntityType = EntityTypes.Customer,
                     EntityId = customer.Id,
                     ContactType = ContactType.Primary,
-                    ContactPersonName = createCustomerDto.ContactPerson ?? "N/A",
+                    ContactPersonName = createCustomerDto.ContactPerson ?? DefaultValues.NotAvailable,
                     Email = createCustomerDto.Email,
                     PhoneNumber = createCustomerDto.PhoneNumber,
                     MobileNumber = createCustomerDto.MobileNumber,
-                    IsPrimary = true,
-                    IsActive = true,
+                    IsPrimary = DefaultValues.DefaultIsPrimary,
+                    IsActive = DefaultValues.DefaultIsActive,
                     OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
@@ -94,16 +89,16 @@ public class CustomerService(IUnitOfWork unitOfWork) : ICustomerService
             {
                 var billingAddress = new BusinessAddress
                 {
-                    EntityType = "Customer",
+                    EntityType = EntityTypes.Customer,
                     EntityId = customer.Id,
                     AddressType = AddressType.Billing,
-                    AddressLine1 = createCustomerDto.BillingAddress ?? "N/A",
+                    AddressLine1 = createCustomerDto.BillingAddress ?? DefaultValues.NotAvailable,
                     City = createCustomerDto.City,
                     State = createCustomerDto.State,
                     PostalCode = createCustomerDto.PostalCode,
                     Country = createCustomerDto.Country,
-                    IsDefault = true,
-                    IsActive = true,
+                    IsDefault = DefaultValues.DefaultIsDefault,
+                    IsActive = DefaultValues.DefaultIsActive,
                     OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
@@ -116,7 +111,7 @@ public class CustomerService(IUnitOfWork unitOfWork) : ICustomerService
                 {
                     var shippingAddress = new BusinessAddress
                     {
-                        EntityType = "Customer",
+                        EntityType = EntityTypes.Customer,
                         EntityId = customer.Id,
                         AddressType = AddressType.Shipping,
                         AddressLine1 = createCustomerDto.ShippingAddress,
@@ -125,7 +120,7 @@ public class CustomerService(IUnitOfWork unitOfWork) : ICustomerService
                         PostalCode = createCustomerDto.PostalCode,
                         Country = createCustomerDto.Country,
                         IsDefault = false,
-                        IsActive = true,
+                        IsActive = DefaultValues.DefaultIsActive,
                         OrganisationId = organisationId,
                         CreatedBy = userId,
                         CreatedOn = DateTime.UtcNow
@@ -141,7 +136,7 @@ public class CustomerService(IUnitOfWork unitOfWork) : ICustomerService
                 {
                     CustomerId = customer.Id,
                     PaymentTermDays = createCustomerDto.PaymentTermDays,
-                    CreditLimit = createCustomerDto.CreditLimit ?? 0,
+                    CreditLimit = createCustomerDto.CreditLimit ?? DefaultValues.DefaultCreditLimit,
                     OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
@@ -155,12 +150,12 @@ public class CustomerService(IUnitOfWork unitOfWork) : ICustomerService
             {
                 taxInfos.Add(new BusinessTaxInfo
                 {
-                    EntityType = "Customer",
+                    EntityType = EntityTypes.Customer,
                     EntityId = customer.Id,
                     TaxType = TaxType.TaxIdentificationNumber,
                     TaxNumber = createCustomerDto.TaxNumber,
-                    IsPrimary = true,
-                    IsActive = true,
+                    IsPrimary = DefaultValues.DefaultIsPrimary,
+                    IsActive = DefaultValues.DefaultIsActive,
                     OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
@@ -171,12 +166,12 @@ public class CustomerService(IUnitOfWork unitOfWork) : ICustomerService
             {
                 taxInfos.Add(new BusinessTaxInfo
                 {
-                    EntityType = "Customer",
+                    EntityType = EntityTypes.Customer,
                     EntityId = customer.Id,
                     TaxType = TaxType.GST,
                     TaxNumber = createCustomerDto.GSTNumber,
                     IsPrimary = string.IsNullOrEmpty(createCustomerDto.TaxNumber),
-                    IsActive = true,
+                    IsActive = DefaultValues.DefaultIsActive,
                     OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
@@ -187,12 +182,12 @@ public class CustomerService(IUnitOfWork unitOfWork) : ICustomerService
             {
                 taxInfos.Add(new BusinessTaxInfo
                 {
-                    EntityType = "Customer",
+                    EntityType = EntityTypes.Customer,
                     EntityId = customer.Id,
                     TaxType = TaxType.PAN,
                     TaxNumber = createCustomerDto.PANNumber,
                     IsPrimary = string.IsNullOrEmpty(createCustomerDto.TaxNumber) && string.IsNullOrEmpty(createCustomerDto.GSTNumber),
-                    IsActive = true,
+                    IsActive = DefaultValues.DefaultIsActive,
                     OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
@@ -219,275 +214,130 @@ public class CustomerService(IUnitOfWork unitOfWork) : ICustomerService
         int organisationId,
         UpdateCustomerDto updateCustomerDto)
     {
-        var existingCustomer = await _unitOfWork.Repository<Customer>()
-            .GetFirstOrDefaultAsync(x => x.Id == updateCustomerDto.Id && x.OrganisationId == organisationId);
-
-        if (existingCustomer == null)
-        {
-            return ServiceResult<bool>
-                .Error(new Problem(ErrorCodes.CustomerNotFound, "Customer not found"));
-        }
-
-        // Check if customer code already exists for another customer
-        var duplicateCode = await _unitOfWork.Repository<Customer>()
-            .GetFirstOrDefaultAsync(x => x.CustomerCode == updateCustomerDto.CustomerCode &&
-                                        x.Id != updateCustomerDto.Id &&
-                                        x.OrganisationId == organisationId);
-
-        if (duplicateCode != null)
-        {
-            return ServiceResult<bool>
-                .Error(new Problem(ErrorCodes.CustomerAlreadyExists, "Customer with this code already exists"));
-        }
-
-        // Check if email already exists for another customer
-        if (!string.IsNullOrEmpty(updateCustomerDto.Email))
-        {
-            var duplicateEmail = await _unitOfWork.Repository<BusinessContact>()
-                .GetFirstOrDefaultAsync(x => x.Email == updateCustomerDto.Email &&
-                                            x.EntityType == "Customer" &&
-                                            x.EntityId != updateCustomerDto.Id &&
-                                            x.OrganisationId == organisationId);
-
-            if (duplicateEmail != null)
-            {
-                return ServiceResult<bool>
-                    .Error(new Problem(ErrorCodes.CustomerEmailExists, "Customer with this email already exists"));
-            }
-        }
-
         try
         {
-            // Update core customer fields
-            existingCustomer.CustomerCode = updateCustomerDto.CustomerCode;
-            existingCustomer.CustomerName = updateCustomerDto.CustomerName;
-            existingCustomer.CompanyName = updateCustomerDto.CompanyName;
-            existingCustomer.WebsiteUrl = updateCustomerDto.WebsiteUrl;
-            existingCustomer.CustomerType = updateCustomerDto.CustomerType;
-            existingCustomer.CurrencyId = updateCustomerDto.CurrencyId;
-            existingCustomer.IsActive = updateCustomerDto.IsActive;
-            existingCustomer.Notes = updateCustomerDto.Notes;
-            existingCustomer.ModifiedBy = userId;
-            existingCustomer.ModifiedOn = DateTime.UtcNow;
+            var customer = await _unitOfWork.Repository<Customer>()
+                .GetFirstOrDefaultAsync(
+                    x => x.Id == updateCustomerDto.Id && x.OrganisationId == organisationId,
+                    "BusinessContacts,BusinessAddresses,BusinessTaxInfos,CustomerFinancial");
 
-            _unitOfWork.Repository<Customer>().Update(existingCustomer);
-
-            // Update or create BusinessContact
-            var existingContact = await _unitOfWork.Repository<BusinessContact>()
-                .GetFirstOrDefaultAsync(x => x.EntityType == "Customer" &&
-                                           x.EntityId == updateCustomerDto.Id &&
-                                           x.IsPrimary == true);
-
-            if (existingContact != null)
+            if (customer == null)
             {
-                existingContact.ContactPersonName = updateCustomerDto.ContactPerson ?? "N/A";
-                existingContact.Email = updateCustomerDto.Email;
-                existingContact.PhoneNumber = updateCustomerDto.PhoneNumber;
-                existingContact.MobileNumber = updateCustomerDto.MobileNumber;
-                existingContact.ModifiedBy = userId;
-                existingContact.ModifiedOn = DateTime.UtcNow;
-                _unitOfWork.Repository<BusinessContact>().Update(existingContact);
+                return ServiceResult<bool>
+                    .Error(new Problem(ErrorCodes.CustomerNotFound, "Customer not found"));
             }
-            else if (!string.IsNullOrEmpty(updateCustomerDto.ContactPerson) ||
-                     !string.IsNullOrEmpty(updateCustomerDto.Email) ||
-                     !string.IsNullOrEmpty(updateCustomerDto.PhoneNumber) ||
-                     !string.IsNullOrEmpty(updateCustomerDto.MobileNumber))
+
+            // Concurrency check
+            if (!customer.RowVersion.SequenceEqual(updateCustomerDto.RowVersion))
             {
-                var newContact = new BusinessContact
+                return ServiceResult<bool>
+                    .Error(new Problem(ErrorCodes.ConcurrencyError, "Customer has been modified by another user"));
+            }
+
+            // Validate unique email
+            if (!string.IsNullOrEmpty(updateCustomerDto.Email))
+            {
+                var duplicateEmail = await _unitOfWork.Repository<BusinessContact>()
+                    .GetFirstOrDefaultAsync(x => x.Email == updateCustomerDto.Email &&
+                                                x.EntityType == EntityTypes.Customer &&
+                                                x.EntityId != updateCustomerDto.Id &&
+                                                x.OrganisationId == organisationId);
+
+                if (duplicateEmail != null)
                 {
-                    EntityType = "Customer",
-                    EntityId = updateCustomerDto.Id,
+                    return ServiceResult<bool>
+                        .Error(new Problem(ErrorCodes.CustomerEmailExists, "Customer with this email already exists"));
+                }
+            }
+
+            // Update customer properties using Mapster
+            updateCustomerDto.Adapt(customer);
+            customer.ModifiedBy = userId;
+            customer.ModifiedOn = DateTime.UtcNow;
+
+            // Update primary contact
+            var primaryContact = customer.BusinessContacts?.FirstOrDefault(x => x.IsPrimary);
+            if (primaryContact != null)
+            {
+                primaryContact.ContactPersonName = updateCustomerDto.ContactPerson ?? DefaultValues.NotAvailable;
+                primaryContact.Email = updateCustomerDto.Email;
+                primaryContact.PhoneNumber = updateCustomerDto.PhoneNumber;
+                primaryContact.MobileNumber = updateCustomerDto.MobileNumber;
+                primaryContact.ModifiedBy = userId;
+                primaryContact.ModifiedOn = DateTime.UtcNow;
+            }
+            else if (!string.IsNullOrEmpty(updateCustomerDto.ContactPerson) || !string.IsNullOrEmpty(updateCustomerDto.Email))
+            {
+                customer.BusinessContacts ??= new List<BusinessContact>();
+                customer.BusinessContacts.Add(new BusinessContact
+                {
+                    EntityType = EntityTypes.Customer,
+                    EntityId = customer.Id,
                     ContactType = ContactType.Primary,
-                    ContactPersonName = updateCustomerDto.ContactPerson ?? "N/A",
+                    ContactPersonName = updateCustomerDto.ContactPerson ?? DefaultValues.NotAvailable,
                     Email = updateCustomerDto.Email,
                     PhoneNumber = updateCustomerDto.PhoneNumber,
                     MobileNumber = updateCustomerDto.MobileNumber,
-                    IsPrimary = true,
-                    IsActive = true,
+                    IsPrimary = DefaultValues.DefaultIsPrimary,
+                    IsActive = DefaultValues.DefaultIsActive,
                     OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
-                };
-                _unitOfWork.Repository<BusinessContact>().Add(newContact);
+                });
             }
 
-            // Update or create BusinessAddress (Billing)
-            var existingBillingAddress = await _unitOfWork.Repository<BusinessAddress>()
-                .GetFirstOrDefaultAsync(x => x.EntityType == "Customer" &&
-                                           x.EntityId == updateCustomerDto.Id &&
-                                           x.AddressType == AddressType.Billing);
-
-            if (existingBillingAddress != null)
+            // Update billing address
+            var billingAddress = customer.BusinessAddresses?.FirstOrDefault(x => x.AddressType == AddressType.Billing);
+            if (billingAddress != null)
             {
-                existingBillingAddress.AddressLine1 = updateCustomerDto.BillingAddress ?? "N/A";
-                existingBillingAddress.City = updateCustomerDto.City;
-                existingBillingAddress.State = updateCustomerDto.State;
-                existingBillingAddress.PostalCode = updateCustomerDto.PostalCode;
-                existingBillingAddress.Country = updateCustomerDto.Country;
-                existingBillingAddress.ModifiedBy = userId;
-                existingBillingAddress.ModifiedOn = DateTime.UtcNow;
-                _unitOfWork.Repository<BusinessAddress>().Update(existingBillingAddress);
+                billingAddress.AddressLine1 = updateCustomerDto.BillingAddress ?? DefaultValues.NotAvailable;
+                billingAddress.City = updateCustomerDto.City;
+                billingAddress.State = updateCustomerDto.State;
+                billingAddress.PostalCode = updateCustomerDto.PostalCode;
+                billingAddress.Country = updateCustomerDto.Country;
+                billingAddress.ModifiedBy = userId;
+                billingAddress.ModifiedOn = DateTime.UtcNow;
             }
-            else if (!string.IsNullOrEmpty(updateCustomerDto.BillingAddress) ||
-                     !string.IsNullOrEmpty(updateCustomerDto.City) ||
-                     !string.IsNullOrEmpty(updateCustomerDto.State) ||
-                     !string.IsNullOrEmpty(updateCustomerDto.Country))
+            else if (!string.IsNullOrEmpty(updateCustomerDto.BillingAddress))
             {
-                var newBillingAddress = new BusinessAddress
+                customer.BusinessAddresses ??= new List<BusinessAddress>();
+                customer.BusinessAddresses.Add(new BusinessAddress
                 {
-                    EntityType = "Customer",
-                    EntityId = updateCustomerDto.Id,
+                    EntityType = EntityTypes.Customer,
+                    EntityId = customer.Id,
                     AddressType = AddressType.Billing,
-                    AddressLine1 = updateCustomerDto.BillingAddress ?? "N/A",
+                    AddressLine1 = updateCustomerDto.BillingAddress,
                     City = updateCustomerDto.City,
                     State = updateCustomerDto.State,
                     PostalCode = updateCustomerDto.PostalCode,
                     Country = updateCustomerDto.Country,
-                    IsDefault = true,
-                    IsActive = true,
+                    IsDefault = DefaultValues.DefaultIsDefault,
+                    IsActive = DefaultValues.DefaultIsActive,
                     OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
-                };
-                _unitOfWork.Repository<BusinessAddress>().Add(newBillingAddress);
+                });
             }
 
-            // Update or create BusinessAddress (Shipping)
-            var existingShippingAddress = await _unitOfWork.Repository<BusinessAddress>()
-                .GetFirstOrDefaultAsync(x => x.EntityType == "Customer" &&
-                                           x.EntityId == updateCustomerDto.Id &&
-                                           x.AddressType == AddressType.Shipping);
-
-            if (!string.IsNullOrEmpty(updateCustomerDto.ShippingAddress) &&
-                updateCustomerDto.ShippingAddress != updateCustomerDto.BillingAddress)
+            // Update financial info
+            if (customer.CustomerFinancial != null)
             {
-                if (existingShippingAddress != null)
-                {
-                    existingShippingAddress.AddressLine1 = updateCustomerDto.ShippingAddress;
-                    existingShippingAddress.City = updateCustomerDto.City;
-                    existingShippingAddress.State = updateCustomerDto.State;
-                    existingShippingAddress.PostalCode = updateCustomerDto.PostalCode;
-                    existingShippingAddress.Country = updateCustomerDto.Country;
-                    existingShippingAddress.ModifiedBy = userId;
-                    existingShippingAddress.ModifiedOn = DateTime.UtcNow;
-                    _unitOfWork.Repository<BusinessAddress>().Update(existingShippingAddress);
-                }
-                else
-                {
-                    var newShippingAddress = new BusinessAddress
-                    {
-                        EntityType = "Customer",
-                        EntityId = updateCustomerDto.Id,
-                        AddressType = AddressType.Shipping,
-                        AddressLine1 = updateCustomerDto.ShippingAddress,
-                        City = updateCustomerDto.City,
-                        State = updateCustomerDto.State,
-                        PostalCode = updateCustomerDto.PostalCode,
-                        Country = updateCustomerDto.Country,
-                        IsDefault = false,
-                        IsActive = true,
-                        OrganisationId = organisationId,
-                        CreatedBy = userId,
-                        CreatedOn = DateTime.UtcNow
-                    };
-                    _unitOfWork.Repository<BusinessAddress>().Add(newShippingAddress);
-                }
-            }
-            else if (existingShippingAddress != null)
-            {
-                // Remove shipping address if it's the same as billing or empty
-                _unitOfWork.Repository<BusinessAddress>().Remove(existingShippingAddress);
-            }
-
-            // Update or create CustomerFinancial
-            var existingFinancial = await _unitOfWork.Repository<CustomerFinancial>()
-                .GetFirstOrDefaultAsync(x => x.CustomerId == updateCustomerDto.Id);
-
-            if (existingFinancial != null)
-            {
-                existingFinancial.PaymentTermDays = updateCustomerDto.PaymentTermDays;
-                existingFinancial.CreditLimit = updateCustomerDto.CreditLimit ?? 0;
-                existingFinancial.ModifiedBy = userId;
-                existingFinancial.ModifiedOn = DateTime.UtcNow;
-                _unitOfWork.Repository<CustomerFinancial>().Update(existingFinancial);
+                customer.CustomerFinancial.PaymentTermDays = updateCustomerDto.PaymentTermDays;
+                customer.CustomerFinancial.CreditLimit = updateCustomerDto.CreditLimit ?? DefaultValues.DefaultCreditLimit;
+                customer.CustomerFinancial.ModifiedBy = userId;
+                customer.CustomerFinancial.ModifiedOn = DateTime.UtcNow;
             }
             else if (updateCustomerDto.PaymentTermDays > 0 || updateCustomerDto.CreditLimit.HasValue)
             {
-                var newFinancial = new CustomerFinancial
+                customer.CustomerFinancial = new CustomerFinancial
                 {
-                    CustomerId = updateCustomerDto.Id,
+                    CustomerId = customer.Id,
                     PaymentTermDays = updateCustomerDto.PaymentTermDays,
-                    CreditLimit = updateCustomerDto.CreditLimit ?? 0,
+                    CreditLimit = updateCustomerDto.CreditLimit ?? DefaultValues.DefaultCreditLimit,
                     OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };
-                _unitOfWork.Repository<CustomerFinancial>().Add(newFinancial);
-            }
-
-            // Update BusinessTaxInfo
-            var existingTaxInfos = await _unitOfWork.Repository<BusinessTaxInfo>()
-                .GetFilteredAsync(x => x.EntityType == "Customer" && x.EntityId == updateCustomerDto.Id);
-
-            // Remove existing tax info
-            foreach (var taxInfo in existingTaxInfos)
-            {
-                _unitOfWork.Repository<BusinessTaxInfo>().Remove(taxInfo);
-            }
-
-            // Add new tax info
-            var newTaxInfos = new List<BusinessTaxInfo>();
-            if (!string.IsNullOrEmpty(updateCustomerDto.TaxNumber))
-            {
-                newTaxInfos.Add(new BusinessTaxInfo
-                {
-                    EntityType = "Customer",
-                    EntityId = updateCustomerDto.Id,
-                    TaxType = TaxType.TaxIdentificationNumber,
-                    TaxNumber = updateCustomerDto.TaxNumber,
-                    IsPrimary = true,
-                    IsActive = true,
-                    OrganisationId = organisationId,
-                    CreatedBy = userId,
-                    CreatedOn = DateTime.UtcNow
-                });
-            }
-
-            if (!string.IsNullOrEmpty(updateCustomerDto.GSTNumber))
-            {
-                newTaxInfos.Add(new BusinessTaxInfo
-                {
-                    EntityType = "Customer",
-                    EntityId = updateCustomerDto.Id,
-                    TaxType = TaxType.GST,
-                    TaxNumber = updateCustomerDto.GSTNumber,
-                    IsPrimary = string.IsNullOrEmpty(updateCustomerDto.TaxNumber),
-                    IsActive = true,
-                    OrganisationId = organisationId,
-                    CreatedBy = userId,
-                    CreatedOn = DateTime.UtcNow
-                });
-            }
-
-            if (!string.IsNullOrEmpty(updateCustomerDto.PANNumber))
-            {
-                newTaxInfos.Add(new BusinessTaxInfo
-                {
-                    EntityType = "Customer",
-                    EntityId = updateCustomerDto.Id,
-                    TaxType = TaxType.PAN,
-                    TaxNumber = updateCustomerDto.PANNumber,
-                    IsPrimary = string.IsNullOrEmpty(updateCustomerDto.TaxNumber) && string.IsNullOrEmpty(updateCustomerDto.GSTNumber),
-                    IsActive = true,
-                    OrganisationId = organisationId,
-                    CreatedBy = userId,
-                    CreatedOn = DateTime.UtcNow
-                });
-            }
-
-            foreach (var taxInfo in newTaxInfos)
-            {
-                _unitOfWork.Repository<BusinessTaxInfo>().Add(taxInfo);
             }
 
             await _unitOfWork.SaveChangesAsync();
@@ -499,6 +349,7 @@ public class CustomerService(IUnitOfWork unitOfWork) : ICustomerService
                 .Error(new Problem(ErrorCodes.CustomerUpdateError, ex.Message));
         }
     }
+
 
     public async Task<ServiceResult<CustomerDto>> GetCustomerById(int id)
     {
