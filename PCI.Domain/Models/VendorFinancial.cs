@@ -47,11 +47,6 @@ public class VendorFinancial : BaseEntity
 
     public string Notes { get; set; }
 
-    // Multi-tenancy
-    public int OrganisationId { get; set; }
-
     // Navigation properties
     public virtual Vendor Vendor { get; set; }
-
-    public virtual Organisation Organisation { get; set; }
 }

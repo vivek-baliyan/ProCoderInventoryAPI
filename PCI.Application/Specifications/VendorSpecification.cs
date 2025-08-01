@@ -24,7 +24,8 @@ public class VendorSpecification : BaseSpecification<Vendor>
                 v.VendorCode.ToLower().Contains(searchTerm) ||
                 (v.CompanyName != null && v.CompanyName.ToLower().Contains(searchTerm)) ||
                 v.BusinessContacts.Any(bc => bc.Email != null && bc.Email.ToLower().Contains(searchTerm)) ||
-                v.BusinessContacts.Any(bc => bc.ContactPersonName != null && bc.ContactPersonName.ToLower().Contains(searchTerm)));
+                v.BusinessContacts.Any(bc => (bc.FirstName != null && bc.FirstName.ToLower().Contains(searchTerm)) || 
+                                            (bc.LastName != null && bc.LastName.ToLower().Contains(searchTerm))));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.VendorCode))

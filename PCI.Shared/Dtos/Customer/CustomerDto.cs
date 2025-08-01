@@ -8,10 +8,21 @@ public record CustomerDto
     public string CustomerCode { get; set; }
     public string CustomerName { get; set; }
     public string CompanyName { get; set; }
+    
+    // Primary Contact Fields
+    public string Salutation { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+    
+    // Contact Information
+    public string Email { get; set; }
+    public string WorkPhone { get; set; }
+    public string Mobile { get; set; }
+    
+    // Legacy fields for backward compatibility
     public string ContactPerson { get; set; }
     public string PhoneNumber { get; set; }
     public string MobileNumber { get; set; }
-    public string Email { get; set; }
     public string BillingAddress { get; set; }
     public string ShippingAddress { get; set; }
     public string City { get; set; }

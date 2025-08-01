@@ -21,17 +21,14 @@ public class BusinessContactConfiguration : IEntityTypeConfiguration<BusinessCon
             .HasConversion<int>()
             .HasDefaultValue(ContactType.Primary);
 
-        builder.Property(e => e.ContactPersonName)
-            .IsRequired()
-            .HasMaxLength(200);
+        // Contact Person Details
+        builder.Property(e => e.Salutation)
+            .HasMaxLength(20);
 
-        builder.Property(e => e.JobTitle)
+        builder.Property(e => e.FirstName)
             .HasMaxLength(100);
 
-        builder.Property(e => e.Department)
-            .HasMaxLength(100);
-
-        builder.Property(e => e.Role)
+        builder.Property(e => e.LastName)
             .HasMaxLength(100);
 
         builder.Property(e => e.Email)
@@ -43,12 +40,6 @@ public class BusinessContactConfiguration : IEntityTypeConfiguration<BusinessCon
         builder.Property(e => e.MobileNumber)
             .HasMaxLength(20);
 
-        builder.Property(e => e.Extension)
-            .HasMaxLength(20);
-
-        builder.Property(e => e.LinkedInProfile)
-            .HasMaxLength(100);
-
         builder.Property(e => e.IsPrimary)
             .IsRequired()
             .HasDefaultValue(false);
@@ -56,15 +47,6 @@ public class BusinessContactConfiguration : IEntityTypeConfiguration<BusinessCon
         builder.Property(e => e.IsActive)
             .IsRequired()
             .HasDefaultValue(true);
-
-        builder.Property(e => e.Notes)
-            .HasMaxLength(500);
-
-        // Foreign key relationship
-        builder.HasOne(e => e.Organisation)
-            .WithMany()
-            .HasForeignKey(e => e.OrganisationId)
-            .OnDelete(DeleteBehavior.Restrict);
 
         // Indexes
         builder.HasIndex(e => new { e.EntityType, e.EntityId })
@@ -87,8 +69,5 @@ public class BusinessContactConfiguration : IEntityTypeConfiguration<BusinessCon
 
         builder.HasIndex(e => new { e.EntityType, e.EntityId, e.IsPrimary })
             .HasDatabaseName("IX_BusinessContact_Entity_IsPrimary");
-
-        builder.HasIndex(e => new { e.OrganisationId, e.EntityType })
-            .HasDatabaseName("IX_BusinessContact_Organisation_EntityType");
     }
 }

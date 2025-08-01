@@ -33,8 +33,7 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
         {
             var existingEmail = await _unitOfWork.Repository<BusinessContact>()
                 .GetFirstOrDefaultAsync(x => x.Email == createVendorDto.Email &&
-                                            x.EntityType == "Vendor" &&
-                                            x.OrganisationId == organisationId);
+                                            x.EntityType == "Vendor");
 
             if (existingEmail != null)
             {
@@ -84,13 +83,12 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     EntityType = "Vendor",
                     EntityId = vendor.Id,
                     ContactType = ContactType.Primary,
-                    ContactPersonName = createVendorDto.ContactPerson ?? "N/A",
+                    FirstName = createVendorDto.ContactPerson ?? "N/A",
                     Email = createVendorDto.Email,
                     PhoneNumber = createVendorDto.PhoneNumber,
                     MobileNumber = createVendorDto.MobileNumber,
                     IsPrimary = true,
                     IsActive = true,
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };
@@ -115,7 +113,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     Country = createVendorDto.Country,
                     IsDefault = true,
                     IsActive = true,
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };
@@ -131,7 +128,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     PaymentTermDays = createVendorDto.PaymentTermDays,
                     MinimumOrderValue = createVendorDto.MinimumOrderValue,
                     PreferredPaymentMethod = createVendorDto.PreferredPaymentMethod.ToString(),
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };
@@ -150,7 +146,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     TaxNumber = createVendorDto.TaxIdentificationNumber,
                     IsPrimary = true,
                     IsActive = true,
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 });
@@ -166,7 +161,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     TaxNumber = createVendorDto.GSTNumber,
                     IsPrimary = string.IsNullOrEmpty(createVendorDto.TaxIdentificationNumber),
                     IsActive = true,
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 });
@@ -182,7 +176,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     TaxNumber = createVendorDto.PANNumber,
                     IsPrimary = string.IsNullOrEmpty(createVendorDto.TaxIdentificationNumber) && string.IsNullOrEmpty(createVendorDto.GSTNumber),
                     IsActive = true,
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 });
@@ -207,7 +200,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     IFSCCode = createVendorDto.IFSCCode,
                     IsPrimary = true,
                     IsActive = true,
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };
@@ -223,7 +215,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     IsPreferredVendor = createVendorDto.IsPreferredVendor,
                     ReviewPeriodStart = DateTime.UtcNow,
                     ReviewPeriodEnd = DateTime.UtcNow.AddMonths(12),
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };
@@ -272,8 +263,7 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
             var duplicateEmail = await _unitOfWork.Repository<BusinessContact>()
                 .GetFirstOrDefaultAsync(x => x.Email == updateVendorDto.Email &&
                                             x.EntityType == "Vendor" &&
-                                            x.EntityId != updateVendorDto.Id &&
-                                            x.OrganisationId == organisationId);
+                                            x.EntityId != updateVendorDto.Id);
 
             if (duplicateEmail != null)
             {
@@ -323,7 +313,7 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
 
             if (existingContact != null)
             {
-                existingContact.ContactPersonName = updateVendorDto.ContactPerson ?? "N/A";
+                existingContact.FirstName = updateVendorDto.ContactPerson ?? "N/A";
                 existingContact.Email = updateVendorDto.Email;
                 existingContact.PhoneNumber = updateVendorDto.PhoneNumber;
                 existingContact.MobileNumber = updateVendorDto.MobileNumber;
@@ -341,13 +331,12 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     EntityType = "Vendor",
                     EntityId = updateVendorDto.Id,
                     ContactType = ContactType.Primary,
-                    ContactPersonName = updateVendorDto.ContactPerson ?? "N/A",
+                    FirstName = updateVendorDto.ContactPerson ?? "N/A",
                     Email = updateVendorDto.Email,
                     PhoneNumber = updateVendorDto.PhoneNumber,
                     MobileNumber = updateVendorDto.MobileNumber,
                     IsPrimary = true,
                     IsActive = true,
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };
@@ -388,7 +377,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     Country = updateVendorDto.Country,
                     IsDefault = true,
                     IsActive = true,
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };
@@ -416,7 +404,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     PaymentTermDays = updateVendorDto.PaymentTermDays,
                     MinimumOrderValue = updateVendorDto.MinimumOrderValue,
                     PreferredPaymentMethod = updateVendorDto.PreferredPaymentMethod.ToString(),
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };
@@ -445,7 +432,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     TaxNumber = updateVendorDto.TaxIdentificationNumber,
                     IsPrimary = true,
                     IsActive = true,
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 });
@@ -461,7 +447,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     TaxNumber = updateVendorDto.GSTNumber,
                     IsPrimary = string.IsNullOrEmpty(updateVendorDto.TaxIdentificationNumber),
                     IsActive = true,
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 });
@@ -477,7 +462,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     TaxNumber = updateVendorDto.PANNumber,
                     IsPrimary = string.IsNullOrEmpty(updateVendorDto.TaxIdentificationNumber) && string.IsNullOrEmpty(updateVendorDto.GSTNumber),
                     IsActive = true,
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 });
@@ -517,7 +501,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     IFSCCode = updateVendorDto.IFSCCode,
                     IsPrimary = true,
                     IsActive = true,
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };
@@ -555,7 +538,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     QualityRating = updateVendorDto.QualityRating,
                     ReviewPeriodStart = DateTime.UtcNow,
                     ReviewPeriodEnd = DateTime.UtcNow.AddMonths(12),
-                    OrganisationId = organisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };
@@ -596,7 +578,7 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
             var primaryContact = vendor.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive);
             if (primaryContact != null)
             {
-                vendorDto.ContactPerson = primaryContact.ContactPersonName;
+                vendorDto.ContactPerson = $"{primaryContact.FirstName} {primaryContact.LastName}".Trim();
                 vendorDto.Email = primaryContact.Email;
                 vendorDto.PhoneNumber = primaryContact.PhoneNumber;
                 vendorDto.MobileNumber = primaryContact.MobileNumber;
@@ -691,7 +673,7 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                 VendorCode = v.VendorCode,
                 VendorName = v.VendorName,
                 CompanyName = v.CompanyName,
-                ContactPerson = v.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.ContactPersonName,
+                ContactPerson = $"{v.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.FirstName} {v.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.LastName}".Trim(),
                 PhoneNumber = v.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.PhoneNumber,
                 Email = v.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.Email,
                 City = v.BusinessAddresses?.FirstOrDefault(x => x.AddressType == AddressType.Office && x.IsActive)?.City,
@@ -736,7 +718,7 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                 VendorCode = v.VendorCode,
                 VendorName = v.VendorName,
                 CompanyName = v.CompanyName,
-                ContactPerson = v.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.ContactPersonName,
+                ContactPerson = $"{v.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.FirstName} {v.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.LastName}".Trim(),
                 PhoneNumber = v.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.PhoneNumber,
                 Email = v.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.Email,
                 City = v.BusinessAddresses?.FirstOrDefault(x => x.AddressType == AddressType.Office && x.IsActive)?.City,
@@ -872,7 +854,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     ReviewPeriodStart = DateTime.UtcNow,
                     ReviewPeriodEnd = DateTime.UtcNow.AddMonths(12),
                     ReviewedBy = userId,
-                    OrganisationId = vendor.OrganisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };
@@ -934,7 +915,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     BlacklistedBy = userId,
                     ReviewPeriodStart = DateTime.UtcNow,
                     ReviewPeriodEnd = DateTime.UtcNow.AddMonths(12),
-                    OrganisationId = vendor.OrganisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };
@@ -1028,7 +1008,6 @@ public class VendorService(IUnitOfWork unitOfWork) : IVendorService
                     IsPreferredVendor = true,
                     ReviewPeriodStart = DateTime.UtcNow,
                     ReviewPeriodEnd = DateTime.UtcNow.AddMonths(12),
-                    OrganisationId = vendor.OrganisationId,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };

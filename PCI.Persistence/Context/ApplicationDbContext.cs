@@ -14,6 +14,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<ProductTagAssignment> ProductTagAssignments { get; init; }
     public DbSet<ProductItemGroup> ProductItemGroups { get; init; }
     public DbSet<Customer> Customers { get; init; }
+    public DbSet<CustomerDocument> CustomerDocuments { get; init; }
     public DbSet<Vendor> Vendors { get; init; }
     public DbSet<BusinessAddress> BusinessAddresses { get; init; }
     public DbSet<BusinessContact> BusinessContacts { get; init; }

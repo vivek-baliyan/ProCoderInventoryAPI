@@ -91,10 +91,7 @@ public class VendorPerformanceConfiguration : IEntityTypeConfiguration<VendorPer
             .HasForeignKey(e => e.VendorId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(e => e.Organisation)
-            .WithMany()
-            .HasForeignKey(e => e.OrganisationId)
-            .OnDelete(DeleteBehavior.Restrict);
+        // No direct Organisation relationship - inherited through Vendor
 
         // Indexes
         builder.HasIndex(e => e.VendorId)
@@ -118,8 +115,7 @@ public class VendorPerformanceConfiguration : IEntityTypeConfiguration<VendorPer
         builder.HasIndex(e => new { e.VendorId, e.ReviewPeriodStart, e.ReviewPeriodEnd })
             .HasDatabaseName("IX_VendorPerformance_Vendor_Period");
 
-        builder.HasIndex(e => new { e.OrganisationId, e.IsPreferredVendor })
-            .HasDatabaseName("IX_VendorPerformance_Organisation_IsPreferredVendor");
+        // Removed OrganisationId composite index as field was removed
 
         // Check constraints
         builder.ToTable(t => t.HasCheckConstraint(

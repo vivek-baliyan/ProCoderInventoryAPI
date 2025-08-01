@@ -24,8 +24,7 @@ public class CustomerSpecification : BaseSpecification<Customer>
                 c.CustomerName.ToLower().Contains(searchTerm) ||
                 c.CustomerCode.ToLower().Contains(searchTerm) ||
                 (c.CompanyName != null && c.CompanyName.ToLower().Contains(searchTerm)) ||
-                c.BusinessContacts.Any(bc => bc.Email != null && bc.Email.ToLower().Contains(searchTerm)) ||
-                c.BusinessContacts.Any(bc => bc.ContactPersonName != null && bc.ContactPersonName.ToLower().Contains(searchTerm)));
+                c.BusinessContacts.Any(bc => bc.Email != null && bc.Email.ToLower().Contains(searchTerm)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.CustomerCode))
@@ -43,9 +42,9 @@ public class CustomerSpecification : BaseSpecification<Customer>
             AddCriteria(c => c.BusinessContacts.Any(bc => bc.Email != null && bc.Email.ToLower().Contains(filter.Email)));
         }
 
-        if (!string.IsNullOrWhiteSpace(filter.PhoneNumber))
+        if (!string.IsNullOrWhiteSpace(filter.WorkPhone))
         {
-            AddCriteria(c => c.BusinessContacts.Any(bc => bc.PhoneNumber != null && bc.PhoneNumber.ToLower().Contains(filter.PhoneNumber)));
+            AddCriteria(c => c.BusinessContacts.Any(bc => bc.PhoneNumber != null && bc.PhoneNumber.ToLower().Contains(filter.WorkPhone)));
         }
 
         if (filter.CustomerType.HasValue && filter.CustomerType > 0)

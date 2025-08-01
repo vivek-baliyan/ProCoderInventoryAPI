@@ -1,3 +1,4 @@
+#nullable enable
 using PCI.Shared.Common.Enums;
 using System.ComponentModel.DataAnnotations;
 

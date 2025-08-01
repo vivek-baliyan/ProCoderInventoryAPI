@@ -35,10 +35,4 @@ public class BusinessBankInfo : BaseEntity
     public string VerifiedBy { get; set; }
 
     public string Notes { get; set; }
-
-    // Multi-tenancy
-    public int OrganisationId { get; set; }
-
-    // Navigation properties
-    public virtual Organisation Organisation { get; set; }
 }

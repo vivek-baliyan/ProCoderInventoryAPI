@@ -57,11 +57,7 @@ public class BusinessAddressConfiguration : IEntityTypeConfiguration<BusinessAdd
         builder.Property(e => e.Notes)
             .HasMaxLength(500);
 
-        // Foreign key relationship
-        builder.HasOne(e => e.Organisation)
-            .WithMany()
-            .HasForeignKey(e => e.OrganisationId)
-            .OnDelete(DeleteBehavior.Restrict);
+        // No direct Organisation relationship - inherited through parent entity
 
         // Indexes
         builder.HasIndex(e => new { e.EntityType, e.EntityId })
@@ -82,7 +78,6 @@ public class BusinessAddressConfiguration : IEntityTypeConfiguration<BusinessAdd
         builder.HasIndex(e => new { e.EntityType, e.EntityId, e.IsDefault })
             .HasDatabaseName("IX_BusinessAddress_Entity_IsDefault");
 
-        builder.HasIndex(e => new { e.OrganisationId, e.EntityType })
-            .HasDatabaseName("IX_BusinessAddress_Organisation_EntityType");
+        // Removed OrganisationId index as field was removed
     }
 }

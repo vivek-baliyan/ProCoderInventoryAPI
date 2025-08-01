@@ -15,6 +15,7 @@ public class CustomerFinancial : BaseEntity
 
     // Payment Terms for customer payments
     public int PaymentTermDays { get; set; } = 30;
+    public string PaymentTerms { get; set; } = "Due on Receipt";
 
     // Sales History
     public decimal TotalSalesYTD { get; set; } = 0;
@@ -41,11 +42,6 @@ public class CustomerFinancial : BaseEntity
 
     public string Notes { get; set; }
 
-    // Multi-tenancy
-    public int OrganisationId { get; set; }
-
     // Navigation properties
     public virtual Customer Customer { get; set; }
-
-    public virtual Organisation Organisation { get; set; }
 }

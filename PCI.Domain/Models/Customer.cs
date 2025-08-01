@@ -11,7 +11,6 @@ public class Customer : BaseEntity
 
     public string CompanyName { get; set; }
 
-
     public string WebsiteUrl { get; set; }
 
     // Customer Type (Individual, Business)
@@ -42,6 +41,7 @@ public class Customer : BaseEntity
     public virtual ICollection<SalesOrder> SalesOrders { get; set; } = new HashSet<SalesOrder>();
     public virtual ICollection<Invoice> Invoices { get; set; } = new HashSet<Invoice>();
     public virtual ICollection<CustomerPriceList> CustomerPriceLists { get; set; } = new HashSet<CustomerPriceList>();
+    public virtual ICollection<CustomerDocument> CustomerDocuments { get; set; } = new HashSet<CustomerDocument>();
 
     // Normalized entities
     public virtual ICollection<BusinessAddress> BusinessAddresses { get; set; } = new HashSet<BusinessAddress>();

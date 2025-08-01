@@ -66,8 +66,7 @@ public class VendorFinancialConfiguration : IEntityTypeConfiguration<VendorFinan
         builder.Property(vf => vf.Notes)
             .HasMaxLength(500);
 
-        builder.Property(vf => vf.OrganisationId)
-            .IsRequired();
+        // OrganisationId removed - inherited through Vendor relationship
 
         // Relationships
         builder.HasOne(vf => vf.Vendor)
@@ -75,15 +74,12 @@ public class VendorFinancialConfiguration : IEntityTypeConfiguration<VendorFinan
             .HasForeignKey<VendorFinancial>(vf => vf.VendorId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(vf => vf.Organisation)
-            .WithMany()
-            .HasForeignKey(vf => vf.OrganisationId)
-            .OnDelete(DeleteBehavior.Restrict);
+        // No direct Organisation relationship - inherited through Vendor
 
         // Indexes
         builder.HasIndex(vf => vf.VendorId)
             .IsUnique();
 
-        builder.HasIndex(vf => vf.OrganisationId);
+        // Removed OrganisationId index as field was removed
     }
 }

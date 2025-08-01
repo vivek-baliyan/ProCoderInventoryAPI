@@ -1,3 +1,4 @@
+#nullable enable
 namespace PCI.Shared.Dtos.Customer;
 
 public record CustomerFilterDto
@@ -6,7 +7,7 @@ public record CustomerFilterDto
     public string? CustomerCode { get; set; }
     public string? CustomerName { get; set; }
     public string? Email { get; set; }
-    public string? PhoneNumber { get; set; }
+    public string? WorkPhone { get; set; }
     public int? CustomerType { get; set; }
     public string? City { get; set; }
     public string? State { get; set; }

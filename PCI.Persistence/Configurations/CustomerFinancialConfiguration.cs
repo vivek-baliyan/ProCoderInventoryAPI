@@ -30,6 +30,10 @@ public class CustomerFinancialConfiguration : IEntityTypeConfiguration<CustomerF
         builder.Property(cf => cf.PaymentTermDays)
             .HasDefaultValue(30);
 
+        builder.Property(cf => cf.PaymentTerms)
+            .HasMaxLength(100)
+            .HasDefaultValue("Due on Receipt");
+
         builder.Property(cf => cf.TotalSalesYTD)
             .HasColumnType("decimal(18,2)")
             .HasDefaultValue(0);
@@ -59,8 +63,7 @@ public class CustomerFinancialConfiguration : IEntityTypeConfiguration<CustomerF
         builder.Property(cf => cf.Notes)
             .HasMaxLength(500);
 
-        builder.Property(cf => cf.OrganisationId)
-            .IsRequired();
+        // OrganisationId removed - inherited through Customer relationship
 
         // Relationships
         builder.HasOne(cf => cf.Customer)
@@ -68,15 +71,12 @@ public class CustomerFinancialConfiguration : IEntityTypeConfiguration<CustomerF
             .HasForeignKey<CustomerFinancial>(cf => cf.CustomerId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(cf => cf.Organisation)
-            .WithMany()
-            .HasForeignKey(cf => cf.OrganisationId)
-            .OnDelete(DeleteBehavior.Restrict);
+        // No direct Organisation relationship - inherited through Customer
 
         // Indexes
         builder.HasIndex(cf => cf.CustomerId)
             .IsUnique();
 
-        builder.HasIndex(cf => cf.OrganisationId);
+        // Removed OrganisationId index as field was removed
     }
 }

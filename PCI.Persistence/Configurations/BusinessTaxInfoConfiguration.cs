@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using PCI.Domain.Models;
-using PCI.Shared.Common.Enums;
 
 namespace PCI.Persistence.Configurations;
 
@@ -24,12 +23,6 @@ public class BusinessTaxInfoConfiguration : IEntityTypeConfiguration<BusinessTax
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(e => e.IssuingAuthority)
-            .HasMaxLength(200);
-
-        builder.Property(e => e.TaxCategory)
-            .HasMaxLength(100);
-
         builder.Property(e => e.IsActive)
             .IsRequired()
             .HasDefaultValue(true);
@@ -40,12 +33,6 @@ public class BusinessTaxInfoConfiguration : IEntityTypeConfiguration<BusinessTax
 
         builder.Property(e => e.Notes)
             .HasMaxLength(500);
-
-        // Foreign key relationship
-        builder.HasOne(e => e.Organisation)
-            .WithMany()
-            .HasForeignKey(e => e.OrganisationId)
-            .OnDelete(DeleteBehavior.Restrict);
 
         // Indexes
         builder.HasIndex(e => new { e.EntityType, e.EntityId })
@@ -66,9 +53,6 @@ public class BusinessTaxInfoConfiguration : IEntityTypeConfiguration<BusinessTax
         builder.HasIndex(e => new { e.EntityType, e.EntityId, e.TaxType })
             .IsUnique()
             .HasDatabaseName("IX_BusinessTaxInfo_Entity_TaxType_Unique");
-
-        builder.HasIndex(e => new { e.OrganisationId, e.EntityType })
-            .HasDatabaseName("IX_BusinessTaxInfo_Organisation_EntityType");
 
         builder.HasIndex(e => new { e.TaxType, e.TaxNumber })
             .HasDatabaseName("IX_BusinessTaxInfo_TaxType_TaxNumber");
