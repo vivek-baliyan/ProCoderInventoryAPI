@@ -1,10 +1,10 @@
+using PCI.Domain.Common;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PCI.Domain.Models;
 
-public class CustomerPriceList
+public class CustomerPriceList : BaseEntity
 {
-    public int Id { get; set; }
     public int CustomerId { get; set; }
     public int PriceListId { get; set; }
     public bool IsDefault { get; set; } = false;
@@ -13,4 +13,6 @@ public class CustomerPriceList
 
     [ForeignKey("PriceListId")]
     public virtual PriceList PriceList { get; set; }
+
+    public virtual Customer Customer { get; set; }
 }

@@ -6,6 +6,7 @@ using PCI.Domain.Models;
 using PCI.Shared.Common;
 using PCI.Shared.Common.Constants;
 using PCI.Shared.Common.Enums;
+using PCI.Shared.Dtos.Common;
 using PCI.Shared.Dtos.Customer;
 
 namespace PCI.Application.Services.Implementations;
@@ -26,9 +27,8 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
         // Check if email already exists for this organization
         if (!string.IsNullOrEmpty(createCustomerDto.Email))
         {
-            var existingEmail = await _unitOfWork.Repository<BusinessContact>()
-                .GetFirstOrDefaultAsync(x => x.Email == createCustomerDto.Email &&
-                                            x.EntityType == EntityTypes.Customer);
+            var existingEmail = await _unitOfWork.Repository<CustomerContact>()
+                .GetFirstOrDefaultAsync(x => x.Email == createCustomerDto.Email);
             if (existingEmail != null)
             {
                 return ServiceResult<bool>
@@ -38,44 +38,30 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
 
         try
         {
-
             var customer = createCustomerDto.Adapt<Customer>();
-            //var customer = new Customer
-            //{
-            //    CustomerCode = customerCode,
-            //    CustomerName = createCustomerDto.CustomerName,
-            //    CompanyName = createCustomerDto.CompanyName,
-            //    WebsiteUrl = createCustomerDto.WebsiteUrl,
-            //    CustomerType = (CustomerType)createCustomerDto.CustomerType,
-            //    CurrencyId = createCustomerDto.CurrencyId,
-            //    IsActive = createCustomerDto.IsActive,
-            //    Notes = createCustomerDto.Notes,
-            //    OrganisationId = organisationId,
-            //    CreatedBy = userId,
-            //    CreatedOn = DateTime.UtcNow
-            //};
-
             customer.CustomerCode = customerCode;
+            customer.OrganisationId = organisationId;
+            customer.CreatedBy = userId;
+            customer.CreatedOn = DateTime.UtcNow;
+
 
             _unitOfWork.Repository<Customer>().Add(customer);
             await _unitOfWork.SaveChangesAsync();
 
-            // Create BusinessContact if contact info provided
+            // Create CustomerContact if contact info provided
             if (!string.IsNullOrEmpty(createCustomerDto.FirstName) ||
                 !string.IsNullOrEmpty(createCustomerDto.LastName) ||
                 !string.IsNullOrEmpty(createCustomerDto.Email) ||
                 !string.IsNullOrEmpty(createCustomerDto.WorkPhone) ||
                 !string.IsNullOrEmpty(createCustomerDto.Mobile))
             {
-                var businessContact = new BusinessContact
+                var customerContact = new CustomerContact
                 {
-                    EntityType = EntityTypes.Customer,
-                    EntityId = customer.Id,
+                    CustomerId = customer.Id,
                     ContactType = ContactType.Primary,
                     Salutation = createCustomerDto.Salutation,
                     FirstName = createCustomerDto.FirstName,
                     LastName = createCustomerDto.LastName,
-                    // ContactPersonName computed from FirstName + LastName
                     Email = createCustomerDto.Email,
                     PhoneNumber = createCustomerDto.WorkPhone,
                     MobileNumber = createCustomerDto.Mobile,
@@ -84,10 +70,10 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };
-                _unitOfWork.Repository<BusinessContact>().Add(businessContact);
+                _unitOfWork.Repository<CustomerContact>().Add(customerContact);
             }
 
-            // Note: Address creation will be handled separately via BusinessAddress endpoints
+            // Note: Address creation will be handled separately via CustomerAddress endpoints
             // Core customer form only contains basic customer information
 
             // Create default CustomerFinancial record
@@ -99,13 +85,12 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
             };
             _unitOfWork.Repository<CustomerFinancial>().Add(customerFinancial);
 
-            // Create BusinessTaxInfo for PAN if provided
+            // Create CustomerTaxInfo for PAN if provided
             if (!string.IsNullOrEmpty(createCustomerDto.PAN))
             {
-                var panTaxInfo = new BusinessTaxInfo
+                var panTaxInfo = new CustomerTaxInfo
                 {
-                    EntityType = EntityTypes.Customer,
-                    EntityId = customer.Id,
+                    CustomerId = customer.Id,
                     TaxType = TaxType.PAN,
                     TaxNumber = createCustomerDto.PAN,
                     IsPrimary = DefaultValues.DefaultIsPrimary,
@@ -113,7 +98,7 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 };
-                _unitOfWork.Repository<BusinessTaxInfo>().Add(panTaxInfo);
+                _unitOfWork.Repository<CustomerTaxInfo>().Add(panTaxInfo);
             }
 
             await _unitOfWork.SaveChangesAsync();
@@ -136,7 +121,7 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
             var customer = await _unitOfWork.Repository<Customer>()
                 .GetFirstOrDefaultAsync(
                     x => x.Id == updateCustomerDto.Id && x.OrganisationId == organisationId,
-                    "BusinessContacts,BusinessAddresses,BusinessTaxInfos,CustomerFinancial");
+                    "CustomerContacts,CustomerAddresses,CustomerTaxInfos,CustomerFinancial");
 
             if (customer == null)
             {
@@ -144,20 +129,14 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
                     .Error(new Problem(ErrorCodes.CustomerNotFound, "Customer not found"));
             }
 
-            // Concurrency check
-            if (!customer.RowVersion.SequenceEqual(updateCustomerDto.RowVersion))
-            {
-                return ServiceResult<bool>
-                    .Error(new Problem(ErrorCodes.ConcurrencyError, "Customer has been modified by another user"));
-            }
+            // Removed concurrency check as RowVersion is no longer used
 
             // Validate unique email
             if (!string.IsNullOrEmpty(updateCustomerDto.Email))
             {
-                var duplicateEmail = await _unitOfWork.Repository<BusinessContact>()
+                var duplicateEmail = await _unitOfWork.Repository<CustomerContact>()
                     .GetFirstOrDefaultAsync(x => x.Email == updateCustomerDto.Email &&
-                                                x.EntityType == EntityTypes.Customer &&
-                                                x.EntityId != updateCustomerDto.Id);
+                                                x.CustomerId != updateCustomerDto.Id);
 
                 if (duplicateEmail != null)
                 {
@@ -172,13 +151,12 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
             customer.ModifiedOn = DateTime.UtcNow;
 
             // Update primary contact
-            var primaryContact = customer.BusinessContacts?.FirstOrDefault(x => x.IsPrimary);
+            var primaryContact = customer.CustomerContacts?.FirstOrDefault(x => x.IsPrimary);
             if (primaryContact != null)
             {
                 primaryContact.Salutation = updateCustomerDto.Salutation;
                 primaryContact.FirstName = updateCustomerDto.FirstName;
                 primaryContact.LastName = updateCustomerDto.LastName;
-                // ContactPersonName computed from FirstName + LastName
                 primaryContact.Email = updateCustomerDto.Email;
                 primaryContact.PhoneNumber = updateCustomerDto.WorkPhone;
                 primaryContact.MobileNumber = updateCustomerDto.Mobile;
@@ -187,16 +165,14 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
             }
             else if (!string.IsNullOrEmpty(updateCustomerDto.FirstName) || !string.IsNullOrEmpty(updateCustomerDto.LastName) || !string.IsNullOrEmpty(updateCustomerDto.Email))
             {
-                customer.BusinessContacts ??= new List<BusinessContact>();
-                customer.BusinessContacts.Add(new BusinessContact
+                customer.CustomerContacts ??= new List<CustomerContact>();
+                customer.CustomerContacts.Add(new CustomerContact
                 {
-                    EntityType = EntityTypes.Customer,
-                    EntityId = customer.Id,
+                    CustomerId = customer.Id,
                     ContactType = ContactType.Primary,
                     Salutation = updateCustomerDto.Salutation,
                     FirstName = updateCustomerDto.FirstName,
                     LastName = updateCustomerDto.LastName,
-                    // ContactPersonName computed from FirstName + LastName
                     Email = updateCustomerDto.Email,
                     PhoneNumber = updateCustomerDto.WorkPhone,
                     MobileNumber = updateCustomerDto.Mobile,
@@ -207,7 +183,7 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
                 });
             }
 
-            // Note: Address updates will be handled separately via BusinessAddress endpoints
+            // Note: Address updates will be handled separately via CustomerAddress endpoints
 
             // Note: Financial info updates will be handled via CustomerFinancial endpoints
 
@@ -229,7 +205,7 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
             var customer = await _unitOfWork.Repository<Customer>()
                 .GetFirstOrDefaultAsync(
                     x => x.Id == id,
-                    includeroperties: "Currency,BusinessContacts,BusinessAddresses,BusinessTaxInfos,CustomerFinancial");
+                    includeroperties: "Currency,CustomerContacts,CustomerAddresses,CustomerTaxInfos,CustomerFinancial");
 
             if (customer == null)
             {
@@ -242,24 +218,20 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
             customerDto.CurrencySymbol = customer.Currency?.Symbol;
 
             // Get primary contact info
-            var primaryContact = customer.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive);
+            var primaryContact = customer.CustomerContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive);
             if (primaryContact != null)
             {
                 customerDto.Salutation = primaryContact.Salutation;
                 customerDto.FirstName = primaryContact.FirstName;
                 customerDto.LastName = primaryContact.LastName;
                 customerDto.Email = primaryContact.Email;
-                customerDto.WorkPhone = primaryContact.PhoneNumber;
-                customerDto.Mobile = primaryContact.MobileNumber;
-
-                // Legacy fields for backward compatibility
                 customerDto.ContactPerson = $"{primaryContact.FirstName} {primaryContact.LastName}".Trim();
                 customerDto.PhoneNumber = primaryContact.PhoneNumber;
                 customerDto.MobileNumber = primaryContact.MobileNumber;
             }
 
             // Get billing address
-            var billingAddress = customer.BusinessAddresses?.FirstOrDefault(x => x.AddressType == AddressType.Billing && x.IsActive);
+            var billingAddress = customer.CustomerAddresses?.FirstOrDefault(x => x.AddressType == AddressType.Billing && x.IsActive);
             if (billingAddress != null)
             {
                 customerDto.BillingAddress = billingAddress.AddressLine1;
@@ -270,7 +242,7 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
             }
 
             // Get shipping address
-            var shippingAddress = customer.BusinessAddresses?.FirstOrDefault(x => x.AddressType == AddressType.Shipping && x.IsActive);
+            var shippingAddress = customer.CustomerAddresses?.FirstOrDefault(x => x.AddressType == AddressType.Shipping && x.IsActive);
             if (shippingAddress != null)
             {
                 customerDto.ShippingAddress = shippingAddress.AddressLine1;
@@ -284,19 +256,19 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
             }
 
             // Get tax info
-            var taxNumber = customer.BusinessTaxInfos?.FirstOrDefault(x => x.TaxType == TaxType.TaxIdentificationNumber && x.IsActive);
+            var taxNumber = customer.CustomerTaxInfos?.FirstOrDefault(x => x.TaxType == TaxType.TaxIdentificationNumber && x.IsActive);
             if (taxNumber != null)
             {
                 customerDto.TaxNumber = taxNumber.TaxNumber;
             }
 
-            var gstNumber = customer.BusinessTaxInfos?.FirstOrDefault(x => x.TaxType == TaxType.GST && x.IsActive);
+            var gstNumber = customer.CustomerTaxInfos?.FirstOrDefault(x => x.TaxType == TaxType.GST && x.IsActive);
             if (gstNumber != null)
             {
                 customerDto.GSTNumber = gstNumber.TaxNumber;
             }
 
-            var panNumber = customer.BusinessTaxInfos?.FirstOrDefault(x => x.TaxType == TaxType.PAN && x.IsActive);
+            var panNumber = customer.CustomerTaxInfos?.FirstOrDefault(x => x.TaxType == TaxType.PAN && x.IsActive);
             if (panNumber != null)
             {
                 customerDto.PANNumber = panNumber.TaxNumber;
@@ -320,26 +292,9 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
                     pageIndex,
                     pageSize,
                     filter: x => x.OrganisationId == organisationId,
-                    includeroperties: "Currency,BusinessContacts,BusinessAddresses,CustomerFinancial");
+                    includeroperties: "Currency,CustomerContacts,CustomerAddresses,CustomerFinancial");
 
-            var customerDtos = customers.Select(c => new CustomerListItemDto
-            {
-                Id = c.Id,
-                CustomerCode = c.CustomerCode,
-                CustomerName = c.CustomerName,
-                CompanyName = c.CompanyName,
-                ContactPerson = $"{c.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.FirstName} {c.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.LastName}".Trim(),
-                PhoneNumber = c.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.PhoneNumber,
-                Email = c.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.Email,
-                City = c.BusinessAddresses?.FirstOrDefault(x => x.AddressType == AddressType.Billing && x.IsActive)?.City,
-                State = c.BusinessAddresses?.FirstOrDefault(x => x.AddressType == AddressType.Billing && x.IsActive)?.State,
-                Country = c.BusinessAddresses?.FirstOrDefault(x => x.AddressType == AddressType.Billing && x.IsActive)?.Country,
-                CustomerType = c.CustomerType,
-                CreditLimit = c.CustomerFinancial?.CreditLimit,
-                IsActive = c.IsActive,
-                CurrencyName = c.Currency?.Name,
-                CreatedOn = c.CreatedOn
-            }).ToList();
+            var customerDtos = customers.Adapt<List<CustomerListItemDto>>();
 
             return ServiceResult<List<CustomerListItemDto>>.Success(customerDtos);
         }
@@ -350,37 +305,33 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
         }
     }
 
-    public async Task<ServiceResult<List<CustomerListItemDto>>> GetFilteredCustomers(int organisationId, CustomerFilterDto filter)
+    public async Task<ServiceResult<PaginatedResult<CustomerListItemDto>>> GetFilteredCustomers(int organisationId, CustomerFilterDto filter)
     {
         try
         {
             var specification = new CustomerSpecification(organisationId, filter);
             var customers = await _unitOfWork.Repository<Customer>().GetAsync(specification);
 
-            var customerDtos = customers.Select(c => new CustomerListItemDto
-            {
-                Id = c.Id,
-                CustomerCode = c.CustomerCode,
-                CustomerName = c.CustomerName,
-                CompanyName = c.CompanyName,
-                ContactPerson = $"{c.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.FirstName} {c.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.LastName}".Trim(),
-                PhoneNumber = c.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.PhoneNumber,
-                Email = c.BusinessContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive)?.Email,
-                City = c.BusinessAddresses?.FirstOrDefault(x => x.AddressType == AddressType.Billing && x.IsActive)?.City,
-                State = c.BusinessAddresses?.FirstOrDefault(x => x.AddressType == AddressType.Billing && x.IsActive)?.State,
-                Country = c.BusinessAddresses?.FirstOrDefault(x => x.AddressType == AddressType.Billing && x.IsActive)?.Country,
-                CustomerType = c.CustomerType,
-                CreditLimit = c.CustomerFinancial?.CreditLimit,
-                IsActive = c.IsActive,
-                CurrencyName = c.Currency?.Name,
-                CreatedOn = c.CreatedOn
-            }).ToList();
+            // Get total count without pagination
+            var countSpecification = new CustomerSpecification(organisationId, filter);
+            countSpecification.ClearPaging();
+            var totalCount = await _unitOfWork.Repository<Customer>().CountAsync(countSpecification);
 
-            return ServiceResult<List<CustomerListItemDto>>.Success(customerDtos);
+            var customerDtos = customers.Adapt<List<CustomerListItemDto>>();
+
+            var result = new PaginatedResult<CustomerListItemDto>
+            {
+                Data = customerDtos,
+                TotalCount = totalCount,
+                PageIndex = filter.PageIndex,
+                PageSize = filter.PageSize
+            };
+
+            return ServiceResult<PaginatedResult<CustomerListItemDto>>.Success(result);
         }
         catch (Exception ex)
         {
-            return ServiceResult<List<CustomerListItemDto>>
+            return ServiceResult<PaginatedResult<CustomerListItemDto>>
                 .Error(new Problem(ErrorCodes.CustomerRetrievalError, ex.Message));
         }
     }
@@ -389,6 +340,7 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
     {
         try
         {
+            // Check if customer exists
             var customer = await _unitOfWork.Repository<Customer>()
                 .GetFirstOrDefaultAsync(x => x.Id == id);
 
@@ -398,7 +350,7 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
                     .Error(new Problem(ErrorCodes.CustomerNotFound, "Customer not found"));
             }
 
-            // Check if customer has any related transactions
+            // Check for existing business transactions (prevent deletion if exists)
             var hasSalesOrders = await _unitOfWork.Repository<SalesOrder>()
                 .AnyAsync(x => x.CustomerId == id);
 
@@ -408,7 +360,8 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
             if (hasSalesOrders || hasInvoices)
             {
                 return ServiceResult<bool>
-                    .Error(new Problem(ErrorCodes.CustomerHasTransactions, "Cannot delete customer with existing transactions"));
+                    .Error(new Problem(ErrorCodes.CustomerDeletionError,
+                        "Cannot delete customer with existing sales orders or invoices. Please archive the customer instead."));
             }
 
             _unitOfWork.Repository<Customer>().Remove(customer);
@@ -419,7 +372,7 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
         catch (Exception ex)
         {
             return ServiceResult<bool>
-                .Error(new Problem(ErrorCodes.CustomerDeletionError, ex.Message));
+                .Error(new Problem(ErrorCodes.CustomerDeletionError, ex.Message, ex.ToString()));
         }
     }
 

@@ -1,20 +1,17 @@
 using System.ComponentModel.DataAnnotations;
-using PCI.Shared.Common.Enums;
 
 namespace PCI.Shared.Dtos.Customer;
 
 public record CreateCustomerDto
 {
-    // CustomerCode is now auto-generated, no longer required from frontend
-
-    public CustomerType CustomerType { get; set; } = CustomerType.Business;
+    public int CustomerType { get; set; }
 
     [StringLength(200, ErrorMessage = "Company name cannot exceed 200 characters")]
     public string CompanyName { get; set; }
 
     [Required(ErrorMessage = "Customer display name is required")]
     [StringLength(200, ErrorMessage = "Customer display name cannot exceed 200 characters")]
-    public string CustomerName { get; set; }
+    public string DisplayName { get; set; }
 
     [StringLength(200, ErrorMessage = "Website URL cannot exceed 200 characters")]
     [Url(ErrorMessage = "Invalid website URL format")]
@@ -35,11 +32,9 @@ public record CreateCustomerDto
     public string Email { get; set; }
 
     [StringLength(20, ErrorMessage = "Work phone cannot exceed 20 characters")]
-    [Phone(ErrorMessage = "Invalid work phone format")]
     public string WorkPhone { get; set; }
 
     [StringLength(20, ErrorMessage = "Mobile cannot exceed 20 characters")]
-    [Phone(ErrorMessage = "Invalid mobile format")]
     public string Mobile { get; set; }
 
     // Tax Information (will be stored in BusinessTaxInfo)
@@ -47,9 +42,4 @@ public record CreateCustomerDto
     public string PAN { get; set; }
 
     public int? CurrencyId { get; set; }
-
-    public bool IsActive { get; set; } = true;
-
-    [StringLength(1000, ErrorMessage = "Notes cannot exceed 1000 characters")]
-    public string Notes { get; set; }
 }

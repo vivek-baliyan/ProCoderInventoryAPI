@@ -241,9 +241,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("CustomerId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("EntityId")
                         .HasColumnType("INTEGER");
 
@@ -291,8 +288,6 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.HasIndex("AddressType")
                         .HasDatabaseName("IX_BusinessAddress_AddressType");
-
-                    b.HasIndex("CustomerId");
 
                     b.HasIndex("IsActive")
                         .HasDatabaseName("IX_BusinessAddress_IsActive");
@@ -352,9 +347,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("CustomerId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("EntityId")
                         .HasColumnType("INTEGER");
 
@@ -411,8 +403,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.HasIndex("BankAccountNumber")
                         .HasDatabaseName("IX_BusinessBankInfo_BankAccountNumber");
 
-                    b.HasIndex("CustomerId");
-
                     b.HasIndex("IFSCCode")
                         .HasDatabaseName("IX_BusinessBankInfo_IFSCCode");
 
@@ -455,9 +445,6 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
-
-                    b.Property<int?>("CustomerId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Email")
                         .HasMaxLength(100)
@@ -515,8 +502,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.HasIndex("ContactType")
                         .HasDatabaseName("IX_BusinessContact_ContactType");
 
-                    b.HasIndex("CustomerId");
-
                     b.HasIndex("Email")
                         .HasDatabaseName("IX_BusinessContact_Email");
 
@@ -551,9 +536,6 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("TEXT");
-
-                    b.Property<int?>("CustomerId")
-                        .HasColumnType("INTEGER");
 
                     b.Property<int>("EntityId")
                         .HasColumnType("INTEGER");
@@ -595,8 +577,6 @@ namespace PCI.Persistence.Migrations.Application
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
 
                     b.HasIndex("IsActive")
                         .HasDatabaseName("IX_BusinessTaxInfo_IsActive");
@@ -810,15 +790,15 @@ namespace PCI.Persistence.Migrations.Application
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("CustomerName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("CustomerType")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(1);
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -831,15 +811,8 @@ namespace PCI.Persistence.Migrations.Application
                     b.Property<DateTime?>("ModifiedOn")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Notes")
-                        .HasMaxLength(1000)
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("OrganisationId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<byte[]>("RowVersion")
-                        .HasColumnType("BLOB");
 
                     b.Property<string>("WebsiteUrl")
                         .HasMaxLength(200)
@@ -853,11 +826,11 @@ namespace PCI.Persistence.Migrations.Application
                     b.HasIndex("CustomerCode")
                         .HasDatabaseName("IX_Customer_CustomerCode");
 
-                    b.HasIndex("CustomerName")
-                        .HasDatabaseName("IX_Customer_CustomerName");
-
                     b.HasIndex("CustomerType")
                         .HasDatabaseName("IX_Customer_CustomerType");
+
+                    b.HasIndex("DisplayName")
+                        .HasDatabaseName("IX_Customer_DisplayName");
 
                     b.HasIndex("IsActive")
                         .HasDatabaseName("IX_Customer_IsActive");
@@ -876,6 +849,250 @@ namespace PCI.Persistence.Migrations.Application
                         .HasDatabaseName("IX_Customer_OrganisationId_IsActive");
 
                     b.ToTable("Customers", "APP");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.CustomerAddress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AddressLine1")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AddressLine2")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("AddressType")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("City")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Country")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsPrimary")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PostalCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("State")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddressType")
+                        .HasDatabaseName("IX_CustomerAddress_AddressType");
+
+                    b.HasIndex("CustomerId")
+                        .HasDatabaseName("IX_CustomerAddress_CustomerId");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_CustomerAddress_IsActive");
+
+                    b.HasIndex("IsPrimary")
+                        .HasDatabaseName("IX_CustomerAddress_IsPrimary");
+
+                    b.HasIndex("CustomerId", "AddressType")
+                        .HasDatabaseName("IX_CustomerAddress_Customer_AddressType");
+
+                    b.HasIndex("CustomerId", "IsPrimary")
+                        .HasDatabaseName("IX_CustomerAddress_Customer_IsPrimary");
+
+                    b.ToTable("CustomerAddresses", "APP");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.CustomerBankInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("AccountHolderName")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("AccountNumber")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BankName")
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BranchAddress")
+                        .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("IFSCCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsPrimary")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SWIFTCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountNumber")
+                        .HasDatabaseName("IX_CustomerBankInfo_AccountNumber");
+
+                    b.HasIndex("CustomerId")
+                        .HasDatabaseName("IX_CustomerBankInfo_CustomerId");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_CustomerBankInfo_IsActive");
+
+                    b.HasIndex("IsPrimary")
+                        .HasDatabaseName("IX_CustomerBankInfo_IsPrimary");
+
+                    b.HasIndex("CustomerId", "IsPrimary")
+                        .HasDatabaseName("IX_CustomerBankInfo_Customer_IsPrimary");
+
+                    b.ToTable("CustomerBankInfos", "APP");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.CustomerContact", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ContactType")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(1);
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsPrimary")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MobileNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Salutation")
+                        .HasMaxLength(20)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContactType")
+                        .HasDatabaseName("IX_CustomerContact_ContactType");
+
+                    b.HasIndex("CustomerId")
+                        .HasDatabaseName("IX_CustomerContact_CustomerId");
+
+                    b.HasIndex("Email")
+                        .HasDatabaseName("IX_CustomerContact_Email");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_CustomerContact_IsActive");
+
+                    b.HasIndex("IsPrimary")
+                        .HasDatabaseName("IX_CustomerContact_IsPrimary");
+
+                    b.HasIndex("CustomerId", "ContactType")
+                        .HasDatabaseName("IX_CustomerContact_Customer_ContactType");
+
+                    b.HasIndex("CustomerId", "IsPrimary")
+                        .HasDatabaseName("IX_CustomerContact_Customer_IsPrimary");
+
+                    b.ToTable("CustomerContacts", "APP");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.CustomerDocument", b =>
@@ -1079,6 +1296,12 @@ namespace PCI.Persistence.Migrations.Application
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("CustomerId")
                         .HasColumnType("INTEGER");
 
@@ -1091,6 +1314,12 @@ namespace PCI.Persistence.Migrations.Application
                     b.Property<bool>("IsDefault")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("PriceListId")
                         .HasColumnType("INTEGER");
 
@@ -1101,6 +1330,73 @@ namespace PCI.Persistence.Migrations.Application
                     b.HasIndex("PriceListId");
 
                     b.ToTable("CustomerPriceList", "APP");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.CustomerTaxInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsPrimary")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(false);
+
+                    b.Property<string>("ModifiedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("ModifiedOn")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TaxNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TaxType")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasDefaultValue(3);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId")
+                        .HasDatabaseName("IX_CustomerTaxInfo_CustomerId");
+
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("IX_CustomerTaxInfo_IsActive");
+
+                    b.HasIndex("IsPrimary")
+                        .HasDatabaseName("IX_CustomerTaxInfo_IsPrimary");
+
+                    b.HasIndex("TaxNumber")
+                        .HasDatabaseName("IX_CustomerTaxInfo_TaxNumber");
+
+                    b.HasIndex("TaxType")
+                        .HasDatabaseName("IX_CustomerTaxInfo_TaxType");
+
+                    b.HasIndex("CustomerId", "IsPrimary")
+                        .HasDatabaseName("IX_CustomerTaxInfo_Customer_IsPrimary");
+
+                    b.HasIndex("CustomerId", "TaxType")
+                        .HasDatabaseName("IX_CustomerTaxInfo_Customer_TaxType");
+
+                    b.ToTable("CustomerTaxInfos", "APP");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.GLAccount", b =>
@@ -1230,9 +1526,6 @@ namespace PCI.Persistence.Migrations.Application
                     b.Property<int>("CustomerId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("CustomerId1")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("TEXT");
 
@@ -1286,8 +1579,6 @@ namespace PCI.Persistence.Migrations.Application
 
                     b.HasIndex("CustomerId")
                         .HasDatabaseName("IX_Invoices_CustomerId");
-
-                    b.HasIndex("CustomerId1");
 
                     b.HasIndex("InvoiceDate")
                         .HasDatabaseName("IX_Invoices_InvoiceDate");
@@ -3698,10 +3989,6 @@ namespace PCI.Persistence.Migrations.Application
 
             modelBuilder.Entity("PCI.Domain.Models.BusinessAddress", b =>
                 {
-                    b.HasOne("PCI.Domain.Models.Customer", null)
-                        .WithMany("BusinessAddresses")
-                        .HasForeignKey("CustomerId");
-
                     b.HasOne("PCI.Domain.Models.Vendor", null)
                         .WithMany("BusinessAddresses")
                         .HasForeignKey("VendorId");
@@ -3709,10 +3996,6 @@ namespace PCI.Persistence.Migrations.Application
 
             modelBuilder.Entity("PCI.Domain.Models.BusinessBankInfo", b =>
                 {
-                    b.HasOne("PCI.Domain.Models.Customer", null)
-                        .WithMany("BusinessBankInfos")
-                        .HasForeignKey("CustomerId");
-
                     b.HasOne("PCI.Domain.Models.Vendor", null)
                         .WithMany("BusinessBankInfos")
                         .HasForeignKey("VendorId");
@@ -3720,10 +4003,6 @@ namespace PCI.Persistence.Migrations.Application
 
             modelBuilder.Entity("PCI.Domain.Models.BusinessContact", b =>
                 {
-                    b.HasOne("PCI.Domain.Models.Customer", null)
-                        .WithMany("BusinessContacts")
-                        .HasForeignKey("CustomerId");
-
                     b.HasOne("PCI.Domain.Models.Vendor", null)
                         .WithMany("BusinessContacts")
                         .HasForeignKey("VendorId");
@@ -3731,10 +4010,6 @@ namespace PCI.Persistence.Migrations.Application
 
             modelBuilder.Entity("PCI.Domain.Models.BusinessTaxInfo", b =>
                 {
-                    b.HasOne("PCI.Domain.Models.Customer", null)
-                        .WithMany("BusinessTaxInfos")
-                        .HasForeignKey("CustomerId");
-
                     b.HasOne("PCI.Domain.Models.Vendor", null)
                         .WithMany("BusinessTaxInfos")
                         .HasForeignKey("VendorId");
@@ -3769,6 +4044,39 @@ namespace PCI.Persistence.Migrations.Application
                     b.Navigation("Organisation");
                 });
 
+            modelBuilder.Entity("PCI.Domain.Models.CustomerAddress", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.Customer", "Customer")
+                        .WithMany("CustomerAddresses")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.CustomerBankInfo", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.Customer", "Customer")
+                        .WithMany("CustomerBankInfos")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.CustomerContact", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.Customer", "Customer")
+                        .WithMany("CustomerContacts")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+                });
+
             modelBuilder.Entity("PCI.Domain.Models.CustomerDocument", b =>
                 {
                     b.HasOne("PCI.Domain.Models.Customer", "Customer")
@@ -3793,7 +4101,7 @@ namespace PCI.Persistence.Migrations.Application
 
             modelBuilder.Entity("PCI.Domain.Models.CustomerPriceList", b =>
                 {
-                    b.HasOne("PCI.Domain.Models.Customer", null)
+                    b.HasOne("PCI.Domain.Models.Customer", "Customer")
                         .WithMany("CustomerPriceLists")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3805,7 +4113,20 @@ namespace PCI.Persistence.Migrations.Application
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Customer");
+
                     b.Navigation("PriceList");
+                });
+
+            modelBuilder.Entity("PCI.Domain.Models.CustomerTaxInfo", b =>
+                {
+                    b.HasOne("PCI.Domain.Models.Customer", "Customer")
+                        .WithMany("CustomerTaxInfos")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("PCI.Domain.Models.GLAccount", b =>
@@ -3837,14 +4158,10 @@ namespace PCI.Persistence.Migrations.Application
             modelBuilder.Entity("PCI.Domain.Models.Invoice", b =>
                 {
                     b.HasOne("PCI.Domain.Models.Customer", "Customer")
-                        .WithMany()
+                        .WithMany("Invoices")
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.HasOne("PCI.Domain.Models.Customer", null)
-                        .WithMany("Invoices")
-                        .HasForeignKey("CustomerId1");
 
                     b.HasOne("PCI.Domain.Models.Organisation", "Organisation")
                         .WithMany()
@@ -4480,19 +4797,19 @@ namespace PCI.Persistence.Migrations.Application
 
             modelBuilder.Entity("PCI.Domain.Models.Customer", b =>
                 {
-                    b.Navigation("BusinessAddresses");
+                    b.Navigation("CustomerAddresses");
 
-                    b.Navigation("BusinessBankInfos");
+                    b.Navigation("CustomerBankInfos");
 
-                    b.Navigation("BusinessContacts");
-
-                    b.Navigation("BusinessTaxInfos");
+                    b.Navigation("CustomerContacts");
 
                     b.Navigation("CustomerDocuments");
 
                     b.Navigation("CustomerFinancial");
 
                     b.Navigation("CustomerPriceLists");
+
+                    b.Navigation("CustomerTaxInfos");
 
                     b.Navigation("Invoices");
 

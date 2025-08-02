@@ -9,7 +9,7 @@ public interface IGenericRepository<T> where T : BaseEntity
     void Add(T entity);
     void Update(T entity);
     void Remove(T entity);
-    void RemoveRange(T entity);
+    void RemoveRange(IEnumerable<T> entity);
     Task<IEnumerable<T>> GetAllAsync(string includeroperties = null);
     Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> filter, string includeroperties = null);
     Task<IEnumerable<T>> GetFilteredAsync(Expression<Func<T, bool>> filter, string includeroperties = null);

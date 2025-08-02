@@ -21,10 +21,10 @@ public class CustomerSpecification : BaseSpecification<Customer>
         {
             var searchTerm = filter.SearchTerm.ToLower();
             AddCriteria(c =>
-                c.CustomerName.ToLower().Contains(searchTerm) ||
+                c.DisplayName.ToLower().Contains(searchTerm) ||
                 c.CustomerCode.ToLower().Contains(searchTerm) ||
                 (c.CompanyName != null && c.CompanyName.ToLower().Contains(searchTerm)) ||
-                c.BusinessContacts.Any(bc => bc.Email != null && bc.Email.ToLower().Contains(searchTerm)));
+                c.CustomerContacts.Any(cc => cc.Email != null && cc.Email.ToLower().Contains(searchTerm)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.CustomerCode))
@@ -34,17 +34,17 @@ public class CustomerSpecification : BaseSpecification<Customer>
 
         if (!string.IsNullOrWhiteSpace(filter.CustomerName))
         {
-            AddCriteria(c => c.CustomerName.ToLower().Contains(filter.CustomerName));
+            AddCriteria(c => c.DisplayName.ToLower().Contains(filter.CustomerName));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.Email))
         {
-            AddCriteria(c => c.BusinessContacts.Any(bc => bc.Email != null && bc.Email.ToLower().Contains(filter.Email)));
+            AddCriteria(c => c.CustomerContacts.Any(cc => cc.Email != null && cc.Email.ToLower().Contains(filter.Email)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.WorkPhone))
         {
-            AddCriteria(c => c.BusinessContacts.Any(bc => bc.PhoneNumber != null && bc.PhoneNumber.ToLower().Contains(filter.WorkPhone)));
+            AddCriteria(c => c.CustomerContacts.Any(cc => cc.PhoneNumber != null && cc.PhoneNumber.ToLower().Contains(filter.WorkPhone)));
         }
 
         if (filter.CustomerType.HasValue && filter.CustomerType > 0)
@@ -54,17 +54,17 @@ public class CustomerSpecification : BaseSpecification<Customer>
 
         if (!string.IsNullOrWhiteSpace(filter.City))
         {
-            AddCriteria(c => c.BusinessAddresses.Any(ba => ba.City != null && ba.City.ToLower().Contains(filter.City)));
+            AddCriteria(c => c.CustomerAddresses.Any(ca => ca.City != null && ca.City.ToLower().Contains(filter.City)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.State))
         {
-            AddCriteria(c => c.BusinessAddresses.Any(ba => ba.State != null && ba.State.ToLower().Contains(filter.State)));
+            AddCriteria(c => c.CustomerAddresses.Any(ca => ca.State != null && ca.State.ToLower().Contains(filter.State)));
         }
 
         if (!string.IsNullOrWhiteSpace(filter.Country))
         {
-            AddCriteria(c => c.BusinessAddresses.Any(ba => ba.Country != null && ba.Country.ToLower().Contains(filter.Country)));
+            AddCriteria(c => c.CustomerAddresses.Any(ca => ca.Country != null && ca.Country.ToLower().Contains(filter.Country)));
         }
 
         if (filter.IsActive.HasValue)
@@ -106,9 +106,9 @@ public class CustomerSpecification : BaseSpecification<Customer>
             {
                 case "customername":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(c => c.CustomerName);
+                        ApplyOrderByDescending(c => c.DisplayName);
                     else
-                        ApplyOrderBy(c => c.CustomerName);
+                        ApplyOrderBy(c => c.DisplayName);
                     break;
                 case "customercode":
                     if (filter.SortDescending)
@@ -124,21 +124,21 @@ public class CustomerSpecification : BaseSpecification<Customer>
                     break;
                 case "email":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(c => c.BusinessContacts.FirstOrDefault().Email);
+                        ApplyOrderByDescending(c => c.CustomerContacts.FirstOrDefault().Email);
                     else
-                        ApplyOrderBy(c => c.BusinessContacts.FirstOrDefault().Email);
+                        ApplyOrderBy(c => c.CustomerContacts.FirstOrDefault().Email);
                     break;
                 case "city":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(c => c.BusinessAddresses.FirstOrDefault().City);
+                        ApplyOrderByDescending(c => c.CustomerAddresses.FirstOrDefault().City);
                     else
-                        ApplyOrderBy(c => c.BusinessAddresses.FirstOrDefault().City);
+                        ApplyOrderBy(c => c.CustomerAddresses.FirstOrDefault().City);
                     break;
                 case "country":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(c => c.BusinessAddresses.FirstOrDefault().Country);
+                        ApplyOrderByDescending(c => c.CustomerAddresses.FirstOrDefault().Country);
                     else
-                        ApplyOrderBy(c => c.BusinessAddresses.FirstOrDefault().Country);
+                        ApplyOrderBy(c => c.CustomerAddresses.FirstOrDefault().Country);
                     break;
                 case "creditlimit":
                     if (filter.SortDescending)
@@ -153,13 +153,13 @@ public class CustomerSpecification : BaseSpecification<Customer>
                         ApplyOrderBy(c => c.CreatedOn);
                     break;
                 default:
-                    ApplyOrderBy(c => c.CustomerName);
+                    ApplyOrderBy(c => c.DisplayName);
                     break;
             }
         }
         else
         {
-            ApplyOrderBy(c => c.CustomerName);
+            ApplyOrderBy(c => c.DisplayName);
         }
     }
 
@@ -173,7 +173,7 @@ public class CustomerSpecification : BaseSpecification<Customer>
     {
         AddInclude("Currency");
         AddInclude("CustomerFinancial");
-        AddInclude("BusinessContacts");
-        AddInclude("BusinessAddresses");
+        AddInclude("CustomerContacts");
+        AddInclude("CustomerAddresses");
     }
 }

@@ -41,6 +41,13 @@ public abstract class BaseSpecification<T> : ISpecification<T>
         IsPagingEnabled = true;
     }
 
+    public virtual void ClearPaging()
+    {
+        Skip = 0;
+        Take = 0;
+        IsPagingEnabled = false;
+    }
+
     protected virtual void ApplyOrderBy(Expression<Func<T, object>> orderByExpression)
     {
         OrderBy = orderByExpression;

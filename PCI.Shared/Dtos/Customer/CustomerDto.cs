@@ -6,20 +6,14 @@ public record CustomerDto
 {
     public int Id { get; set; }
     public string CustomerCode { get; set; }
-    public string CustomerName { get; set; }
+    public string DisplayName { get; set; }
     public string CompanyName { get; set; }
-    
-    // Primary Contact Fields
+
     public string Salutation { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    
-    // Contact Information
     public string Email { get; set; }
-    public string WorkPhone { get; set; }
-    public string Mobile { get; set; }
-    
-    // Legacy fields for backward compatibility
+
     public string ContactPerson { get; set; }
     public string PhoneNumber { get; set; }
     public string MobileNumber { get; set; }
@@ -40,11 +34,5 @@ public record CustomerDto
     public string CurrencyName { get; set; }
     public string CurrencySymbol { get; set; }
     public bool IsActive { get; set; }
-    public string Notes { get; set; }
     public int OrganisationId { get; set; }
-    public string CreatedBy { get; set; }
-    public string ModifiedBy { get; set; }
-    public DateTime CreatedOn { get; set; }
-    public DateTime? ModifiedOn { get; set; }
-    public byte[] RowVersion { get; set; }
 }

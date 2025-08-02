@@ -81,7 +81,7 @@ public class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
 
         // Relationships
         builder.HasOne(i => i.Customer)
-            .WithMany()
+            .WithMany(c => c.Invoices)
             .HasForeignKey(i => i.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
 

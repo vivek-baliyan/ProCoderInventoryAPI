@@ -8,9 +8,6 @@ public record UpdateCustomerDto
     [Required(ErrorMessage = "Customer ID is required")]
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "Row version is required for concurrency control")]
-    public byte[] RowVersion { get; set; }
-
     public CustomerType CustomerType { get; set; } = CustomerType.Business;
 
     [StringLength(200, ErrorMessage = "Company name cannot exceed 200 characters")]
@@ -43,7 +40,6 @@ public record UpdateCustomerDto
     public string WorkPhone { get; set; }
 
     [StringLength(20, ErrorMessage = "Mobile cannot exceed 20 characters")]
-    [Phone(ErrorMessage = "Invalid mobile format")]
     public string Mobile { get; set; }
 
     // Tax Information (will be stored in BusinessTaxInfo)

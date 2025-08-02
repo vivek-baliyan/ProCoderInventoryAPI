@@ -59,8 +59,6 @@ public class BusinessBankInfoConfiguration : IEntityTypeConfiguration<BusinessBa
         builder.Property(e => e.Notes)
             .HasMaxLength(500);
 
-        // No direct Organisation relationship - inherited through parent entity
-
         // Indexes
         builder.HasIndex(e => new { e.EntityType, e.EntityId })
             .HasDatabaseName("IX_BusinessBankInfo_Entity");
@@ -82,8 +80,6 @@ public class BusinessBankInfoConfiguration : IEntityTypeConfiguration<BusinessBa
 
         builder.HasIndex(e => new { e.EntityType, e.EntityId, e.IsPrimary })
             .HasDatabaseName("IX_BusinessBankInfo_Entity_IsPrimary");
-
-        // Removed OrganisationId index as field was removed
 
         builder.HasIndex(e => new { e.BankName, e.BankAccountNumber })
             .HasDatabaseName("IX_BusinessBankInfo_Bank_Account");

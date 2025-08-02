@@ -9,9 +9,6 @@ public record PatchCustomerDto
     [Required(ErrorMessage = "Customer ID is required")]
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "Row version is required for concurrency control")]
-    public byte[] RowVersion { get; set; }
-
     // Nullable properties to indicate which fields should be updated
     // null = don't update, has value = update with this value
     

@@ -1,5 +1,3 @@
-using PCI.Shared.Common.Enums;
-
 namespace PCI.Shared.Dtos.Customer;
 
 public record CustomerListItemDto
@@ -14,7 +12,7 @@ public record CustomerListItemDto
     public string City { get; set; }
     public string State { get; set; }
     public string Country { get; set; }
-    public CustomerType CustomerType { get; set; }
+    public string CustomerType { get; set; }
     public decimal? CreditLimit { get; set; }
     public bool IsActive { get; set; }
     public string CurrencyName { get; set; }

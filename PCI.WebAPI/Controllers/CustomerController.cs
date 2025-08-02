@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PCI.Application.Services.Interfaces;
+using PCI.Shared.Dtos.Common;
 using PCI.Shared.Dtos.Customer;
 
 namespace PCI.WebAPI.Controllers;
@@ -69,7 +70,7 @@ public class CustomerController(
     }
 
     [HttpPost("filter")]
-    public async Task<ActionResult<CustomerListItemDto>> GetFilteredCustomers([FromBody] CustomerFilterDto filter)
+    public async Task<ActionResult<PaginatedResult<CustomerListItemDto>>> GetFilteredCustomers([FromBody] CustomerFilterDto filter)
     {
         var result = await _customerService.GetFilteredCustomers(OrganisationId, filter);
 

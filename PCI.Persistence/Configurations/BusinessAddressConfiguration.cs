@@ -57,8 +57,6 @@ public class BusinessAddressConfiguration : IEntityTypeConfiguration<BusinessAdd
         builder.Property(e => e.Notes)
             .HasMaxLength(500);
 
-        // No direct Organisation relationship - inherited through parent entity
-
         // Indexes
         builder.HasIndex(e => new { e.EntityType, e.EntityId })
             .HasDatabaseName("IX_BusinessAddress_Entity");
@@ -77,7 +75,5 @@ public class BusinessAddressConfiguration : IEntityTypeConfiguration<BusinessAdd
 
         builder.HasIndex(e => new { e.EntityType, e.EntityId, e.IsDefault })
             .HasDatabaseName("IX_BusinessAddress_Entity_IsDefault");
-
-        // Removed OrganisationId index as field was removed
     }
 }

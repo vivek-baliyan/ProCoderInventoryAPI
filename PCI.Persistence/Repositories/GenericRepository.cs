@@ -28,7 +28,7 @@ public class GenericRepository<T>(ApplicationDbContext context) : IGenericReposi
         _dbSet.Remove(entity);
     }
 
-    public void RemoveRange(T entity)
+    public void RemoveRange(IEnumerable<T> entity)
     {
         _dbSet.RemoveRange(entity);
     }
