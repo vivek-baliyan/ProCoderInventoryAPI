@@ -11,13 +11,15 @@ public class CustomerAddress : BaseEntity
     public string AddressLine1 { get; set; }
     public string AddressLine2 { get; set; }
     public string City { get; set; }
-    public string State { get; set; }
+    public int StateId { get; set; }
     public string PostalCode { get; set; }
-    public string Country { get; set; }
+    public int CountryId { get; set; }
 
     public bool IsPrimary { get; set; } = false;
     public bool IsActive { get; set; } = true;
 
     // Navigation property
     public virtual Customer Customer { get; set; }
+    public virtual State State { get; set; }
+    public virtual Country Country { get; set; }
 }

@@ -57,14 +57,14 @@ public class CustomerSpecification : BaseSpecification<Customer>
             AddCriteria(c => c.CustomerAddresses.Any(ca => ca.City != null && ca.City.ToLower().Contains(filter.City)));
         }
 
-        if (!string.IsNullOrWhiteSpace(filter.State))
+        if (filter.StateId > 0)
         {
-            AddCriteria(c => c.CustomerAddresses.Any(ca => ca.State != null && ca.State.ToLower().Contains(filter.State)));
+            AddCriteria(c => c.CustomerAddresses.Any(ca => ca.StateId == filter.StateId));
         }
 
-        if (!string.IsNullOrWhiteSpace(filter.Country))
+        if (filter.CountryId > 0)
         {
-            AddCriteria(c => c.CustomerAddresses.Any(ca => ca.Country != null && ca.Country.ToLower().Contains(filter.Country)));
+            AddCriteria(c => c.CustomerAddresses.Any(ca => ca.CountryId == filter.CountryId));
         }
 
         if (filter.IsActive.HasValue)
@@ -136,9 +136,9 @@ public class CustomerSpecification : BaseSpecification<Customer>
                     break;
                 case "country":
                     if (filter.SortDescending)
-                        ApplyOrderByDescending(c => c.CustomerAddresses.FirstOrDefault().Country);
+                        ApplyOrderByDescending(c => c.CustomerAddresses.FirstOrDefault().CountryId);
                     else
-                        ApplyOrderBy(c => c.CustomerAddresses.FirstOrDefault().Country);
+                        ApplyOrderBy(c => c.CustomerAddresses.FirstOrDefault().CountryId);
                     break;
                 case "creditlimit":
                     if (filter.SortDescending)

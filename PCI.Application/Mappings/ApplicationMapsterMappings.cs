@@ -16,20 +16,7 @@ public static class ApplicationMapsterMappings
               .Map(dst => dst.OrganisationId, src => src.Id);
 
         config.ForType<CreateCustomerDto, Customer>()
-            .Map(dst => dst.CustomerType, src => (CustomerType)src.CustomerType)
-            .Map(dst => dst.CustomerContacts, src => new List<CustomerContact>
-            {
-                new() {
-                    Salutation = src.Salutation ,
-                    FirstName = src.FirstName ,
-                    LastName = src.LastName,
-                    Email = src.Email,
-                    PhoneNumber = src.WorkPhone,
-                    MobileNumber = src.Mobile ,
-                    IsPrimary = true,
-                    IsActive = true
-                }
-            });
+            .Map(dst => dst.CustomerType, src => (CustomerType)src.CustomerType);
 
         config.ForType<Customer, CustomerListItemDto>()
             .Map(dst => dst.CustomerName, src => src.DisplayName)
@@ -67,11 +54,11 @@ public static class ApplicationMapsterMappings
 
     private static string GetState(ICollection<CustomerAddress> addresses)
     {
-        return addresses?.FirstOrDefault(x => x.AddressType == AddressType.Billing && x.IsActive)?.State ?? string.Empty;
+        return addresses?.FirstOrDefault(x => x.AddressType == AddressType.Billing && x.IsActive)?.State?.Name ?? string.Empty;
     }
 
     private static string GetCountry(ICollection<CustomerAddress> addresses)
     {
-        return addresses?.FirstOrDefault(x => x.AddressType == AddressType.Billing && x.IsActive)?.Country ?? string.Empty;
+        return addresses?.FirstOrDefault(x => x.AddressType == AddressType.Billing && x.IsActive)?.Country?.Name ?? string.Empty;
     }
 }

@@ -1,4 +1,5 @@
 using PCI.Domain.Common;
+using PCI.Shared.Common.Enums;
 
 namespace PCI.Domain.Models;
 
@@ -6,41 +7,23 @@ public class CustomerFinancial : BaseEntity
 {
     public int CustomerId { get; set; }
 
-    // Accounts Receivable (Customer owes us)
-    public decimal CurrentBalance { get; set; } = 0;
-
-    public decimal CreditLimit { get; set; } = 0;
-
-    public decimal OutstandingAmount { get; set; } = 0;
-
     // Payment Terms for customer payments
-    public int PaymentTermDays { get; set; } = 30;
-    public string PaymentTerms { get; set; } = "Due on Receipt";
+    public PaymentTerms PaymentTerms { get; set; } = PaymentTerms.Net30;
 
-    // Sales History
-    public decimal TotalSalesYTD { get; set; } = 0;
-
-    public decimal TotalSalesLifetime { get; set; } = 0;
-
-    public decimal MinimumOrderValue { get; set; } = 0;
-
-    public DateTime? LastSaleDate { get; set; }
-    public DateTime? LastPaymentDate { get; set; }
+    // For custom payment terms only
+    public int? CustomPaymentTermDays { get; set; }
 
     // How customer pays us
-    public string PreferredPaymentMethod { get; set; } = "BankTransfer";
+    public CustomerPaymentMethod PreferredPaymentMethod { get; set; } = CustomerPaymentMethod.BankTransfer;
 
-    // Credit Management (Customer-specific)
+    // Credit Management
+    public decimal CreditLimit { get; set; } = 0;
+
     public bool IsOnCreditHold { get; set; } = false;
 
     public string CreditHoldReason { get; set; }
 
     public DateTime? CreditReviewDate { get; set; }
-
-    // Discount Information
-    public decimal DefaultDiscountPercentage { get; set; } = 0;
-
-    public string Notes { get; set; }
 
     // Navigation properties
     public virtual Customer Customer { get; set; }

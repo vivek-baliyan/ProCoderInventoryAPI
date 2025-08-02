@@ -21,87 +21,47 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
         int organisationId,
         CreateCustomerDto createCustomerDto)
     {
+        // Validate the request
+        var validationResult = await ValidateCreateCustomerAsync(createCustomerDto);
+        if (!validationResult.Succeeded)
+            return validationResult;
+
         // Generate unique customer code
         var customerCode = await _codeGenerationService.GenerateCustomerCodeAsync(organisationId);
 
-        // Check if email already exists for this organization
-        if (!string.IsNullOrEmpty(createCustomerDto.Email))
-        {
-            var existingEmail = await _unitOfWork.Repository<CustomerContact>()
-                .GetFirstOrDefaultAsync(x => x.Email == createCustomerDto.Email);
-            if (existingEmail != null)
-            {
-                return ServiceResult<bool>
-                    .Error(new Problem(ErrorCodes.CustomerEmailExists, "Customer with this email already exists"));
-            }
-        }
-
+        using var transaction = await _unitOfWork.BeginTransactionAsync();
         try
         {
-            var customer = createCustomerDto.Adapt<Customer>();
-            customer.CustomerCode = customerCode;
-            customer.OrganisationId = organisationId;
-            customer.CreatedBy = userId;
-            customer.CreatedOn = DateTime.UtcNow;
-
-
+            // Create the main customer entity
+            var customer = CreateCustomerEntity(createCustomerDto, customerCode, organisationId, userId);
             _unitOfWork.Repository<Customer>().Add(customer);
+
+            // Save customer to get the generated ID
             await _unitOfWork.SaveChangesAsync();
 
-            // Create CustomerContact if contact info provided
-            if (!string.IsNullOrEmpty(createCustomerDto.FirstName) ||
-                !string.IsNullOrEmpty(createCustomerDto.LastName) ||
-                !string.IsNullOrEmpty(createCustomerDto.Email) ||
-                !string.IsNullOrEmpty(createCustomerDto.WorkPhone) ||
-                !string.IsNullOrEmpty(createCustomerDto.Mobile))
-            {
-                var customerContact = new CustomerContact
-                {
-                    CustomerId = customer.Id,
-                    ContactType = ContactType.Primary,
-                    Salutation = createCustomerDto.Salutation,
-                    FirstName = createCustomerDto.FirstName,
-                    LastName = createCustomerDto.LastName,
-                    Email = createCustomerDto.Email,
-                    PhoneNumber = createCustomerDto.WorkPhone,
-                    MobileNumber = createCustomerDto.Mobile,
-                    IsPrimary = DefaultValues.DefaultIsPrimary,
-                    IsActive = DefaultValues.DefaultIsActive,
-                    CreatedBy = userId,
-                    CreatedOn = DateTime.UtcNow
-                };
-                _unitOfWork.Repository<CustomerContact>().Add(customerContact);
-            }
+            // Now create related entities with proper customer ID
+            var contacts = CreateCustomerContacts(customer.Id, createCustomerDto, userId);
+            var addresses = CreateCustomerAddresses(customer.Id, createCustomerDto, userId);
+            var financial = CreateCustomerFinancial(customer.Id, createCustomerDto, userId);
+            var taxInfo = CreateCustomerTaxInfo(customer.Id, createCustomerDto, userId);
 
-            // Note: Address creation will be handled separately via CustomerAddress endpoints
-            // Core customer form only contains basic customer information
+            // Add all related entities to repository
+            foreach (var contact in contacts)
+                _unitOfWork.Repository<CustomerContact>().Add(contact);
 
-            // Create default CustomerFinancial record
-            var customerFinancial = new CustomerFinancial
-            {
-                CustomerId = customer.Id,
-                CreatedBy = userId,
-                CreatedOn = DateTime.UtcNow
-            };
-            _unitOfWork.Repository<CustomerFinancial>().Add(customerFinancial);
+            foreach (var address in addresses)
+                _unitOfWork.Repository<CustomerAddress>().Add(address);
 
-            // Create CustomerTaxInfo for PAN if provided
-            if (!string.IsNullOrEmpty(createCustomerDto.PAN))
-            {
-                var panTaxInfo = new CustomerTaxInfo
-                {
-                    CustomerId = customer.Id,
-                    TaxType = TaxType.PAN,
-                    TaxNumber = createCustomerDto.PAN,
-                    IsPrimary = DefaultValues.DefaultIsPrimary,
-                    IsActive = DefaultValues.DefaultIsActive,
-                    CreatedBy = userId,
-                    CreatedOn = DateTime.UtcNow
-                };
-                _unitOfWork.Repository<CustomerTaxInfo>().Add(panTaxInfo);
-            }
+            _unitOfWork.Repository<CustomerFinancial>().Add(financial);
 
+            if (taxInfo != null)
+                _unitOfWork.Repository<CustomerTaxInfo>().Add(taxInfo);
+
+            // Save all related entities
             await _unitOfWork.SaveChangesAsync();
+
+            // Commit the transaction
+            await transaction.CommitAsync();
             return ServiceResult<bool>.Success(true);
         }
         catch (Exception ex)
@@ -236,9 +196,9 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
             {
                 customerDto.BillingAddress = billingAddress.AddressLine1;
                 customerDto.City = billingAddress.City;
-                customerDto.State = billingAddress.State;
+                customerDto.StateId = billingAddress.StateId;
                 customerDto.PostalCode = billingAddress.PostalCode;
-                customerDto.Country = billingAddress.Country;
+                customerDto.CountryId = billingAddress.CountryId;
             }
 
             // Get shipping address
@@ -251,7 +211,7 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
             // Get financial info
             if (customer.CustomerFinancial != null)
             {
-                customerDto.PaymentTermDays = customer.CustomerFinancial.PaymentTermDays;
+                customerDto.CustomPaymentTermDays = customer.CustomerFinancial.CustomPaymentTermDays ?? 0;
                 customerDto.CreditLimit = customer.CustomerFinancial.CreditLimit;
             }
 
@@ -404,4 +364,193 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
                 .Error(new Problem(ErrorCodes.CustomerUpdateError, ex.Message));
         }
     }
+
+    #region Private Helper Methods for CreateCustomer
+
+    private async Task<ServiceResult<bool>> ValidateCreateCustomerAsync(CreateCustomerDto createCustomerDto)
+    {
+        // Check if email already exists for this organization
+        if (!string.IsNullOrEmpty(createCustomerDto.Email))
+        {
+            var existingEmail = await _unitOfWork.Repository<CustomerContact>()
+                .GetFirstOrDefaultAsync(x => x.Email == createCustomerDto.Email);
+            if (existingEmail != null)
+            {
+                return ServiceResult<bool>
+                    .Error(new Problem(ErrorCodes.CustomerEmailExists, "Customer with this email already exists"));
+            }
+        }
+
+        // Check for additional contact person emails
+        if (createCustomerDto.ContactPersons?.Any() == true)
+        {
+            var contactEmails = createCustomerDto.ContactPersons
+                .Where(cp => !string.IsNullOrEmpty(cp.Email))
+                .Select(cp => cp.Email)
+                .ToList();
+
+            if (contactEmails.Any())
+            {
+                var existingContactEmails = await _unitOfWork.Repository<CustomerContact>()
+                    .GetFilteredAsync(x => contactEmails.Contains(x.Email));
+                if (existingContactEmails.Any())
+                {
+                    return ServiceResult<bool>
+                        .Error(new Problem(ErrorCodes.CustomerEmailExists, "One or more contact person emails already exist"));
+                }
+            }
+        }
+
+        return ServiceResult<bool>.Success(true);
+    }
+
+    private static Customer CreateCustomerEntity(
+        CreateCustomerDto createCustomerDto,
+        string customerCode,
+        int organisationId,
+        string userId)
+    {
+        var customer = createCustomerDto.Adapt<Customer>();
+        customer.CustomerCode = customerCode;
+        customer.OrganisationId = organisationId;
+        customer.CreatedBy = userId;
+        customer.CreatedOn = DateTime.UtcNow;
+        return customer;
+    }
+
+    private static List<CustomerContact> CreateCustomerContacts(int customerId, CreateCustomerDto createCustomerDto, string userId)
+    {
+        var contacts = new List<CustomerContact>();
+
+        // Create primary CustomerContact if contact info provided
+        if (!string.IsNullOrEmpty(createCustomerDto.FirstName) ||
+            !string.IsNullOrEmpty(createCustomerDto.LastName) ||
+            !string.IsNullOrEmpty(createCustomerDto.Email) ||
+            !string.IsNullOrEmpty(createCustomerDto.Phone) ||
+            !string.IsNullOrEmpty(createCustomerDto.Mobile))
+        {
+            var customerContact = new CustomerContact
+            {
+                CustomerId = customerId,
+                ContactType = ContactType.Primary,
+                Salutation = createCustomerDto.Salutation,
+                FirstName = createCustomerDto.FirstName,
+                LastName = createCustomerDto.LastName,
+                Email = createCustomerDto.Email,
+                PhoneNumber = createCustomerDto.Phone,
+                MobileNumber = createCustomerDto.Mobile,
+                IsPrimary = true,
+                IsActive = DefaultValues.DefaultIsActive,
+                CreatedBy = userId,
+                CreatedOn = DateTime.UtcNow
+            };
+            contacts.Add(customerContact);
+        }
+
+        // Create additional contact persons
+        if (createCustomerDto.ContactPersons?.Any() == true)
+        {
+            foreach (var contactDto in createCustomerDto.ContactPersons)
+            {
+                var contactPerson = new CustomerContact
+                {
+                    CustomerId = customerId,
+                    ContactType = contactDto.ContactType,
+                    Salutation = contactDto.Salutation,
+                    FirstName = contactDto.FirstName,
+                    LastName = contactDto.LastName,
+                    Email = contactDto.Email,
+                    PhoneNumber = contactDto.PhoneNumber,
+                    MobileNumber = contactDto.MobileNumber,
+                    IsPrimary = contactDto.IsPrimary,
+                    IsActive = contactDto.IsActive,
+                    CreatedBy = userId,
+                    CreatedOn = DateTime.UtcNow
+                };
+                contacts.Add(contactPerson);
+            }
+        }
+
+        return contacts;
+    }
+
+    private static List<CustomerAddress> CreateCustomerAddresses(int customerId, CreateCustomerDto createCustomerDto, string userId)
+    {
+        var addresses = new List<CustomerAddress>();
+
+        // Create billing address if provided
+        if (createCustomerDto.BillingAddress != null)
+        {
+            var billingAddress = new CustomerAddress
+            {
+                CustomerId = customerId,
+                AddressType = AddressType.Billing,
+                AddressLine1 = createCustomerDto.BillingAddress.AddressLine1,
+                AddressLine2 = createCustomerDto.BillingAddress.AddressLine2,
+                City = createCustomerDto.BillingAddress.City,
+                StateId = createCustomerDto.BillingAddress.StateId,
+                PostalCode = createCustomerDto.BillingAddress.PostalCode,
+                CountryId = createCustomerDto.BillingAddress.CountryId,
+                IsPrimary = true,
+                IsActive = DefaultValues.DefaultIsActive,
+                CreatedBy = userId,
+                CreatedOn = DateTime.UtcNow
+            };
+            addresses.Add(billingAddress);
+        }
+
+        // Create shipping address if provided
+        if (createCustomerDto.ShippingAddress != null)
+        {
+            var shippingAddress = new CustomerAddress
+            {
+                CustomerId = customerId,
+                AddressType = AddressType.Shipping,
+                AddressLine1 = createCustomerDto.ShippingAddress.AddressLine1,
+                AddressLine2 = createCustomerDto.ShippingAddress.AddressLine2,
+                City = createCustomerDto.ShippingAddress.City,
+                StateId = createCustomerDto.ShippingAddress.StateId,
+                PostalCode = createCustomerDto.ShippingAddress.PostalCode,
+                CountryId = createCustomerDto.ShippingAddress.CountryId,
+                IsPrimary = createCustomerDto.ShippingAddress.IsPrimary,
+                IsActive = DefaultValues.DefaultIsActive,
+                CreatedBy = userId,
+                CreatedOn = DateTime.UtcNow
+            };
+            addresses.Add(shippingAddress);
+        }
+
+        return addresses;
+    }
+
+    private static CustomerFinancial CreateCustomerFinancial(int customerId, CreateCustomerDto createCustomerDto, string userId)
+    {
+        return new CustomerFinancial
+        {
+            CustomerId = customerId,
+            CreditLimit = createCustomerDto.CreditLimit,
+            CreatedBy = userId,
+            CreatedOn = DateTime.UtcNow
+        };
+    }
+
+    private static CustomerTaxInfo CreateCustomerTaxInfo(int customerId, CreateCustomerDto createCustomerDto, string userId)
+    {
+        if (!string.IsNullOrEmpty(createCustomerDto.Pan))
+        {
+            return new CustomerTaxInfo
+            {
+                CustomerId = customerId,
+                TaxType = TaxType.PAN,
+                TaxNumber = createCustomerDto.Pan,
+                IsPrimary = DefaultValues.DefaultIsPrimary,
+                IsActive = DefaultValues.DefaultIsActive,
+                CreatedBy = userId,
+                CreatedOn = DateTime.UtcNow
+            };
+        }
+        return null;
+    }
+
+    #endregion
 }

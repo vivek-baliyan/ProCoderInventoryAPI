@@ -20,12 +20,12 @@ public record CustomerDto
     public string BillingAddress { get; set; }
     public string ShippingAddress { get; set; }
     public string City { get; set; }
-    public string State { get; set; }
+    public int StateId { get; set; }
     public string PostalCode { get; set; }
-    public string Country { get; set; }
+    public int CountryId { get; set; }
     public string WebsiteUrl { get; set; }
     public CustomerType CustomerType { get; set; }
-    public int PaymentTermDays { get; set; }
+    public int? CustomPaymentTermDays { get; set; }
     public decimal? CreditLimit { get; set; }
     public string TaxNumber { get; set; }
     public string GSTNumber { get; set; }

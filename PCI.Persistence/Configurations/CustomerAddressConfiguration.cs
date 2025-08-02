@@ -28,13 +28,13 @@ public class CustomerAddressConfiguration : IEntityTypeConfiguration<CustomerAdd
         builder.Property(e => e.City)
             .HasMaxLength(100);
 
-        builder.Property(e => e.State)
+        builder.Property(e => e.StateId)
             .HasMaxLength(100);
 
         builder.Property(e => e.PostalCode)
             .HasMaxLength(20);
 
-        builder.Property(e => e.Country)
+        builder.Property(e => e.CountryId)
             .HasMaxLength(100);
 
         builder.Property(e => e.IsPrimary)
@@ -50,6 +50,16 @@ public class CustomerAddressConfiguration : IEntityTypeConfiguration<CustomerAdd
             .WithMany(c => c.CustomerAddresses)
             .HasForeignKey(e => e.CustomerId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(e => e.State)
+            .WithMany()
+            .HasForeignKey(e => e.StateId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(e => e.Country)
+            .WithMany()
+            .HasForeignKey(e => e.CountryId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         // Indexes
         builder.HasIndex(e => e.CustomerId)
