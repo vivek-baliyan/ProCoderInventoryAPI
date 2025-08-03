@@ -539,5 +539,30 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
         return null;
     }
 
+    public async Task<ServiceResult<List<CustomerAutocompleteDto>>> GetCustomerAutocomplete(int organisationId, string searchTerm, int limit = 10)
+    {
+        try
+        {
+            var specification = new CustomerSpecification(organisationId, searchTerm, limit);
+            var customers = await _unitOfWork.Repository<Customer>().GetAsync(specification);
+
+            var autocompleteResults = customers.Select(c => new CustomerAutocompleteDto
+            {
+                Id = c.Id,
+                CustomerCode = c.CustomerCode,
+                CustomerName = c.DisplayName,
+                CompanyName = c.CompanyName,
+                Email = c.CustomerContacts?.FirstOrDefault(contact => contact.IsPrimary)?.Email,
+                PhoneNumber = c.CustomerContacts?.FirstOrDefault(contact => contact.IsPrimary)?.PhoneNumber
+            }).ToList();
+
+            return ServiceResult<List<CustomerAutocompleteDto>>.Success(autocompleteResults);
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<List<CustomerAutocompleteDto>>.Error(new Problem(ErrorCodes.CustomerRetrievalError, ex.Message, ex.ToString()));
+        }
+    }
+
     #endregion
 }

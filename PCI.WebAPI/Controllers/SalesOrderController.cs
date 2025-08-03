@@ -6,9 +6,11 @@ namespace PCI.WebAPI.Controllers;
 
 public class SalesOrderController(
     ISalesOrderService salesOrderService,
+    ICodeGenerationService codeGenerationService,
     IHttpContextAccessor httpContextAccessor) : BaseController(httpContextAccessor)
 {
     private readonly ISalesOrderService _salesOrderService = salesOrderService;
+    private readonly ICodeGenerationService _codeGenerationService = codeGenerationService;
 
     [HttpPost("create")]
     public async Task<ActionResult<bool>> CreateSalesOrder([FromBody] CreateSalesOrderDto createSalesOrderDto)
@@ -105,6 +107,20 @@ public class SalesOrderController(
         }
 
         return StatusCode(StatusCodes.Status200OK, SuccessResponse(result.ResultData, "Sales order deleted successfully."));
+    }
+
+    [HttpGet("generateOrderNumber")]
+    public async Task<ActionResult<string>> GenerateSalesOrderNumber()
+    {
+        try
+        {
+            var orderNumber = await _codeGenerationService.GenerateSalesOrderNumberAsync(OrganisationId);
+            return StatusCode(StatusCodes.Status200OK, SuccessResponse(orderNumber, "Sales order number generated successfully."));
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, ErrorResponse("Failed to generate sales order number.", ex.Message));
+        }
     }
 }
 

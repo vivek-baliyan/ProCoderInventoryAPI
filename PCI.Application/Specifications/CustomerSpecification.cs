@@ -15,6 +15,24 @@ public class CustomerSpecification : BaseSpecification<Customer>
         ApplyIncludes();
     }
 
+    public CustomerSpecification(int organisationId, string searchTerm, int limit)
+        : base(c => c.OrganisationId == organisationId && c.IsActive)
+    {
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            var lowerSearchTerm = searchTerm.ToLower();
+            AddCriteria(c =>
+                c.DisplayName.ToLower().Contains(lowerSearchTerm) ||
+                c.CustomerCode.ToLower().Contains(lowerSearchTerm) ||
+                (c.CompanyName != null && c.CompanyName.ToLower().Contains(lowerSearchTerm)) ||
+                c.CustomerContacts.Any(cc => cc.Email != null && cc.Email.ToLower().Contains(lowerSearchTerm)));
+        }
+
+        ApplyOrderBy(c => c.DisplayName);
+        ApplyPaging(0, limit);
+        AddInclude("CustomerContacts");
+    }
+
     private void ApplyFilters(CustomerFilterDto filter)
     {
         if (!string.IsNullOrWhiteSpace(filter.SearchTerm))

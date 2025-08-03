@@ -107,4 +107,17 @@ public class CustomerController(
 
         return StatusCode(StatusCodes.Status200OK, SuccessResponse(result.ResultData, "Customer status updated successfully."));
     }
+
+    [HttpGet("autocomplete")]
+    public async Task<ActionResult<List<CustomerAutocompleteDto>>> GetCustomerAutocomplete([FromQuery] string searchTerm = "", [FromQuery] int limit = 10)
+    {
+        var result = await _customerService.GetCustomerAutocomplete(OrganisationId, searchTerm, limit);
+
+        if (!result.Succeeded)
+        {
+            return StatusCode(StatusCodes.Status400BadRequest, ErrorResponse(result));
+        }
+
+        return StatusCode(StatusCodes.Status200OK, SuccessResponse(result.ResultData, "Customer autocomplete results retrieved successfully."));
+    }
 }

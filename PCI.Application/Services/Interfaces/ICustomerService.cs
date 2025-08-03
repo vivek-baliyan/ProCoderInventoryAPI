@@ -13,4 +13,5 @@ public interface ICustomerService
     Task<ServiceResult<PaginatedResult<CustomerListItemDto>>> GetFilteredCustomers(int organisationId, CustomerFilterDto filter);
     Task<ServiceResult<bool>> DeleteCustomer(int id, string userId);
     Task<ServiceResult<bool>> ToggleCustomerStatus(int id, string userId);
+    Task<ServiceResult<List<CustomerAutocompleteDto>>> GetCustomerAutocomplete(int organisationId, string searchTerm, int limit = 10);
 }
