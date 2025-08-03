@@ -27,14 +27,14 @@ public record CreateCustomerDto
     public string Email { get; set; }
 
     [StringLength(20, ErrorMessage = "Phone cannot exceed 20 characters")]
-    public string Phone { get; set; }
+    public string PhoneNumber { get; set; }
 
     [StringLength(20, ErrorMessage = "Mobile cannot exceed 20 characters")]
-    public string Mobile { get; set; }
+    public string MobileNumber { get; set; }
 
     [StringLength(200, ErrorMessage = "Website URL cannot exceed 200 characters")]
     [Url(ErrorMessage = "Invalid website URL format")]
-    public string Website { get; set; }
+    public string WebsiteUrl { get; set; }
 
     public CustomerAddressDto BillingAddress { get; set; }
 

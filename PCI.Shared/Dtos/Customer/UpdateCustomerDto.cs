@@ -15,13 +15,16 @@ public record UpdateCustomerDto
 
     [Required(ErrorMessage = "Customer display name is required")]
     [StringLength(200, ErrorMessage = "Customer display name cannot exceed 200 characters")]
-    public string CustomerName { get; set; }
+    public string DisplayName { get; set; }
 
     [StringLength(200, ErrorMessage = "Website URL cannot exceed 200 characters")]
     [Url(ErrorMessage = "Invalid website URL format")]
     public string WebsiteUrl { get; set; }
 
-    // Primary Contact Information (will be stored in BusinessContact)
+    [Required]
+    [StringLength(20, ErrorMessage = "Status cannot exceed 20 characters")]
+    public string Status { get; set; } = "ACTIVE";
+
     [StringLength(20, ErrorMessage = "Salutation cannot exceed 20 characters")]
     public string Salutation { get; set; }
 
@@ -35,21 +38,31 @@ public record UpdateCustomerDto
     [EmailAddress(ErrorMessage = "Invalid email format")]
     public string Email { get; set; }
 
-    [StringLength(20, ErrorMessage = "Work phone cannot exceed 20 characters")]
-    [Phone(ErrorMessage = "Invalid work phone format")]
-    public string WorkPhone { get; set; }
+    [StringLength(20, ErrorMessage = "Phone number cannot exceed 20 characters")]
+    public string PhoneNumber { get; set; }
 
-    [StringLength(20, ErrorMessage = "Mobile cannot exceed 20 characters")]
-    public string Mobile { get; set; }
+    [StringLength(20, ErrorMessage = "Mobile number cannot exceed 20 characters")]
+    public string MobileNumber { get; set; }
 
-    // Tax Information (will be stored in BusinessTaxInfo)
+    // Financial Information
+    public decimal? CreditLimit { get; set; }
+
+    [StringLength(100, ErrorMessage = "Payment terms cannot exceed 100 characters")]
+    public string PaymentTerms { get; set; }
+
+    // Tax Information (will be stored in CustomerTaxInfo)
     [StringLength(50, ErrorMessage = "PAN cannot exceed 50 characters")]
-    public string PAN { get; set; }
+    public string Pan { get; set; }
 
+    // Currency and Business Settings
     public int? CurrencyId { get; set; }
+    public int? PriceListId { get; set; }
+    public bool? AllowBackOrders { get; set; }
+    public bool? SendStatements { get; set; }
 
     public bool IsActive { get; set; } = true;
 
-    [StringLength(1000, ErrorMessage = "Notes cannot exceed 1000 characters")]
-    public string Notes { get; set; }
+    // Collections for related data updates
+    public List<CustomerContactDto> ContactPersons { get; set; } = [];
+    public List<CustomerAddressDto> Addresses { get; set; } = [];
 }

@@ -118,8 +118,8 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
                 primaryContact.FirstName = updateCustomerDto.FirstName;
                 primaryContact.LastName = updateCustomerDto.LastName;
                 primaryContact.Email = updateCustomerDto.Email;
-                primaryContact.PhoneNumber = updateCustomerDto.WorkPhone;
-                primaryContact.MobileNumber = updateCustomerDto.Mobile;
+                primaryContact.PhoneNumber = updateCustomerDto.PhoneNumber;
+                primaryContact.MobileNumber = updateCustomerDto.MobileNumber;
                 primaryContact.ModifiedBy = userId;
                 primaryContact.ModifiedOn = DateTime.UtcNow;
             }
@@ -134,13 +134,59 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
                     FirstName = updateCustomerDto.FirstName,
                     LastName = updateCustomerDto.LastName,
                     Email = updateCustomerDto.Email,
-                    PhoneNumber = updateCustomerDto.WorkPhone,
-                    MobileNumber = updateCustomerDto.Mobile,
+                    PhoneNumber = updateCustomerDto.PhoneNumber,
+                    MobileNumber = updateCustomerDto.MobileNumber,
                     IsPrimary = DefaultValues.DefaultIsPrimary,
                     IsActive = DefaultValues.DefaultIsActive,
                     CreatedBy = userId,
                     CreatedOn = DateTime.UtcNow
                 });
+            }
+
+            // Update financial information if provided
+            if (updateCustomerDto.CreditLimit.HasValue || !string.IsNullOrEmpty(updateCustomerDto.PaymentTerms))
+            {
+                if (customer.CustomerFinancial == null)
+                {
+                    customer.CustomerFinancial = new CustomerFinancial
+                    {
+                        CustomerId = customer.Id,
+                        CreatedBy = userId,
+                        CreatedOn = DateTime.UtcNow
+                    };
+                }
+
+                if (updateCustomerDto.CreditLimit.HasValue)
+                    customer.CustomerFinancial.CreditLimit = updateCustomerDto.CreditLimit.Value;
+
+                customer.CustomerFinancial.ModifiedBy = userId;
+                customer.CustomerFinancial.ModifiedOn = DateTime.UtcNow;
+            }
+
+            // Update tax information if PAN is provided
+            if (!string.IsNullOrEmpty(updateCustomerDto.Pan))
+            {
+                var existingPanInfo = customer.CustomerTaxInfos?.FirstOrDefault(x => x.TaxType == TaxType.PAN);
+                if (existingPanInfo != null)
+                {
+                    existingPanInfo.TaxNumber = updateCustomerDto.Pan;
+                    existingPanInfo.ModifiedBy = userId;
+                    existingPanInfo.ModifiedOn = DateTime.UtcNow;
+                }
+                else
+                {
+                    customer.CustomerTaxInfos ??= new List<CustomerTaxInfo>();
+                    customer.CustomerTaxInfos.Add(new CustomerTaxInfo
+                    {
+                        CustomerId = customer.Id,
+                        TaxType = TaxType.PAN,
+                        TaxNumber = updateCustomerDto.Pan,
+                        IsPrimary = DefaultValues.DefaultIsPrimary,
+                        IsActive = DefaultValues.DefaultIsActive,
+                        CreatedBy = userId,
+                        CreatedOn = DateTime.UtcNow
+                    });
+                }
             }
 
             // Note: Address updates will be handled separately via CustomerAddress endpoints
@@ -174,65 +220,6 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
             }
 
             var customerDto = customer.Adapt<CustomerDto>();
-            customerDto.CurrencyName = customer.Currency?.Name;
-            customerDto.CurrencySymbol = customer.Currency?.Symbol;
-
-            // Get primary contact info
-            var primaryContact = customer.CustomerContacts?.FirstOrDefault(x => x.IsPrimary && x.IsActive);
-            if (primaryContact != null)
-            {
-                customerDto.Salutation = primaryContact.Salutation;
-                customerDto.FirstName = primaryContact.FirstName;
-                customerDto.LastName = primaryContact.LastName;
-                customerDto.Email = primaryContact.Email;
-                customerDto.ContactPerson = $"{primaryContact.FirstName} {primaryContact.LastName}".Trim();
-                customerDto.PhoneNumber = primaryContact.PhoneNumber;
-                customerDto.MobileNumber = primaryContact.MobileNumber;
-            }
-
-            // Get billing address
-            var billingAddress = customer.CustomerAddresses?.FirstOrDefault(x => x.AddressType == AddressType.Billing && x.IsActive);
-            if (billingAddress != null)
-            {
-                customerDto.BillingAddress = billingAddress.AddressLine1;
-                customerDto.City = billingAddress.City;
-                customerDto.StateId = billingAddress.StateId;
-                customerDto.PostalCode = billingAddress.PostalCode;
-                customerDto.CountryId = billingAddress.CountryId;
-            }
-
-            // Get shipping address
-            var shippingAddress = customer.CustomerAddresses?.FirstOrDefault(x => x.AddressType == AddressType.Shipping && x.IsActive);
-            if (shippingAddress != null)
-            {
-                customerDto.ShippingAddress = shippingAddress.AddressLine1;
-            }
-
-            // Get financial info
-            if (customer.CustomerFinancial != null)
-            {
-                customerDto.CustomPaymentTermDays = customer.CustomerFinancial.CustomPaymentTermDays ?? 0;
-                customerDto.CreditLimit = customer.CustomerFinancial.CreditLimit;
-            }
-
-            // Get tax info
-            var taxNumber = customer.CustomerTaxInfos?.FirstOrDefault(x => x.TaxType == TaxType.TaxIdentificationNumber && x.IsActive);
-            if (taxNumber != null)
-            {
-                customerDto.TaxNumber = taxNumber.TaxNumber;
-            }
-
-            var gstNumber = customer.CustomerTaxInfos?.FirstOrDefault(x => x.TaxType == TaxType.GST && x.IsActive);
-            if (gstNumber != null)
-            {
-                customerDto.GSTNumber = gstNumber.TaxNumber;
-            }
-
-            var panNumber = customer.CustomerTaxInfos?.FirstOrDefault(x => x.TaxType == TaxType.PAN && x.IsActive);
-            if (panNumber != null)
-            {
-                customerDto.PANNumber = panNumber.TaxNumber;
-            }
 
             return ServiceResult<CustomerDto>.Success(customerDto);
         }
@@ -426,8 +413,8 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
         if (!string.IsNullOrEmpty(createCustomerDto.FirstName) ||
             !string.IsNullOrEmpty(createCustomerDto.LastName) ||
             !string.IsNullOrEmpty(createCustomerDto.Email) ||
-            !string.IsNullOrEmpty(createCustomerDto.Phone) ||
-            !string.IsNullOrEmpty(createCustomerDto.Mobile))
+            !string.IsNullOrEmpty(createCustomerDto.PhoneNumber) ||
+            !string.IsNullOrEmpty(createCustomerDto.MobileNumber))
         {
             var customerContact = new CustomerContact
             {
@@ -437,8 +424,8 @@ public class CustomerService(IUnitOfWork unitOfWork, ICodeGenerationService code
                 FirstName = createCustomerDto.FirstName,
                 LastName = createCustomerDto.LastName,
                 Email = createCustomerDto.Email,
-                PhoneNumber = createCustomerDto.Phone,
-                MobileNumber = createCustomerDto.Mobile,
+                PhoneNumber = createCustomerDto.PhoneNumber,
+                MobileNumber = createCustomerDto.MobileNumber,
                 IsPrimary = true,
                 IsActive = DefaultValues.DefaultIsActive,
                 CreatedBy = userId,

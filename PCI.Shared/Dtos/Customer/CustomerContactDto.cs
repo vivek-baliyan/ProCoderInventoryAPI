@@ -5,6 +5,8 @@ namespace PCI.Shared.Dtos.Customer;
 
 public record CustomerContactDto
 {
+    public int Id { get; set; }
+    public int CustomerId { get; set; }
     public ContactType ContactType { get; set; } = ContactType.Primary;
 
     [StringLength(20, ErrorMessage = "Salutation cannot exceed 20 characters")]
